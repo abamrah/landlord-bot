@@ -182,24 +182,27 @@ router.post("/tenants", async (req, res) => {
     } catch { /* ignore */ }
   }
 
-  // Send automated welcome message if tenant has a phone number (only for single-occupant units)
+  // Send automated welcome message in background (don't block tenant creation)
   if (parsed.data.phone && !skipIndividualWelcome) {
-    try {
-      const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { name: true, company: true } });
-      const landlordName = landlord?.company || landlord?.name || "Your Landlord";
-      const tenantName = parsed.data.name;
-      const welcomeMsg = `*Welcome to ${landlordName}'s Property Management!*\n\nHi ${tenantName}, your landlord has decided to use NestMind — an AI-powered platform for property management, making communication faster and easier for everyone.\n\n*How it works:*\n• Send a message here anytime to report maintenance issues\n• You'll receive rent reminders before due dates\n• AI-assisted support means faster response times\n\n*Dos:*\n✅ Report maintenance issues promptly — attach photos if possible\n✅ Respond to rent reminders and payment confirmations\n✅ Keep this chat for property-related communication\n\n*Don'ts:*\n❌ Don't share personal financial info (bank passwords, SIN, etc.)\n❌ Don't ignore maintenance follow-ups\n\nWe're here to help! Send \"Hi\" anytime to get started.`;
-      await whatsappService.sendWhatsAppText({ to: parsed.data.phone, text: welcomeMsg, landlordId: authReq.landlordId });
-      // Log the welcome message in conversation history
-      await conversationMemory.saveMessage({
-        phone: parsed.data.phone,
-        landlordId: authReq.landlordId,
-        role: "system",
-        content: welcomeMsg,
-      });
-    } catch (welcomeErr) {
-      console.warn("Failed to send welcome message:", (welcomeErr as Error).message);
-    }
+    const welcomePhone = parsed.data.phone;
+    const welcomeLandlordId = authReq.landlordId;
+    const welcomeTenantName = parsed.data.name;
+    setImmediate(async () => {
+      try {
+        const landlord = await db.landlord.findUnique({ where: { id: welcomeLandlordId }, select: { name: true, company: true } });
+        const landlordName = landlord?.company || landlord?.name || "Your Landlord";
+        const welcomeMsg = `*Welcome to ${landlordName}'s Property Management!*\n\nHi ${welcomeTenantName}, your landlord has decided to use NestMind — an AI-powered platform for property management, making communication faster and easier for everyone.\n\n*How it works:*\n• Send a message here anytime to report maintenance issues\n• You'll receive rent reminders before due dates\n• AI-assisted support means faster response times\n\n*Dos:*\n✅ Report maintenance issues promptly — attach photos if possible\n✅ Respond to rent reminders and payment confirmations\n✅ Keep this chat for property-related communication\n\n*Don'ts:*\n❌ Don't share personal financial info (bank passwords, SIN, etc.)\n❌ Don't ignore maintenance follow-ups\n\nWe're here to help! Send \"Hi\" anytime to get started.`;
+        await whatsappService.sendWhatsAppText({ to: welcomePhone, text: welcomeMsg, landlordId: welcomeLandlordId });
+        await conversationMemory.saveMessage({
+          phone: welcomePhone,
+          landlordId: welcomeLandlordId,
+          role: "system",
+          content: welcomeMsg,
+        });
+      } catch (welcomeErr) {
+        console.warn("Failed to send welcome message:", (welcomeErr as Error).message);
+      }
+    });
   }
 
   res.json({ tenant });
@@ -391,18 +394,42 @@ router.patch("/unit-tenants/:id", async (req, res) => {
 router.post("/units/:id/utility-shares", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   if (!(await repo.verifyUnitOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
-  const sharesSchema = z.object({
-    shares: z.array(z.object({
-      unitTenantId: z.string(),
-      percent: z.number().min(0).max(100),
-    })),
-  });
-  const parsed = sharesSchema.safeParse(req.body || {});
-  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  // Accept two formats:
+  // Format A (dashboard): { shares: [{ unitTenantId, percent }] }
+  // Format B (onboarding): { shares: { tenantId: percent, ... } }
+  const body = req.body || {};
+  let sharesArray: { unitTenantId: string; percent: number }[] = [];
+
+  if (Array.isArray(body.shares)) {
+    // Format A
+    const schema = z.object({
+      shares: z.array(z.object({
+        unitTenantId: z.string(),
+        percent: z.number().min(0).max(100),
+      })),
+    });
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+    sharesArray = parsed.data.shares;
+  } else if (body.shares && typeof body.shares === "object") {
+    // Format B: { tenantId: percent } — resolve tenantId to unitTenantId
+    const unitId = req.params.id;
+    const unitTenants = await db.unitTenant.findMany({ where: { unitId } });
+    for (const [tenantId, pct] of Object.entries(body.shares)) {
+      const ut = unitTenants.find((u) => u.tenantId === tenantId);
+      if (!ut) return res.status(400).json({ error: "tenant_not_in_unit", tenantId });
+      sharesArray.push({ unitTenantId: ut.id, percent: Number(pct) || 0 });
+    }
+  } else {
+    return res.status(400).json({ error: "validation_failed", message: "shares must be an array or object" });
+  }
+
+  if (sharesArray.length === 0) return res.status(400).json({ error: "no_shares_provided" });
   // Validate total = 100
-  const total = parsed.data.shares.reduce((sum, s) => sum + s.percent, 0);
+  const total = sharesArray.reduce((sum, s) => sum + s.percent, 0);
   if (Math.abs(total - 100) > 0.01) return res.status(400).json({ error: "shares_must_total_100", total });
-  const ok = await repo.setUtilityShares(req.params.id, parsed.data.shares);
+  const ok = await repo.setUtilityShares(req.params.id, sharesArray);
   if (!ok) return res.status(500).json({ error: "set_shares_failed" });
   res.json({ ok: true });
 });

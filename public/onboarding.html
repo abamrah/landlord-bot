@@ -7,7 +7,8 @@
     <title>NestMind AI — Welcome</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
     <style>
         :root {
             --bg: #000000;
@@ -36,136 +37,556 @@
             --warn-text: #f59e0b;
             --radius: 16px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg); color: var(--text); min-height: 100vh;
-            position: relative; font-size: 16px;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            font-size: 16px;
         }
+
         body::before {
-            content: ''; position: fixed; width: 600px; height: 600px;
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
             background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            top: -200px; right: -100px; pointer-events: none;
+            top: -200px;
+            right: -100px;
+            pointer-events: none;
         }
-        .container { max-width: 680px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
-        .header { text-align: center; margin-bottom: 32px; }
-        .header .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 12px; }
-        .header .logo-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--gradient); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .header .logo-text { font-weight: 800; font-size: 20px; color: #fff; }
-        .header h1 { font-size: 30px; font-weight: 700; color: #fff; margin-top: 6px; }
-        .header p { color: var(--text-muted); margin-top: 6px; font-size: 16px; }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+
+        .header .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .header .logo-text {
+            font-weight: 800;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 6px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-size: 16px;
+        }
 
         /* Stepper */
-        .stepper { display: flex; justify-content: center; gap: 6px; margin-bottom: 32px; }
-        .step-dot { width: 40px; height: 5px; border-radius: 3px; background: var(--border-light); transition: background 0.3s; }
-        .step-dot.active { background: var(--accent); }
-        .step-dot.done { background: var(--accent-2); }
-
-        .step { display: none; }
-        .step.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: var(--surface); border-radius: var(--radius); padding: 32px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .card h2 { font-size: 21px; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 10px; }
-        .card h2 .step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 8px; background: var(--gradient); font-size: 14px; font-weight: 700; flex-shrink: 0; }
-        .card p { color: var(--text-secondary); font-size: 15px; margin-bottom: 16px; line-height: 1.7; }
-
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-            background: var(--bg); color: var(--text); font-size: 15px; outline: none;
-            transition: border-color 0.2s; font-family: inherit;
+        .stepper {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 32px;
         }
-        .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
-        .form-group input::placeholder { color: var(--text-muted); }
-        .form-group select { cursor: pointer; }
-        .form-row { display: flex; gap: 12px; }
-        .form-row .form-group { flex: 1; }
-        .form-group .helper { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-        .btn { padding: 12px 26px; border: none; border-radius: 100px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .btn-primary { background: #fff; color: #000; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1); }
-        .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-light); }
-        .btn-secondary:hover { border-color: #fff; color: #fff; }
-        .btn-ghost { background: transparent; color: var(--accent); padding: 8px 16px; font-size: 13px; }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-row { display: flex; justify-content: space-between; margin-top: 8px; gap: 8px; }
+        .step-dot {
+            width: 40px;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--border-light);
+            transition: background 0.3s;
+        }
 
-        .info-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 12px 16px; border-radius: 10px; color: var(--info-text); font-size: 14px; margin-bottom: 14px; line-height: 1.6; }
-        .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); padding: 12px 16px; border-radius: 10px; color: var(--warn-text); font-size: 14px; margin-bottom: 14px; line-height: 1.6; }
-        .error-box { background: var(--error-bg); border: 1px solid var(--error-border); padding: 12px 16px; border-radius: 10px; color: var(--error-text); font-size: 14px; margin-bottom: 14px; display: none; }
+        .step-dot.active {
+            background: var(--accent);
+        }
 
-        .checklist { list-style: none; padding: 0; }
-        .checklist li { padding: 14px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px; font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
-        .checklist li:last-child { border-bottom: none; }
-        .checklist .icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+        .step-dot.done {
+            background: var(--accent-2);
+        }
 
-        .skip-link { text-align: center; margin-top: 12px; }
-        .skip-link a { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
-        .skip-link a:hover { color: #fff; }
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 32px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 21px;
+            margin-bottom: 6px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--gradient);
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group .helper {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .btn {
+            padding: 12px 26px;
+            border: none;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--accent);
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            gap: 8px;
+        }
+
+        .info-box {
+            background: var(--info-bg);
+            border: 1px solid var(--info-border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--info-text);
+            font-size: 14px;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .warn-box {
+            background: var(--warn-bg);
+            border: 1px solid var(--warn-border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--warn-text);
+            font-size: 14px;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .error-box {
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--error-text);
+            font-size: 14px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist .icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .skip-link {
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .skip-link a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .skip-link a:hover {
+            color: #fff;
+        }
 
         /* Occupant row */
         .occupant-row {
-            background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
-            padding: 14px; margin-bottom: 10px; position: relative;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
         }
+
         .occupant-row .remove-btn {
-            position: absolute; top: 8px; right: 10px; background: none; border: none;
-            color: var(--error-text); cursor: pointer; font-size: 16px; padding: 2px 6px;
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--error-text);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 6px;
         }
+
         .role-badge {
-            display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px;
-            border-radius: 6px; margin-bottom: 8px;
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
         }
-        .role-badge.tenant { background: rgba(0,200,150,.15); color: var(--accent); }
-        .role-badge.resident { background: rgba(124,92,255,.15); color: var(--accent-2); }
+
+        .role-badge.tenant {
+            background: rgba(0, 200, 150, .15);
+            color: var(--accent);
+        }
+
+        .role-badge.resident {
+            background: rgba(124, 92, 255, .15);
+            color: var(--accent-2);
+        }
 
         /* Utility config */
-        .utility-config { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
-        .share-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 14px; color: var(--text-secondary); }
-        .share-row input { width: 70px; text-align: center; }
-        .share-row .name { flex: 1; }
+        .utility-config {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .share-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .share-row input {
+            width: 70px;
+            text-align: center;
+        }
+
+        .share-row .name {
+            flex: 1;
+        }
 
         /* Summary card */
-        .summary-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+        .summary-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
 
         /* Progress indicator */
-        .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 24px; }
-        .progress-bar .fill { height: 100%; background: var(--gradient); transition: width 0.5s ease; border-radius: 2px; }
+        .progress-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: var(--gradient);
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
 
         /* Feature tour cards */
         .feature-card {
-            background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
-            padding: 20px; margin-bottom: 12px; cursor: pointer; transition: border-color 0.2s;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
         }
-        .feature-card:hover { border-color: var(--accent); }
-        .feature-card h4 { font-size: 15px; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .feature-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+        }
+
+        .feature-card h4 {
+            font-size: 15px;
+            color: #fff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0;
+        }
 
         @media (max-width: 640px) {
-            .container { padding: 32px 16px; }
-            .card { padding: 24px 18px; }
-            .form-row { flex-direction: column; gap: 0; }
-            .header h1 { font-size: 26px; }
-            .header p { font-size: 15px; }
-            .btn { padding: 14px 24px; font-size: 16px; min-height: 48px; }
-            .btn-row { flex-direction: column; gap: 8px; }
-            .btn-row .btn { width: 100%; text-align: center; }
-            .form-group input, .form-group select { padding: 14px; font-size: 16px; }
-            .occupant-row { padding: 12px; }
-            .share-row { flex-wrap: wrap; gap: 8px; }
-            .share-row input { width: 80px; }
-            .feature-card { padding: 16px; }
-            .utility-config { padding: 14px; }
+            .container {
+                padding: 32px 16px;
+            }
+
+            .card {
+                padding: 24px 18px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .header p {
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 14px 24px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            .btn-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn-row .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            .occupant-row {
+                padding: 12px;
+            }
+
+            .share-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .share-row input {
+                width: 80px;
+            }
+
+            .feature-card {
+                padding: 16px;
+            }
+
+            .utility-config {
+                padding: 14px;
+            }
         }
+
         @media (max-width: 380px) {
-            .container { padding: 20px 12px; }
-            .card { padding: 20px 14px; }
-            .header h1 { font-size: 22px; }
-            .stepper { gap: 4px; }
-            .step-dot { width: 32px; }
+            .container {
+                padding: 20px 12px;
+            }
+
+            .card {
+                padding: 20px 14px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .stepper {
+                gap: 4px;
+            }
+
+            .step-dot {
+                width: 32px;
+            }
         }
     </style>
 </head>
@@ -181,7 +602,9 @@
             <p>Let's set up your AI property manager step by step.</p>
         </div>
 
-        <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+        <div class="progress-bar">
+            <div class="fill" id="progressFill" style="width:0%"></div>
+        </div>
 
         <div class="stepper">
             <div class="step-dot active" id="dot-0"></div>
@@ -198,10 +621,14 @@
         <div class="step active" id="step-0">
             <div class="card">
                 <h2><span class="step-num">1</span> Connect WhatsApp</h2>
-                <p class="onb-desktop-hint">Scan the QR code below with WhatsApp on your phone to link your AI property manager.<br>
-                   <strong>WhatsApp → Settings → Linked Devices → Link a Device</strong></p>
-                <p class="onb-mobile-hint" style="display:none;">Enter the pairing code below in WhatsApp to link your AI property manager.<br>
-                   <strong>WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</strong></p>
+                <p class="onb-desktop-hint">Scan the QR code below with WhatsApp on your phone to link your AI property
+                    manager.<br>
+                    <strong>WhatsApp → Settings → Linked Devices → Link a Device</strong>
+                </p>
+                <p class="onb-mobile-hint" style="display:none;">Enter the pairing code below in WhatsApp to link your
+                    AI property manager.<br>
+                    <strong>WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</strong>
+                </p>
 
                 <div id="qrArea" style="text-align:center;margin:16px 0;">
                     <div id="qrLoading" style="color:var(--text-muted);font-size:14px;padding:32px 0;">
@@ -209,25 +636,36 @@
                         Initializing WhatsApp connection…
                     </div>
                     <div id="qrCodeContainer" style="display:none;">
-                        <div id="qrCodeImg" style="background:#fff;border-radius:12px;display:inline-block;padding:14px;margin-bottom:10px;"></div>
-                        <div style="font-size:12px;color:var(--text-muted);">QR code refreshes automatically. Scan within 45 seconds.</div>
+                        <div id="qrCodeImg"
+                            style="background:#fff;border-radius:12px;display:inline-block;padding:14px;margin-bottom:10px;">
+                        </div>
+                        <div style="font-size:12px;color:var(--text-muted);">QR code refreshes automatically. Scan
+                            within 45 seconds.</div>
                     </div>
                     <div id="qrPairingCode" style="display:none;margin-top:10px;">
-                        <div class="onb-desktop-hint" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Or enter this pairing code:</div>
-                        <div class="onb-mobile-hint" style="display:none;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">Enter this 8-character code in WhatsApp:</div>
-                        <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:var(--accent);" id="pairingCodeText"></div>
+                        <div class="onb-desktop-hint"
+                            style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Or enter this pairing
+                            code:</div>
+                        <div class="onb-mobile-hint"
+                            style="display:none;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">
+                            Enter this 8-character code in WhatsApp:</div>
+                        <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:var(--accent);"
+                            id="pairingCodeText"></div>
                     </div>
                     <div id="qrConnected" style="display:none;padding:24px 0;">
                         <div style="font-size:42px;margin-bottom:10px;">✅</div>
                         <div style="font-size:17px;font-weight:600;color:var(--success-text);">WhatsApp Connected!</div>
-                        <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Your AI property manager is now linked.</div>
+                        <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Your AI property manager is
+                            now linked.</div>
                     </div>
                     <div id="qrError" style="display:none;" class="error-box"></div>
                 </div>
 
-                <div class="info-box">💡 <strong>Tip:</strong> This WhatsApp number becomes your AI assistant's number. Tenants will message this number for maintenance requests.</div>
+                <div class="info-box">💡 <strong>Tip:</strong> This WhatsApp number becomes your AI assistant's number.
+                    Tenants will message this number for maintenance requests.</div>
                 <div class="btn-row">
-                    <button class="btn btn-secondary" id="retryQrBtn" onclick="initWhatsAppQR()" style="display:none;">↻ Retry QR</button>
+                    <button class="btn btn-secondary" id="retryQrBtn" onclick="initWhatsAppQR()" style="display:none;">↻
+                        Retry QR</button>
                     <button class="btn btn-primary" onclick="completeStep(0)">Next →</button>
                 </div>
             </div>
@@ -237,13 +675,15 @@
         <div class="step" id="step-1">
             <div class="card">
                 <h2><span class="step-num">2</span> Add Your Property</h2>
-                <p>A <strong>property</strong> is the building or address that contains your rental units. You can add more properties later from the dashboard.</p>
+                <p>A <strong>property</strong> is the building or address that contains your rental units. You can add
+                    more properties later from the dashboard.</p>
                 <div class="form-group">
                     <label>Property Address</label>
                     <input type="text" id="propAddress" placeholder="e.g. 123 Main Street, Toronto, ON M5V 1A1" />
                     <div class="helper">This groups your units under one address.</div>
                 </div>
-                <div class="info-box">🏘️ <strong>Single unit?</strong> Just enter the full address here. You'll add the unit details in the next step.</div>
+                <div class="info-box">🏘️ <strong>Single unit?</strong> Just enter the full address here. You'll add the
+                    unit details in the next step.</div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(0)">← Back</button>
                     <button class="btn btn-primary" onclick="createProperty()">Add Property & Next →</button>
@@ -259,7 +699,8 @@
 
                 <div id="unitsList"></div>
 
-                <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;">
+                <div
+                    style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;">
                     <div class="form-group" style="margin-bottom:10px;">
                         <label>Unit Label</label>
                         <input type="text" id="newUnitLabel" placeholder="e.g. Unit 1, Apt 4B, Basement Suite" />
@@ -271,12 +712,16 @@
                             <option value="SINGLE">Single — one tenant pays the full bill</option>
                             <option value="SHARED">Shared — bill split among occupants by %</option>
                         </select>
-                        <div class="helper">Choose <strong>Shared</strong> if multiple tenants split utility costs for this unit.</div>
+                        <div class="helper">Choose <strong>Shared</strong> if multiple tenants split utility costs for
+                            this unit.</div>
                     </div>
-                    <button class="btn btn-ghost" onclick="addUnit()" style="width:100%;border:1px dashed var(--border-light);border-radius:8px;padding:10px;">+ Add Unit</button>
+                    <button class="btn btn-ghost" onclick="addUnit()"
+                        style="width:100%;border:1px dashed var(--border-light);border-radius:8px;padding:10px;">+ Add
+                        Unit</button>
                 </div>
 
-                <div class="info-box">💡 <strong>Tip:</strong> You can always add more units later from the dashboard. Add at least one unit to continue.</div>
+                <div class="info-box">💡 <strong>Tip:</strong> You can always add more units later from the dashboard.
+                    Add at least one unit to continue.</div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
                     <button class="btn btn-primary" id="unitsNextBtn" onclick="completeStep(2)" disabled>Next →</button>
@@ -288,7 +733,8 @@
         <div class="step" id="step-3">
             <div class="card">
                 <h2><span class="step-num">4</span> Add Tenants & Residents</h2>
-                <p>Add the people living in each unit. The <strong>Tenant</strong> is the primary lease signer. <strong>Residents</strong> are co-occupants (roommates, family members).</p>
+                <p>Add the people living in each unit. The <strong>Tenant</strong> is the primary lease signer.
+                    <strong>Residents</strong> are co-occupants (roommates, family members).</p>
 
                 <div class="info-box">
                     👤 <strong>Tenant</strong> = primary lease holder — receives official notices &amp; billing<br>
@@ -299,7 +745,8 @@
 
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
-                    <button class="btn btn-primary" id="tenantsNextBtn" onclick="saveTenants()" disabled>Save & Next →</button>
+                    <button class="btn btn-primary" id="tenantsNextBtn" onclick="saveTenants()" disabled>Save & Next
+                        →</button>
                 </div>
             </div>
         </div>
@@ -308,12 +755,14 @@
         <div class="step" id="step-4">
             <div class="card">
                 <h2><span class="step-num">5</span> Utility Sharing & WhatsApp Groups</h2>
-                <p>Configure how utility bills are split for shared units, and optionally create WhatsApp groups for multi-occupant units.</p>
+                <p>Configure how utility bills are split for shared units, and optionally create WhatsApp groups for
+                    multi-occupant units.</p>
 
                 <div id="utilityConfig"></div>
 
                 <div id="noSharedUnits" style="display:none;">
-                    <div class="info-box">✅ No shared utility units to configure. You can set this up later in the dashboard if needed.</div>
+                    <div class="info-box">✅ No shared utility units to configure. You can set this up later in the
+                        dashboard if needed.</div>
                 </div>
 
                 <div class="btn-row">
@@ -331,31 +780,38 @@
 
                 <div class="feature-card" onclick="window.location.href='/dashboard'">
                     <h4>📱 AI Maintenance Triage</h4>
-                    <p>Tenants message your WhatsApp number. The AI classifies urgency (emergency / normal / cosmetic), drafts a reply, and logs a ticket in your dashboard — all automatically.</p>
+                    <p>Tenants message your WhatsApp number. The AI classifies urgency (emergency / normal / cosmetic),
+                        drafts a reply, and logs a ticket in your dashboard — all automatically.</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='/dashboard'">
                     <h4>🤖 Smart Autopilot</h4>
-                    <p>Enable autopilot to auto-reply to low-severity messages. High-severity issues are held for your approval. Configure delay, cooldown, and message style.</p>
+                    <p>Enable autopilot to auto-reply to low-severity messages. High-severity issues are held for your
+                        approval. Configure delay, cooldown, and message style.</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='/dashboard'">
                     <h4>💰 Utility Billing & Splits</h4>
-                    <p>Log utility bills per unit. For shared units, the AI calculates each tenant's share and sends personalized reminders via WhatsApp or to unit groups.</p>
+                    <p>Log utility bills per unit. For shared units, the AI calculates each tenant's share and sends
+                        personalized reminders via WhatsApp or to unit groups.</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='/dashboard'">
                     <h4>👥 WhatsApp Groups</h4>
-                    <p>Create WhatsApp groups for multi-occupant units. Send announcements, utility reminders, and welcome messages to the entire group. Group messages are routed to your AI too.</p>
+                    <p>Create WhatsApp groups for multi-occupant units. Send announcements, utility reminders, and
+                        welcome messages to the entire group. Group messages are routed to your AI too.</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='/dashboard'">
                     <h4>⏰ Automated Reminders</h4>
-                    <p>Schedule monthly rent and utility reminders. Choose friendly or formal tone. Messages go out on the day and time you pick, converted to each tenant's local timezone.</p>
+                    <p>Schedule monthly rent and utility reminders. Choose friendly or formal tone. Messages go out on
+                        the day and time you pick, converted to each tenant's local timezone.</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='/dashboard'">
                     <h4>⚖️ Legal Compliance</h4>
-                    <p>AI responses are guided by your region's tenancy laws (RTA). It knows legal timeframes, tenant rights, and proper procedures for your jurisdiction.</p>
+                    <p>AI responses are guided by your region's tenancy laws (RTA). It knows legal timeframes, tenant
+                        rights, and proper procedures for your jurisdiction.</p>
                 </div>
 
                 <div style="margin-top:20px;">
-                    <button class="btn btn-primary" style="width:100%;padding:16px;" onclick="window.location.href='/dashboard'">
+                    <button class="btn btn-primary" style="width:100%;padding:16px;"
+                        onclick="window.location.href='/dashboard'">
                         Go to Dashboard →
                     </button>
                 </div>
@@ -364,11 +820,16 @@
             <div class="card" style="border-color:var(--accent);border-style:dashed;">
                 <h2 style="font-size:18px;">💡 Quick Tips to Get Started</h2>
                 <ul class="checklist">
-                    <li><span class="icon">1️⃣</span> Send a test message from your tenant's phone to verify the AI responds correctly.</li>
-                    <li><span class="icon">2️⃣</span> Go to <strong>AI Agent → Settings</strong> to customize the autopilot delay and message tone.</li>
-                    <li><span class="icon">3️⃣</span> Check the <strong>Tips & Guides</strong> section in your dashboard sidebar for step-by-step tutorials.</li>
-                    <li><span class="icon">4️⃣</span> Add your contractors so the AI can suggest assigning them to maintenance tickets.</li>
-                    <li><span class="icon">5️⃣</span> Set up utility credentials under <strong>Utilities</strong> to enable automatic bill fetching.</li>
+                    <li><span class="icon">1️⃣</span> Send a test message from your tenant's phone to verify the AI
+                        responds correctly.</li>
+                    <li><span class="icon">2️⃣</span> Go to <strong>AI Agent → Settings</strong> to customize the
+                        autopilot delay and message tone.</li>
+                    <li><span class="icon">3️⃣</span> Check the <strong>Tips & Guides</strong> section in your dashboard
+                        sidebar for step-by-step tutorials.</li>
+                    <li><span class="icon">4️⃣</span> Add your contractors so the AI can suggest assigning them to
+                        maintenance tickets.</li>
+                    <li><span class="icon">5️⃣</span> Set up utility credentials under <strong>Utilities</strong> to
+                        enable automatic bill fetching.</li>
                 </ul>
             </div>
         </div>
@@ -382,11 +843,11 @@
         var token = localStorage.getItem('token');
         if (!token) window.location.href = '/login';
 
-        var API = function(path, opts) {
+        var API = function (path, opts) {
             opts = opts || {};
             opts.headers = Object.assign({}, opts.headers || {}, { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' });
-            return fetch(path, opts).then(function(r) {
-                return r.json().then(function(data) {
+            return fetch(path, opts).then(function (r) {
+                return r.json().then(function (data) {
                     if (!r.ok) throw new Error(data.message || data.error || 'Request failed');
                     return data;
                 });
@@ -401,9 +862,9 @@
 
         // ── Navigation ──
         function goStep(n) {
-            document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); });
+            document.querySelectorAll('.step').forEach(function (s) { s.classList.remove('active'); });
             document.getElementById('step-' + n).classList.add('active');
-            document.querySelectorAll('.step-dot').forEach(function(d, i) {
+            document.querySelectorAll('.step-dot').forEach(function (d, i) {
                 d.classList.remove('active');
                 d.classList.toggle('done', i < n);
                 if (i === n) d.classList.add('active');
@@ -420,7 +881,7 @@
         function showError(msg) {
             var el = document.getElementById('onboardError');
             el.textContent = msg; el.style.display = 'block';
-            setTimeout(function() { el.style.display = 'none'; }, 6000);
+            setTimeout(function () { el.style.display = 'none'; }, 6000);
         }
 
         function completeStep(n) { goStep(n + 1); }
@@ -439,7 +900,7 @@
         // ── STEP 3: Add Units ──
         function renderUnitsList() {
             var html = '';
-            createdUnits.forEach(function(u, i) {
+            createdUnits.forEach(function (u, i) {
                 html += '<div class="summary-card" style="display:flex;align-items:center;justify-content:space-between;">' +
                     '<div><strong>' + escHtml(u.label) + '</strong> <span style="font-size:12px;padding:2px 8px;border-radius:6px;background:' +
                     (u.utilityType === 'SHARED' ? 'rgba(124,92,255,.15);color:#7c5cff' : 'rgba(0,200,150,.15);color:#00c896') +
@@ -478,12 +939,12 @@
         // ── STEP 4: Tenants & Residents ──
         function renderTenantSections() {
             var html = '';
-            createdUnits.forEach(function(unit) {
+            createdUnits.forEach(function (unit) {
                 var tenants = pendingTenants[unit.id] || [];
                 html += '<div class="utility-config" style="margin-bottom:16px;">';
                 html += '<h4 style="font-size:15px;color:var(--accent);margin-bottom:10px;">🏢 ' + escHtml(unit.label) + '</h4>';
 
-                tenants.forEach(function(t, ti) {
+                tenants.forEach(function (t, ti) {
                     html += '<div class="occupant-row">' +
                         '<button class="remove-btn" onclick="removeOccupant(\'' + unit.id + '\',' + ti + ')">✕</button>' +
                         '<span class="role-badge ' + t.role + '">' + (t.role === 'tenant' ? '👤 Tenant (Lease Holder)' : '👥 Resident') + '</span>' +
@@ -498,7 +959,7 @@
                     '</div></div>';
             });
             document.getElementById('unitTenantSections').innerHTML = html;
-            var hasAny = createdUnits.some(function(u) { return (pendingTenants[u.id] || []).length > 0; });
+            var hasAny = createdUnits.some(function (u) { return (pendingTenants[u.id] || []).length > 0; });
             document.getElementById('tenantsNextBtn').disabled = !hasAny;
         }
 
@@ -548,7 +1009,7 @@
             var html = '';
             var hasContent = false;
 
-            createdUnits.forEach(function(unit) {
+            createdUnits.forEach(function (unit) {
                 var tenants = pendingTenants[unit.id] || [];
                 if (tenants.length === 0) return;
 
@@ -560,7 +1021,7 @@
                     html += '<h4 style="font-size:14px;color:var(--accent);margin-bottom:4px;">💡 ' + escHtml(unit.label) + ' — Shared Utilities</h4>';
                     html += '<p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Set what percentage of the utility bill each person pays. Must total 100%.</p>';
 
-                    tenants.forEach(function(t, ti) {
+                    tenants.forEach(function (t, ti) {
                         if (t.sharePercent === null) t.sharePercent = equalShare;
                         html += '<div class="share-row">' +
                             '<span class="name">' + escHtml(t.name) + ' <span style="font-size:11px;color:var(--text-muted);">(' + t.role + ')</span></span>' +
@@ -577,7 +1038,7 @@
                 // WhatsApp group option for multi-occupant units
                 if (tenants.length >= 2) {
                     hasContent = true;
-                    var phones = tenants.filter(function(t) { return t.phone; });
+                    var phones = tenants.filter(function (t) { return t.phone; });
                     html += '<div class="summary-card" style="display:flex;align-items:center;justify-content:space-between;">' +
                         '<div><span style="font-size:13px;color:var(--text-secondary);">💬 WhatsApp Group for <strong>' + escHtml(unit.label) + '</strong></span>' +
                         '<div style="font-size:11px;color:var(--text-muted);">' + phones.length + ' members with phone numbers</div></div>';
@@ -594,8 +1055,8 @@
             document.getElementById('noSharedUnits').style.display = hasContent ? 'none' : '';
 
             // Bind WA group buttons
-            document.querySelectorAll('.create-wa-group').forEach(function(btn) {
-                btn.addEventListener('click', async function() {
+            document.querySelectorAll('.create-wa-group').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
                     var unitId = this.dataset.unitId;
                     this.disabled = true; this.textContent = 'Creating...';
                     try {
@@ -612,7 +1073,7 @@
             });
 
             // Init share totals
-            createdUnits.forEach(function(unit) { updateShareTotal(unit.id); });
+            createdUnits.forEach(function (unit) { updateShareTotal(unit.id); });
         }
 
         function updateShare(unitId, idx, val) {
@@ -623,7 +1084,7 @@
         function updateShareTotal(unitId) {
             var el = document.getElementById('shareTotal-' + unitId);
             if (!el) return;
-            var total = (pendingTenants[unitId] || []).reduce(function(sum, t) { return sum + (t.sharePercent || 0); }, 0);
+            var total = (pendingTenants[unitId] || []).reduce(function (sum, t) { return sum + (t.sharePercent || 0); }, 0);
             el.textContent = 'Total: ' + total + '%';
             el.style.color = Math.abs(total - 100) < 0.01 ? 'var(--success-text)' : 'var(--error-text)';
         }
@@ -636,14 +1097,14 @@
                 var tenants = pendingTenants[unit.id] || [];
                 if (tenants.length === 0) continue;
 
-                var total = tenants.reduce(function(s, t) { return s + (t.sharePercent || 0); }, 0);
+                var total = tenants.reduce(function (s, t) { return s + (t.sharePercent || 0); }, 0);
                 if (Math.abs(total - 100) > 0.01) {
                     errors.push(unit.label + ': shares must total 100% (currently ' + total + '%)');
                     continue;
                 }
 
                 var shares = {};
-                tenants.forEach(function(t) { if (t.tenantId) shares[t.tenantId] = t.sharePercent || 0; });
+                tenants.forEach(function (t) { if (t.tenantId) shares[t.tenantId] = t.sharePercent || 0; });
                 if (Object.keys(shares).length > 0) {
                     try {
                         await API('/admin/units/' + unit.id + '/utility-shares', {
@@ -741,7 +1202,7 @@
                         if (qrPollTimer) clearInterval(qrPollTimer);
                         return;
                     }
-                } catch (e) {}
+                } catch (e) { }
                 loading.style.display = 'none';
                 errorEl.textContent = err.message || 'Failed to get QR code.';
                 errorEl.style.display = 'block';
@@ -761,17 +1222,17 @@
                     document.getElementById('qrConnected').style.display = 'block';
                     document.getElementById('qrError').style.display = 'none';
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         // Auto-init QR on page load
         initWhatsAppQR();
 
         // Mobile: show pairing code hints, hide QR hints
-        (function() {
+        (function () {
             var isMobile = window.matchMedia('(max-width: 768px)').matches;
-            document.querySelectorAll('.onb-mobile-hint').forEach(function(el) { el.style.display = isMobile ? '' : 'none'; });
-            document.querySelectorAll('.onb-desktop-hint').forEach(function(el) { el.style.display = isMobile ? 'none' : ''; });
+            document.querySelectorAll('.onb-mobile-hint').forEach(function (el) { el.style.display = isMobile ? '' : 'none'; });
+            document.querySelectorAll('.onb-desktop-hint').forEach(function (el) { el.style.display = isMobile ? 'none' : ''; });
         })();
     </script>
 </body>

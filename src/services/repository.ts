@@ -496,13 +496,16 @@ export async function createTenant(params: {
   autoReplyEnabled?: boolean;
 }) {
   if (!isDbEnabled) return null;
+  // Normalize empty strings to null so unique constraints work
+  const phone = params.phone?.trim() || null;
+  const email = params.email?.trim() || null;
   try {
     const record = await db.tenant.create({
       data: {
         id: params.id,
         name: params.name,
-        phone: params.phone,
-        email: params.email,
+        phone,
+        email,
         landlordId: params.landlordId,
         autoReplyEnabled: typeof params.autoReplyEnabled === "boolean" ? params.autoReplyEnabled : undefined,
       },
@@ -521,8 +524,8 @@ export async function createTenant(params: {
 export async function updateTenantContact(params: { id: string; phone?: string; email?: string }) {
   if (!isDbEnabled || !params.id) return null;
   const data: Record<string, unknown> = {};
-  if (typeof params.phone === "string") data.phone = params.phone;
-  if (typeof params.email === "string") data.email = params.email;
+  if (typeof params.phone === "string") data.phone = params.phone.trim() || null;
+  if (typeof params.email === "string") data.email = params.email.trim() || null;
   if (!Object.keys(data).length) return null;
   try {
     return await db.tenant.update({ where: { id: params.id }, data });
@@ -577,8 +580,8 @@ export async function updateTenant(params: {
   if (!isDbEnabled || !params.id) return null;
   const data: Record<string, unknown> = {};
   if (typeof params.name === "string") data.name = params.name;
-  if (typeof params.phone === "string") data.phone = params.phone;
-  if (typeof params.email === "string") data.email = params.email;
+  if (typeof params.phone === "string") data.phone = params.phone.trim() || null;
+  if (typeof params.email === "string") data.email = params.email.trim() || null;
   if (typeof (params as { autoReplyEnabled?: boolean }).autoReplyEnabled === "boolean") {
     data.autoReplyEnabled = (params as { autoReplyEnabled: boolean }).autoReplyEnabled;
   }

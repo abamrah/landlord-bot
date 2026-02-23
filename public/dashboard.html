@@ -1888,21 +1888,27 @@
       .mobile-overlay-content .grid-2 {
         grid-template-columns: 1fr !important;
       }
+
       .mobile-overlay-content .guide-card {
         padding: 14px;
       }
+
       .mobile-overlay-content .guide-card-header h3 {
         font-size: 15px;
       }
+
       .mobile-overlay-content .guide-body {
         font-size: 13px;
       }
+
       .mobile-overlay-content .guide-step {
         padding: 10px 12px;
       }
+
       .mobile-overlay-content .guide-checklist-item {
         font-size: 13px;
       }
+
       .mobile-overlay-content .panel {
         padding: 14px;
       }
@@ -2066,52 +2072,145 @@
     }
 
     /* ── TIPS & GUIDES ── */
-    .guide-card { transition: border-color 0.2s; }
-    .guide-card:hover { border-color: var(--accent); }
+    .guide-card {
+      transition: border-color 0.2s;
+    }
+
+    .guide-card:hover {
+      border-color: var(--accent);
+    }
+
     .guide-card-header {
-      display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer; padding: 4px 0; user-select: none; min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 4px 0;
+      user-select: none;
+      min-height: 44px;
       -webkit-tap-highlight-color: transparent;
     }
-    .guide-card-header h3 { margin: 0; font-size: 15px; }
-    .guide-toggle { color: var(--text-muted); font-size: 12px; transition: transform 0.2s; }
-    .guide-card-header[aria-expanded="true"] .guide-toggle { transform: rotate(180deg); }
-    .guide-body { padding-top: 14px; border-top: 1px solid var(--border); margin-top: 12px; }
+
+    .guide-card-header h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .guide-toggle {
+      color: var(--text-muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    .guide-card-header[aria-expanded="true"] .guide-toggle {
+      transform: rotate(180deg);
+    }
+
+    .guide-body {
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
     .guide-step {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 8px 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
     }
+
     .guide-num {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px; border-radius: 6px; background: var(--accent);
-      color: #000; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #000;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
+
     .guide-tip {
-      font-size: 13px; color: var(--accent); line-height: 1.5;
-      padding: 8px 12px; background: rgba(0,200,150,.06); border-radius: 8px;
+      font-size: 13px;
+      color: var(--accent);
+      line-height: 1.5;
+      padding: 8px 12px;
+      background: rgba(0, 200, 150, .06);
+      border-radius: 8px;
       margin-top: 8px;
     }
+
     .guide-checklist-item {
-      display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
-      border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.5;
     }
-    .guide-checklist-item:last-child { border-bottom: none; }
-    .guide-check { font-size: 16px; color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
-    .guide-check.done { color: var(--accent); }
-    .guide-sub { font-size: 13px; color: var(--text-muted); }
-    .guide-sub a { color: var(--accent); text-decoration: none; }
-    .guide-sub a:hover { text-decoration: underline; }
+
+    .guide-checklist-item:last-child {
+      border-bottom: none;
+    }
+
+    .guide-check {
+      font-size: 16px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .guide-check.done {
+      color: var(--accent);
+    }
+
+    .guide-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .guide-sub a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .guide-sub a:hover {
+      text-decoration: underline;
+    }
 
     /* Contextual help tooltip icons */
     .help-tip {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border-light);
-      font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer;
-      margin-left: 8px; vertical-align: middle; text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid var(--border-light);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-left: 8px;
+      vertical-align: middle;
+      text-decoration: none;
       transition: border-color 0.2s, color 0.2s, background 0.2s;
       -webkit-tap-highlight-color: transparent;
     }
-    .help-tip:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,200,150,.08); }
+
+    .help-tip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 200, 150, .08);
+    }
   </style>
 </head>
 
@@ -2390,7 +2489,8 @@
       <!-- ═══════════════════ MAINTENANCE ═══════════════════ -->
       <section id="maintenance" class="section">
         <div class="section-header">
-          <h2>Maintenance<a class="help-tip" onclick="openGuideFor('guideMaint')" title="How maintenance works">?</a></h2>
+          <h2>Maintenance<a class="help-tip" onclick="openGuideFor('guideMaint')" title="How maintenance works">?</a>
+          </h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <select id="maintStatusFilter" style="width:auto;padding:6px 10px;font-size:12px;">
               <option value="">All Statuses</option>
@@ -2440,7 +2540,8 @@
       <!-- ═══════════════════ TENANTS ═══════════════════ -->
       <section id="tenants" class="section">
         <div class="section-header">
-          <h2>Tenants<a class="help-tip" onclick="openGuideFor('guideTenants')" title="Tenants & residents guide">?</a></h2>
+          <h2>Tenants<a class="help-tip" onclick="openGuideFor('guideTenants')" title="Tenants & residents guide">?</a>
+          </h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <label class="toggle" title="Global auto-reply">
               <input type="checkbox" id="globalAutoReplyToggle" />
@@ -2464,7 +2565,8 @@
                 <option value="tenant">Tenant (lease signer)</option>
                 <option value="resident">Resident (co-occupant)</option>
               </select></div>
-            <div class="form-field" id="tenantShareField" style="display:none;"><label>Utility Share %</label><input id="tenantSharePercent" type="number" min="0" max="100" placeholder="e.g. 50" /></div>
+            <div class="form-field" id="tenantShareField" style="display:none;"><label>Utility Share %</label><input
+                id="tenantSharePercent" type="number" min="0" max="100" placeholder="e.g. 50" /></div>
             <button class="btn btn-primary" id="createTenantBtn" style="align-self:end;">+ Add Tenant</button>
           </div>
         </div>
@@ -2487,8 +2589,10 @@
                   style="width:100%;resize:vertical;font-size:13px;"></textarea>
               </div>
               <div style="display:flex;gap:8px;">
-                <button class="btn btn-secondary btn-sm" id="tenantMsgDraftBtn" onclick="aiDraftTenantMsg()">🤖 AI Draft</button>
-                <button class="btn btn-primary btn-sm" id="tenantMsgSendBtn" onclick="sendTenantMsg()">📤 Send via WhatsApp</button>
+                <button class="btn btn-secondary btn-sm" id="tenantMsgDraftBtn" onclick="aiDraftTenantMsg()">🤖 AI
+                  Draft</button>
+                <button class="btn btn-primary btn-sm" id="tenantMsgSendBtn" onclick="sendTenantMsg()">📤 Send via
+                  WhatsApp</button>
               </div>
               <div id="tenantMsgStatus" style="font-size:12px;display:none;"></div>
             </div>
@@ -2499,7 +2603,8 @@
       <!-- ═══════════════════ UNITS ═══════════════════ -->
       <section id="units" class="section">
         <div class="section-header">
-          <h2>Properties &amp; Units<a class="help-tip" onclick="openGuideFor('guideUnits')" title="Properties & units guide">?</a></h2>
+          <h2>Properties &amp; Units<a class="help-tip" onclick="openGuideFor('guideUnits')"
+              title="Properties & units guide">?</a></h2>
           <button class="btn btn-secondary btn-sm" id="refreshUnits">↻</button>
         </div>
 
@@ -2507,7 +2612,8 @@
         <div class="panel panel-sm" style="margin-bottom:12px;">
           <h3 style="margin:0 0 8px 0;font-size:14px;color:var(--text-muted)">Add Property</h3>
           <div class="form-row">
-            <div class="form-field" style="flex:2;"><label>Address</label><input id="propertyAddress" placeholder="123 Main St, Toronto, ON" /></div>
+            <div class="form-field" style="flex:2;"><label>Address</label><input id="propertyAddress"
+                placeholder="123 Main St, Toronto, ON" /></div>
             <button class="btn btn-primary" id="createPropertyBtn" style="align-self:end;">+ Add Property</button>
           </div>
         </div>
@@ -2516,12 +2622,14 @@
         <div class="panel panel-sm">
           <h3 style="margin:0 0 8px 0;font-size:14px;color:var(--text-muted)">Add Unit</h3>
           <div class="form-row">
-            <div class="form-field"><label>Property</label><select id="unitProperty"><option value="">No property</option></select></div>
+            <div class="form-field"><label>Property</label><select id="unitProperty">
+                <option value="">No property</option>
+              </select></div>
             <div class="form-field"><label>Label</label><input id="unitLabel" placeholder="Unit 201" /></div>
             <div class="form-field"><label>Utility Type</label><select id="unitUtilityType">
-              <option value="SINGLE">Single (1 tenant, 100%)</option>
-              <option value="SHARED">Shared (split by %)</option>
-            </select></div>
+                <option value="SINGLE">Single (1 tenant, 100%)</option>
+                <option value="SHARED">Shared (split by %)</option>
+              </select></div>
             <button class="btn btn-primary" id="createUnitBtn" style="align-self:end;">+ Add Unit</button>
           </div>
         </div>
@@ -2554,7 +2662,8 @@
       <!-- ═══════════════════ CONTRACTORS ═══════════════════ -->
       <section id="contractors" class="section">
         <div class="section-header">
-          <h2>Contractors<a class="help-tip" onclick="openGuideFor('guideContractors')" title="Contractors guide">?</a></h2>
+          <h2>Contractors<a class="help-tip" onclick="openGuideFor('guideContractors')" title="Contractors guide">?</a>
+          </h2>
           <button class="btn btn-secondary btn-sm" id="refreshContractors">↻</button>
         </div>
         <div class="panel panel-sm">
@@ -2589,7 +2698,8 @@
       <!-- ═══════════════════ UTILITIES ═══════════════════ -->
       <section id="utilities" class="section">
         <div class="section-header">
-          <h2>Utilities<a class="help-tip" onclick="openGuideFor('guideUtility')" title="Utility billing guide">?</a></h2>
+          <h2>Utilities<a class="help-tip" onclick="openGuideFor('guideUtility')" title="Utility billing guide">?</a>
+          </h2>
           <button class="btn btn-secondary btn-sm" id="refreshUtilities">↻</button>
         </div>
 
@@ -2699,12 +2809,15 @@
             </p>
 
             <!-- IN-PROGRESS BANNER -->
-            <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
+            <div
+              style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
               <span style="font-size:18px;">⚠️</span>
               <div>
-                <div style="font-weight:600;font-size:13px;color:#f59e0b;margin-bottom:4px;">This feature is in progress</div>
+                <div style="font-weight:600;font-size:13px;color:#f59e0b;margin-bottom:4px;">This feature is in progress
+                </div>
                 <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
-                  We are registering as a third-party provider with each utility company to enable automatic API connections.
+                  We are registering as a third-party provider with each utility company to enable automatic API
+                  connections.
                   In the meantime, you can upload Green Button XML files manually using the upload section below.
                 </div>
               </div>
@@ -2742,7 +2855,8 @@
                 <div class="form-field"><label>Account #</label>
                   <input id="gbAccountNum" placeholder="Optional" />
                 </div>
-                <button class="btn btn-primary" id="gbConnectBtn" style="align-self:end;opacity:0.5;cursor:not-allowed;" disabled title="API connections coming soon — use XML upload below">Connect (Coming Soon)</button>
+                <button class="btn btn-primary" id="gbConnectBtn" style="align-self:end;opacity:0.5;cursor:not-allowed;"
+                  disabled title="API connections coming soon — use XML upload below">Connect (Coming Soon)</button>
               </div>
             </div>
 
@@ -3004,16 +3118,22 @@
       <!-- ═══════════════════ REMINDERS ═══════════════════ -->
       <section id="reminders" class="section">
         <div class="section-header">
-          <h2>Reminders<a class="help-tip" onclick="openGuideFor('guideReminders')" title="Reminders guide">?</a></h2><button class="btn btn-secondary btn-sm" id="refreshReminders">↻</button>
+          <h2>Reminders<a class="help-tip" onclick="openGuideFor('guideReminders')" title="Reminders guide">?</a></h2>
+          <button class="btn btn-secondary btn-sm" id="refreshReminders">↻</button>
         </div>
         <div class="panel panel-sm">
           <div class="form-row">
-            <div class="form-field"><label>Type</label><select id="reminderType" onchange="toggleReminderUtilityFields()">
+            <div class="form-field"><label>Type</label><select id="reminderType"
+                onchange="toggleReminderUtilityFields()">
                 <option value="rent">Rent</option>
                 <option value="utility">Utility</option>
               </select></div>
-            <div class="form-field" id="reminderUnitField" style="display:none;"><label>Unit</label><select id="reminderUnit"><option value="">All tenants</option></select></div>
-            <div class="form-field" id="reminderAmountField" style="display:none;"><label>Amount ($)</label><input id="reminderAmount" type="number" min="0" step="0.01" placeholder="Auto from bills" /></div>
+            <div class="form-field" id="reminderUnitField" style="display:none;"><label>Unit</label><select
+                id="reminderUnit">
+                <option value="">All tenants</option>
+              </select></div>
+            <div class="form-field" id="reminderAmountField" style="display:none;"><label>Amount ($)</label><input
+                id="reminderAmount" type="number" min="0" step="0.01" placeholder="Auto from bills" /></div>
             <div class="form-field"><label>Day</label><input id="reminderDay" type="number" min="1" max="28"
                 placeholder="1-28" /></div>
             <div class="form-field"><label>Time (local)</label><input id="reminderTime" placeholder="14:00" /></div>
@@ -3097,7 +3217,8 @@
       <!-- ═══════════════════ LEASES ═══════════════════ -->
       <section id="leases" class="section">
         <div class="section-header">
-          <h2>Lease Management<a class="help-tip" onclick="openGuideFor('guideLeases')" title="Lease management guide">?</a></h2>
+          <h2>Lease Management<a class="help-tip" onclick="openGuideFor('guideLeases')"
+              title="Lease management guide">?</a></h2>
           <div style="display:flex;gap:8px">
             <button class="btn btn-secondary" onclick="loadExpiringLeases()">Refresh</button>
             <button class="btn btn-primary" onclick="sendLeaseAlerts()">Send Alerts Now</button>
@@ -3119,31 +3240,41 @@
 
         <!-- Getting started checklist -->
         <div class="panel" style="margin-bottom:20px;border-left:3px solid var(--accent);">
-          <div class="panel-header"><h3>🚀 Getting Started Checklist</h3></div>
+          <div class="panel-header">
+            <h3>🚀 Getting Started Checklist</h3>
+          </div>
           <div style="padding:4px 0;">
             <div class="guide-checklist-item" id="gCheck1">
               <span class="guide-check">○</span>
-              <div><strong>Connect WhatsApp</strong><br><span class="guide-sub">Link your WhatsApp number so the AI can send and receive messages. Go to <a href="#" onclick="showView('whatsapp');return false;">WhatsApp Settings</a>.</span></div>
+              <div><strong>Connect WhatsApp</strong><br><span class="guide-sub">Link your WhatsApp number so the AI can
+                  send and receive messages. Go to <a href="#" onclick="showView('whatsapp');return false;">WhatsApp
+                    Settings</a>.</span></div>
             </div>
             <div class="guide-checklist-item" id="gCheck2">
               <span class="guide-check">○</span>
-              <div><strong>Add a Property</strong><br><span class="guide-sub">Create your first property (building address) under <a href="#" onclick="showView('units');return false;">Properties & Units</a>.</span></div>
+              <div><strong>Add a Property</strong><br><span class="guide-sub">Create your first property (building
+                  address) under <a href="#" onclick="showView('units');return false;">Properties & Units</a>.</span>
+              </div>
             </div>
             <div class="guide-checklist-item" id="gCheck3">
               <span class="guide-check">○</span>
-              <div><strong>Add a Unit</strong><br><span class="guide-sub">Add at least one rental unit to your property.</span></div>
+              <div><strong>Add a Unit</strong><br><span class="guide-sub">Add at least one rental unit to your
+                  property.</span></div>
             </div>
             <div class="guide-checklist-item" id="gCheck4">
               <span class="guide-check">○</span>
-              <div><strong>Add a Tenant</strong><br><span class="guide-sub">Add a tenant with their WhatsApp number so they can message the AI.</span></div>
+              <div><strong>Add a Tenant</strong><br><span class="guide-sub">Add a tenant with their WhatsApp number so
+                  they can message the AI.</span></div>
             </div>
             <div class="guide-checklist-item" id="gCheck5">
               <span class="guide-check">○</span>
-              <div><strong>Send a Test Message</strong><br><span class="guide-sub">Have your tenant (or yourself from another phone) send a message like "My faucet is leaking" to test the AI.</span></div>
+              <div><strong>Send a Test Message</strong><br><span class="guide-sub">Have your tenant (or yourself from
+                  another phone) send a message like "My faucet is leaking" to test the AI.</span></div>
             </div>
             <div class="guide-checklist-item" id="gCheck6">
               <span class="guide-check">○</span>
-              <div><strong>Enable Autopilot</strong><br><span class="guide-sub">Turn on autopilot in the Dashboard to let the AI auto-reply to low-severity messages.</span></div>
+              <div><strong>Enable Autopilot</strong><br><span class="guide-sub">Turn on autopilot in the Dashboard to
+                  let the AI auto-reply to low-severity messages.</span></div>
             </div>
           </div>
         </div>
@@ -3158,11 +3289,16 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideUnits" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Properties & Units</strong> from the sidebar.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Click <strong>+ Add Property</strong> and enter your building address.</div>
-              <div class="guide-step"><span class="guide-num">3</span> Select the property from the dropdown, enter a unit label (e.g. "Apt 4B").</div>
-              <div class="guide-step"><span class="guide-num">4</span> Choose <strong>Utility Type</strong>: Single (one tenant pays full bill) or Shared (split among occupants).</div>
-              <div class="guide-step"><span class="guide-num">5</span> Click <strong>+ Add Unit</strong>. Repeat for each unit in the property.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Properties & Units</strong> from
+                the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Click <strong>+ Add Property</strong> and enter
+                your building address.</div>
+              <div class="guide-step"><span class="guide-num">3</span> Select the property from the dropdown, enter a
+                unit label (e.g. "Apt 4B").</div>
+              <div class="guide-step"><span class="guide-num">4</span> Choose <strong>Utility Type</strong>: Single (one
+                tenant pays full bill) or Shared (split among occupants).</div>
+              <div class="guide-step"><span class="guide-num">5</span> Click <strong>+ Add Unit</strong>. Repeat for
+                each unit in the property.</div>
               <div class="guide-tip">💡 Properties group units by address. One property can have many units.</div>
             </div>
           </div>
@@ -3174,13 +3310,19 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideTenants" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Tenants</strong> from the sidebar.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Enter the tenant's name, WhatsApp phone number, and optionally email.</div>
-              <div class="guide-step"><span class="guide-num">3</span> Select the <strong>Unit</strong> they belong to from the dropdown.</div>
-              <div class="guide-step"><span class="guide-num">4</span> Choose their <strong>Role</strong>: Tenant (lease holder) or Resident (co-occupant like a roommate).</div>
-              <div class="guide-step"><span class="guide-num">5</span> For Shared utility units, enter the tenant's <strong>Utility Share %</strong>.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Tenants</strong> from the sidebar.
+              </div>
+              <div class="guide-step"><span class="guide-num">2</span> Enter the tenant's name, WhatsApp phone number,
+                and optionally email.</div>
+              <div class="guide-step"><span class="guide-num">3</span> Select the <strong>Unit</strong> they belong to
+                from the dropdown.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Choose their <strong>Role</strong>: Tenant (lease
+                holder) or Resident (co-occupant like a roommate).</div>
+              <div class="guide-step"><span class="guide-num">5</span> For Shared utility units, enter the tenant's
+                <strong>Utility Share %</strong>.</div>
               <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add Tenant</strong>.</div>
-              <div class="guide-tip">💡 <strong>Tenant</strong> = primary lease signer who receives notices. <strong>Resident</strong> = co-occupant who can message the AI for maintenance.</div>
+              <div class="guide-tip">💡 <strong>Tenant</strong> = primary lease signer who receives notices.
+                <strong>Resident</strong> = co-occupant who can message the AI for maintenance.</div>
             </div>
           </div>
 
@@ -3191,13 +3333,20 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideMaint" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Tenants send a WhatsApp message describing their issue (e.g. "My kitchen faucet is dripping").</div>
-              <div class="guide-step"><span class="guide-num">2</span> The AI automatically classifies the severity: <strong>Emergency</strong>, <strong>Normal</strong>, or <strong>Cosmetic</strong>.</div>
-              <div class="guide-step"><span class="guide-num">3</span> A maintenance ticket is created in your dashboard with the AI's triage assessment.</div>
-              <div class="guide-step"><span class="guide-num">4</span> For low-severity issues, autopilot sends a reply automatically. For high/critical issues, the AI holds the reply and notifies you.</div>
-              <div class="guide-step"><span class="guide-num">5</span> You can reply "approve" or "deny" to the WhatsApp notification to control the AI's response.</div>
-              <div class="guide-step"><span class="guide-num">6</span> View tickets in List or Kanban view. Drag cards to update status.</div>
-              <div class="guide-tip">💡 The AI also accepts photos, voice notes, and documents. It analyzes images to assess damage severity.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Tenants send a WhatsApp message describing their
+                issue (e.g. "My kitchen faucet is dripping").</div>
+              <div class="guide-step"><span class="guide-num">2</span> The AI automatically classifies the severity:
+                <strong>Emergency</strong>, <strong>Normal</strong>, or <strong>Cosmetic</strong>.</div>
+              <div class="guide-step"><span class="guide-num">3</span> A maintenance ticket is created in your dashboard
+                with the AI's triage assessment.</div>
+              <div class="guide-step"><span class="guide-num">4</span> For low-severity issues, autopilot sends a reply
+                automatically. For high/critical issues, the AI holds the reply and notifies you.</div>
+              <div class="guide-step"><span class="guide-num">5</span> You can reply "approve" or "deny" to the WhatsApp
+                notification to control the AI's response.</div>
+              <div class="guide-step"><span class="guide-num">6</span> View tickets in List or Kanban view. Drag cards
+                to update status.</div>
+              <div class="guide-tip">💡 The AI also accepts photos, voice notes, and documents. It analyzes images to
+                assess damage severity.</div>
             </div>
           </div>
 
@@ -3208,11 +3357,16 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideAutopilot" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Toggle <strong>Autopilot</strong> on from the Dashboard or AI Agent page.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Set the <strong>Reply Delay</strong> — how long the AI waits before replying (allows batching multiple messages).</div>
-              <div class="guide-step"><span class="guide-num">3</span> Set the <strong>Cooldown</strong> — minimum time between auto-replies to the same tenant.</div>
-              <div class="guide-step"><span class="guide-num">4</span> The AI automatically holds replies for <strong>High</strong> and <strong>Critical</strong> severity issues for your approval.</div>
-              <div class="guide-tip">💡 A 2-minute delay is recommended. This gives tenants time to send follow-up details before the AI responds.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Toggle <strong>Autopilot</strong> on from the
+                Dashboard or AI Agent page.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Set the <strong>Reply Delay</strong> — how long
+                the AI waits before replying (allows batching multiple messages).</div>
+              <div class="guide-step"><span class="guide-num">3</span> Set the <strong>Cooldown</strong> — minimum time
+                between auto-replies to the same tenant.</div>
+              <div class="guide-step"><span class="guide-num">4</span> The AI automatically holds replies for
+                <strong>High</strong> and <strong>Critical</strong> severity issues for your approval.</div>
+              <div class="guide-tip">💡 A 2-minute delay is recommended. This gives tenants time to send follow-up
+                details before the AI responds.</div>
             </div>
           </div>
 
@@ -3223,13 +3377,20 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideUtility" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Utilities</strong> and click <strong>Log Bill</strong>.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Select the unit, utility type (electricity, gas, water, etc.), and enter the bill amount.</div>
-              <div class="guide-step"><span class="guide-num">3</span> For <strong>SHARED</strong> units, go to Properties & Units and click <strong>% Shares</strong> to set each tenant's percentage.</div>
-              <div class="guide-step"><span class="guide-num">4</span> Set up a <strong>Utility Reminder</strong> under Reminders → select type "Utility", pick the target unit, and enter the bill amount.</div>
-              <div class="guide-step"><span class="guide-num">5</span> When the reminder fires, the AI calculates each tenant's share and sends personalized messages.</div>
-              <div class="guide-tip">💡 For SHARED units with WhatsApp groups, utility reminders are sent to the group with a breakdown of each person's share.</div>
-              <div class="guide-tip">💡 You can save utility credentials (login details for your utility provider) so the AI agent can fetch bills automatically.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Utilities</strong> and click
+                <strong>Log Bill</strong>.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Select the unit, utility type (electricity, gas,
+                water, etc.), and enter the bill amount.</div>
+              <div class="guide-step"><span class="guide-num">3</span> For <strong>SHARED</strong> units, go to
+                Properties & Units and click <strong>% Shares</strong> to set each tenant's percentage.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Set up a <strong>Utility Reminder</strong> under
+                Reminders → select type "Utility", pick the target unit, and enter the bill amount.</div>
+              <div class="guide-step"><span class="guide-num">5</span> When the reminder fires, the AI calculates each
+                tenant's share and sends personalized messages.</div>
+              <div class="guide-tip">💡 For SHARED units with WhatsApp groups, utility reminders are sent to the group
+                with a breakdown of each person's share.</div>
+              <div class="guide-tip">💡 You can save utility credentials (login details for your utility provider) so
+                the AI agent can fetch bills automatically.</div>
             </div>
           </div>
 
@@ -3240,12 +3401,18 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideGroups" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Add 2 or more tenants/residents with phone numbers to a unit.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Go to <strong>Properties & Units</strong> and find the unit in the table.</div>
-              <div class="guide-step"><span class="guide-num">3</span> Click the <strong>Create Group</strong> button in the "WA Group" column.</div>
-              <div class="guide-step"><span class="guide-num">4</span> A WhatsApp group is created with all occupants + your AI's number. A welcome message is sent automatically.</div>
-              <div class="guide-step"><span class="guide-num">5</span> Messages sent in the group are routed to your AI agent — tenants can report issues directly in the group.</div>
-              <div class="guide-tip">💡 Groups are great for shared housing situations. Utility reminders and announcements go to the group instead of individual DMs.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Add 2 or more tenants/residents with phone
+                numbers to a unit.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Go to <strong>Properties & Units</strong> and
+                find the unit in the table.</div>
+              <div class="guide-step"><span class="guide-num">3</span> Click the <strong>Create Group</strong> button in
+                the "WA Group" column.</div>
+              <div class="guide-step"><span class="guide-num">4</span> A WhatsApp group is created with all occupants +
+                your AI's number. A welcome message is sent automatically.</div>
+              <div class="guide-step"><span class="guide-num">5</span> Messages sent in the group are routed to your AI
+                agent — tenants can report issues directly in the group.</div>
+              <div class="guide-tip">💡 Groups are great for shared housing situations. Utility reminders and
+                announcements go to the group instead of individual DMs.</div>
             </div>
           </div>
 
@@ -3256,13 +3423,20 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideReminders" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Reminders</strong> from the sidebar.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Choose the reminder type: <strong>Rent</strong>, <strong>Utility</strong>, <strong>Lease</strong>, or <strong>Custom</strong>.</div>
-              <div class="guide-step"><span class="guide-num">3</span> For <strong>Utility</strong> reminders, select the target unit and optionally enter the bill amount.</div>
-              <div class="guide-step"><span class="guide-num">4</span> Set the <strong>Day of Month</strong> (1–28) and <strong>Time</strong> (in your local timezone).</div>
-              <div class="guide-step"><span class="guide-num">5</span> Choose message <strong>Style</strong>: Friendly, Formal, or Urgent.</div>
-              <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add</strong>. The reminder will fire automatically each month.</div>
-              <div class="guide-tip">💡 Rent reminders go to all tenants. Utility reminders go to the specific unit's tenants (or WhatsApp group for shared units).</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Reminders</strong> from the
+                sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Choose the reminder type: <strong>Rent</strong>,
+                <strong>Utility</strong>, <strong>Lease</strong>, or <strong>Custom</strong>.</div>
+              <div class="guide-step"><span class="guide-num">3</span> For <strong>Utility</strong> reminders, select
+                the target unit and optionally enter the bill amount.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Set the <strong>Day of Month</strong> (1–28) and
+                <strong>Time</strong> (in your local timezone).</div>
+              <div class="guide-step"><span class="guide-num">5</span> Choose message <strong>Style</strong>: Friendly,
+                Formal, or Urgent.</div>
+              <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add</strong>. The reminder will
+                fire automatically each month.</div>
+              <div class="guide-tip">💡 Rent reminders go to all tenants. Utility reminders go to the specific unit's
+                tenants (or WhatsApp group for shared units).</div>
             </div>
           </div>
 
@@ -3273,11 +3447,16 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideAgent" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>AI Agent</strong> from the sidebar.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Use the <strong>Chat</strong> panel to test the AI — ask it questions about your properties, tenants, or maintenance.</div>
-              <div class="guide-step"><span class="guide-num">3</span> The AI has access to your full portfolio context: units, tenants, bills, lease expiry dates, and more.</div>
-              <div class="guide-step"><span class="guide-num">4</span> Ask it things like: "Draft a rent increase notice for unit 4B" or "What maintenance issues are open?"</div>
-              <div class="guide-tip">💡 The AI agent can also use web tools to search for contractors, look up regulations, and fetch utility bills if credentials are saved.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>AI Agent</strong> from the sidebar.
+              </div>
+              <div class="guide-step"><span class="guide-num">2</span> Use the <strong>Chat</strong> panel to test the
+                AI — ask it questions about your properties, tenants, or maintenance.</div>
+              <div class="guide-step"><span class="guide-num">3</span> The AI has access to your full portfolio context:
+                units, tenants, bills, lease expiry dates, and more.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Ask it things like: "Draft a rent increase notice
+                for unit 4B" or "What maintenance issues are open?"</div>
+              <div class="guide-tip">💡 The AI agent can also use web tools to search for contractors, look up
+                regulations, and fetch utility bills if credentials are saved.</div>
             </div>
           </div>
 
@@ -3288,10 +3467,14 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideContractors" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Contractors</strong> from the sidebar.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Add a contractor with their name, phone, email, and role (e.g. Plumber, Electrician).</div>
-              <div class="guide-step"><span class="guide-num">3</span> When a maintenance ticket comes in, the AI will suggest relevant contractors based on the issue type.</div>
-              <div class="guide-tip">💡 The more contractors you add by specialty, the better the AI can match them to incoming issues.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Contractors</strong> from the
+                sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Add a contractor with their name, phone, email,
+                and role (e.g. Plumber, Electrician).</div>
+              <div class="guide-step"><span class="guide-num">3</span> When a maintenance ticket comes in, the AI will
+                suggest relevant contractors based on the issue type.</div>
+              <div class="guide-tip">💡 The more contractors you add by specialty, the better the AI can match them to
+                incoming issues.</div>
             </div>
           </div>
 
@@ -3302,11 +3485,16 @@
               <span class="guide-toggle">▼</span>
             </div>
             <div class="guide-body" id="guideLeases" style="display:none;">
-              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Leases</strong> from the sidebar.</div>
-              <div class="guide-step"><span class="guide-num">2</span> Set lease start and end dates for each tenant.</div>
-              <div class="guide-step"><span class="guide-num">3</span> The dashboard shows upcoming lease expirations automatically.</div>
-              <div class="guide-step"><span class="guide-num">4</span> You can ask the AI agent to draft renewal notices or check regional requirements for notice periods.</div>
-              <div class="guide-tip">💡 The AI knows your region's tenancy laws and can advise on proper notice periods for non-renewal.</div>
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Leases</strong> from the sidebar.
+              </div>
+              <div class="guide-step"><span class="guide-num">2</span> Set lease start and end dates for each tenant.
+              </div>
+              <div class="guide-step"><span class="guide-num">3</span> The dashboard shows upcoming lease expirations
+                automatically.</div>
+              <div class="guide-step"><span class="guide-num">4</span> You can ask the AI agent to draft renewal notices
+                or check regional requirements for notice periods.</div>
+              <div class="guide-tip">💡 The AI knows your region's tenancy laws and can advise on proper notice periods
+                for non-renewal.</div>
             </div>
           </div>
 
@@ -3314,16 +3502,26 @@
 
         <!-- Pro Tips Section -->
         <div class="panel" style="margin-top:20px;border-left:3px solid var(--accent-2);">
-          <div class="panel-header"><h3>⚡ Power User Tips</h3></div>
+          <div class="panel-header">
+            <h3>⚡ Power User Tips</h3>
+          </div>
           <div style="padding:8px 0;">
-            <div class="guide-tip" style="margin-bottom:12px;">🔍 Use the <strong>search bar</strong> at the top to quickly find tenants, units, or tickets by name.</div>
-            <div class="guide-tip" style="margin-bottom:12px;">📊 Click any <strong>KPI card</strong> on the dashboard to jump directly to that section.</div>
-            <div class="guide-tip" style="margin-bottom:12px;">📱 <strong>Enable push notifications</strong> (bell icon in the header) to get browser alerts for new tickets.</div>
-            <div class="guide-tip" style="margin-bottom:12px;">🤖 Reply <strong>"approve"</strong> or <strong>"deny"</strong> to WhatsApp escalation alerts to control AI responses.</div>
-            <div class="guide-tip" style="margin-bottom:12px;">📸 Tenants can send <strong>photos and voice notes</strong> — the AI analyzes images for damage and transcribes audio.</div>
-            <div class="guide-tip" style="margin-bottom:12px;">💬 Use <strong>WhatsApp groups</strong> for shared units to send one message to all occupants at once.</div>
-            <div class="guide-tip" style="margin-bottom:12px;">💡 The <strong>Green Button</strong> integration can auto-import utility data if your provider supports it.</div>
-            <div class="guide-tip">📋 <strong>Download PDF reports</strong> of maintenance tickets by clicking the PDF icon on any ticket detail view.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">🔍 Use the <strong>search bar</strong> at the top to
+              quickly find tenants, units, or tickets by name.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">📊 Click any <strong>KPI card</strong> on the dashboard
+              to jump directly to that section.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">📱 <strong>Enable push notifications</strong> (bell icon
+              in the header) to get browser alerts for new tickets.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">🤖 Reply <strong>"approve"</strong> or
+              <strong>"deny"</strong> to WhatsApp escalation alerts to control AI responses.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">📸 Tenants can send <strong>photos and voice
+                notes</strong> — the AI analyzes images for damage and transcribes audio.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">💬 Use <strong>WhatsApp groups</strong> for shared units
+              to send one message to all occupants at once.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">💡 The <strong>Green Button</strong> integration can
+              auto-import utility data if your provider supports it.</div>
+            <div class="guide-tip">📋 <strong>Download PDF reports</strong> of maintenance tickets by clicking the PDF
+              icon on any ticket detail view.</div>
           </div>
         </div>
       </section>
@@ -3594,7 +3792,7 @@
       // On mobile, use the overlay system instead of desktop section toggling
       if (window.innerWidth <= 640 && typeof openMobileOverlay === 'function') {
         closeMobileOverlay();
-        setTimeout(function() { openMobileOverlay(id); }, 50);
+        setTimeout(function () { openMobileOverlay(id); }, 50);
         return;
       }
       sections.forEach(s => s.classList.toggle('active', s.id === id));
@@ -3616,7 +3814,7 @@
 
     function openGuideFor(guideId) {
       showView('guides');
-      setTimeout(function() {
+      setTimeout(function () {
         var el = document.getElementById(guideId);
         if (el && el.style.display === 'none') toggleGuide(guideId);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -3632,7 +3830,7 @@
         { id: 'gCheck5', done: state.issues && state.issues.length > 0 },
         { id: 'gCheck6', done: state.autoReplyGlobalEnabled === true },
       ];
-      checks.forEach(function(c) {
+      checks.forEach(function (c) {
         var el = document.getElementById(c.id);
         if (!el) return;
         var check = el.querySelector('.guide-check');
@@ -3665,10 +3863,10 @@
 
     function buildPdfDownloadButton(base64, fileName) {
       var id = 'pdf-dl-' + Math.random().toString(36).substr(2, 9);
-      setTimeout(function() {
+      setTimeout(function () {
         var btn = document.getElementById(id);
         if (!btn) return;
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
           try {
             var byteChars = atob(base64);
             var byteArr = new Uint8Array(byteChars.length);
@@ -3677,8 +3875,8 @@
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url; a.download = fileName; a.click();
-            setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
-          } catch(e) { toast('Download failed: ' + e.message); }
+            setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+          } catch (e) { toast('Download failed: ' + e.message); }
         });
       }, 100);
       return '<div style="margin-top:8px;"><button id="' + id + '" class="btn btn-primary btn-sm" style="gap:6px;">\uD83D\uDCC4 Download ' + fileName + '</button></div>';
@@ -3761,7 +3959,7 @@
       tbody.innerHTML = state.units.map(function (u) {
         var propAddr = u.property ? u.property.address : (u.address || '—');
         var occupantCount = u.tenants ? u.tenants.length : 0;
-        var occupantList = (u.tenants || []).map(function(ut) {
+        var occupantList = (u.tenants || []).map(function (ut) {
           var role = ut.role === 'resident' ? '(res)' : '';
           var share = u.utilityType === 'SHARED' && ut.utilitySharePercent != null ? ' ' + ut.utilitySharePercent + '%' : '';
           return ut.tenant.name + ' ' + role + share;
@@ -3779,9 +3977,9 @@
           '<td style="font-size:12px;" title="' + occupantList + '">' + occupantCount + ' person(s)</td>' +
           '<td>' + waGroupBadge + '</td>' +
           '<td><div class="actions-cell">' +
-            (u.utilityType === 'SHARED' && occupantCount > 0 ? '<button class="btn btn-ghost btn-sm set-shares-btn" data-id="' + u.id + '">% Shares</button>' : '') +
-            '<button class="btn btn-ghost btn-sm unit-edit" data-id="' + u.id + '">Edit</button>' +
-            '<button class="btn btn-danger btn-sm unit-delete" data-id="' + u.id + '">Delete</button>' +
+          (u.utilityType === 'SHARED' && occupantCount > 0 ? '<button class="btn btn-ghost btn-sm set-shares-btn" data-id="' + u.id + '">% Shares</button>' : '') +
+          '<button class="btn btn-ghost btn-sm unit-edit" data-id="' + u.id + '">Edit</button>' +
+          '<button class="btn btn-danger btn-sm unit-delete" data-id="' + u.id + '">Delete</button>' +
           '</div></td>' +
           '</tr>';
       }).join('');
@@ -3790,7 +3988,7 @@
     function fillPropertySelects() {
       var sel = document.getElementById('unitProperty');
       if (!sel) return;
-      sel.innerHTML = '<option value="">No property</option>' + state.properties.map(function(p) {
+      sel.innerHTML = '<option value="">No property</option>' + state.properties.map(function (p) {
         return '<option value="' + p.id + '">' + p.address + '</option>';
       }).join('');
     }
@@ -3874,7 +4072,7 @@
       var tbody = document.querySelector('#reminderTable tbody');
       if (!state.reminders.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">No reminders</td></tr>'; return; }
       tbody.innerHTML = state.reminders.map(function (r) {
-        var unitLabel = r.unitId ? (state.units.find(function(u) { return u.id === r.unitId; }) || {}).label || '—' : 'All';
+        var unitLabel = r.unitId ? (state.units.find(function (u) { return u.id === r.unitId; }) || {}).label || '—' : 'All';
         var amountInfo = r.amountCents ? ' ($' + (r.amountCents / 100).toFixed(2) + ')' : '';
         return '<tr><td>' + r.type + amountInfo + '</td><td>' + unitLabel + '</td><td>' + r.dayOfMonth + '</td><td>' + r.timeUtc + '</td><td>' + r.style + '</td><td><button class="btn btn-danger btn-sm reminder-delete" data-id="' + r.id + '">Delete</button></td></tr>';
       }).join('');
@@ -4335,7 +4533,7 @@
       var unitId = document.getElementById('tenantUnit').value;
       var shareField = document.getElementById('tenantShareField');
       if (!shareField) return;
-      var unit = state.units.find(function(u) { return u.id === unitId; });
+      var unit = state.units.find(function (u) { return u.id === unitId; });
       shareField.style.display = unit && unit.utilityType === 'SHARED' ? '' : 'none';
     }
 
@@ -4796,7 +4994,7 @@
         // Check for PDF data in pdfArtifacts from agent response
         var pdfButtons = '';
         if (res?.pdfArtifacts && res.pdfArtifacts.length) {
-          res.pdfArtifacts.forEach(function(art) {
+          res.pdfArtifacts.forEach(function (art) {
             pdfButtons += buildPdfDownloadButton(art.pdfBase64, art.fileName);
           });
         }
@@ -4808,7 +5006,7 @@
             if (pdfMatch && fnMatch) {
               pdfButtons += buildPdfDownloadButton(pdfMatch[1], fnMatch[1]);
             }
-          } catch(e) {}
+          } catch (e) { }
         }
 
         thinking.innerHTML = '<div style="white-space:pre-wrap">' + formattedAnswer + '</div>' + pdfButtons + '<div class="meta">Agent' + (tools ? ' \u00B7 ' + tools : '') + ' \u00B7 ' + new Date().toLocaleTimeString() + '</div>';
@@ -5070,7 +5268,7 @@
     // ── Direct Tenant Messaging ──
     var _tenantMsgState = { id: null, name: '', phone: '' };
 
-    document.body.addEventListener('click', function(e) {
+    document.body.addEventListener('click', function (e) {
       var btn = e.target.closest('.tenant-msg-btn');
       if (!btn) return;
       openTenantMsgModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone);
@@ -5347,7 +5545,7 @@
       try {
         var data = await fetchJson('/admin/financial/summary');
         if (data && !data.error) {
-          var fmt = function(v) { return '$' + (v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+          var fmt = function (v) { return '$' + (v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
           document.getElementById('finIncome').textContent = fmt(data.totalIncome);
           document.getElementById('finExpenses').textContent = fmt(data.totalExpenses);
           var net = data.net || 0;
@@ -5367,7 +5565,7 @@
           document.getElementById('finExpensesBreakdown').textContent = expParts.join(' \u00B7 ') || 'No expenses recorded';
           document.getElementById('finNetSub').textContent = data.totalRecords + ' records total';
         }
-      } catch(e) { console.warn('Financial summary load failed', e); }
+      } catch (e) { console.warn('Financial summary load failed', e); }
     }
 
     async function loadAccount() {
