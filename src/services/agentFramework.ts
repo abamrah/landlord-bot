@@ -128,20 +128,34 @@ export async function runAgent(opts: {
     for (let iteration = 0; iteration < maxIter; iteration++) {
         // Call Gemini with tools
         let result: any;
-        try {
-            result = await model.generateContent({
-                contents,
-                tools: geminiTools.length > 0 ? [{ functionDeclarations: geminiTools }] : undefined,
-            } as any);
-        } catch (err) {
-            const errMsg = (err as Error).message || String(err);
-            console.warn("[AgentFramework] LLM call failed:", errMsg);
-            return {
-                finalAnswer: `Agent error: ${errMsg}`,
-                steps,
-                toolCallCount,
-                totalTokensEstimate: 0,
-            };
+        const maxRetries = 3;
+        let lastErr: Error | null = null;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                result = await model.generateContent({
+                    contents,
+                    tools: geminiTools.length > 0 ? [{ functionDeclarations: geminiTools }] : undefined,
+                } as any);
+                lastErr = null;
+                break;
+            } catch (err) {
+                lastErr = err as Error;
+                const errMsg = lastErr.message || String(err);
+                const isRetryable = /503|429|high demand|overloaded|rate.?limit/i.test(errMsg);
+                if (isRetryable && attempt < maxRetries) {
+                    const backoff = 800 * Math.pow(2, attempt - 1);
+                    console.warn(`[AgentFramework] LLM call failed (attempt ${attempt}/${maxRetries}), retrying in ${backoff}ms:`, errMsg);
+                    await new Promise(r => setTimeout(r, backoff));
+                    continue;
+                }
+                console.warn(`[AgentFramework] LLM call failed (attempt ${attempt}/${maxRetries}, giving up):`, errMsg);
+                return {
+                    finalAnswer: `Agent error: ${errMsg}`,
+                    steps,
+                    toolCallCount,
+                    totalTokensEstimate: 0,
+                };
+            }
         }
 
         const candidate = result.response?.candidates?.[0];

@@ -516,7 +516,12 @@ async function flushTenantReply(params: { tenantId: string }) {
         tokens: agentResult.totalTokensEstimate,
       });
 
-      const draftText = extractDraftReply(agentResult.finalAnswer || "");
+      let draftText = extractDraftReply(agentResult.finalAnswer || "");
+      // If the agent returned an error (e.g. LLM 503), use a friendly fallback
+      if (/^Agent error:/i.test(draftText) || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
+        console.warn("LLM unavailable for tenant reply (agentic batch), using fallback", { tenantId: tenant.id, raw: draftText.substring(0, 100) });
+        draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
+      }
       // eslint-disable-next-line no-console
       console.info("draft reply extracted", {
         tenantId: tenant.id,
@@ -629,31 +634,33 @@ async function flushTenantReply(params: { tenantId: string }) {
     }
   }
 
-  const draftText = (draftResponse?.draft || "").trim();
-  if (draftText && canAutoReply) {
-    const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
-    if (!sendResult.ok) {
-      // eslint-disable-next-line no-console
-      console.error("auto-reply send FAILED (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo, error: sendResult.error, response: sendResult.response });
-    } else {
-      if (record?.id) {
-        await repo.appendChatMessage({
-          id: record.id,
-          role: "ai",
-          content: draftText,
-          meta: { channel: bucket.isGroup ? "whatsapp_group" : "whatsapp", batched: true },
-        });
+let draftText = (draftResponse?.draft || "").trim();
+      // If linear batch returned LLM-unavailable or empty draft, use fallback
+      if (!draftText || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
+        draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
+        console.warn("LLM unavailable for tenant reply (linear batch), using fallback", { tenantId: tenant.id });
       }
-      lastReplySentAt.set(tenant.id, Date.now());
-      // eslint-disable-next-line no-console
-      console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
-    }
-  } else if (draftText && !canAutoReply) {
-    // eslint-disable-next-line no-console
-    console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
-  } else if (!draftText) {
-    // eslint-disable-next-line no-console
-    console.warn("auto-reply skipped: AI returned empty draft", { tenantId: tenant.id });
+      if (draftText && canAutoReply) {
+        const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
+        if (!sendResult.ok) {
+          // eslint-disable-next-line no-console
+          console.error("auto-reply send FAILED (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo, error: sendResult.error, response: sendResult.response });
+        } else {
+          if (record?.id) {
+            await repo.appendChatMessage({
+              id: record.id,
+              role: "ai",
+              content: draftText,
+              meta: { channel: bucket.isGroup ? "whatsapp_group" : "whatsapp", batched: true },
+            });
+          }
+          lastReplySentAt.set(tenant.id, Date.now());
+          // eslint-disable-next-line no-console
+          console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
+        }
+      } else if (draftText && !canAutoReply) {
+        // eslint-disable-next-line no-console
+        console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
   }
 
   const triageJson: any = record?.triageJson || triage || {};
@@ -1152,7 +1159,12 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         });
         llmInvoked = true;
 
-        const agentDraft = extractDraftReply(agentResult.finalAnswer || "");
+        let agentDraft = extractDraftReply(agentResult.finalAnswer || "");
+        // If the agent returned an error (e.g. LLM 503), use a friendly fallback instead
+        if (/^Agent error:/i.test(agentDraft) || /llm_unavailable|vertex_not_configured/i.test(agentDraft)) {
+          console.warn("LLM unavailable for tenant reply, using fallback", { tenantId: tenant.id, raw: agentDraft.substring(0, 100) });
+          agentDraft = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
+        }
         const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
         const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
 
@@ -1227,7 +1239,12 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
     const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
     const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
-    const draftText = (draftResponse?.draft || "").trim();
+    let draftText = (draftResponse?.draft || "").trim();
+    // If the linear path returned an LLM-unavailable or empty draft, use fallback
+    if (!draftText || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
+      draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
+      console.warn("LLM unavailable for tenant reply (linear), using fallback", { tenantId: tenant.id });
+    }
     if (draftText && canAutoReply) {
       const sendResult = await whatsappService.sendWhatsAppText({
         to: replyTo,
