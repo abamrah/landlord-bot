@@ -1207,3 +1207,92 @@ export async function deleteAllLandlordData(landlordId: string): Promise<{ insta
 
   return { instanceNames };
 }
+
+// ── Landlord Portfolio Context (for agent awareness) ────
+
+export interface LandlordPortfolio {
+  landlordName: string;
+  company: string;
+  plan: string;
+  province: string;
+  totalUnits: number;
+  totalTenants: number;
+  units: {
+    id: string;
+    label: string;
+    address: string;
+    tenants: {
+      id: string;
+      name: string;
+      phone: string | null;
+      email: string | null;
+      leaseStart: string | null;
+      leaseEnd: string | null;
+    }[];
+  }[];
+  activeMaintenanceCount: number;
+  remindersCount: number;
+}
+
+/**
+ * Load full portfolio context for a landlord.
+ * Used to inject into the agent system prompt so it has
+ * immediate awareness of the landlord's properties and tenants
+ * without needing tool calls to discover this info.
+ */
+export async function loadLandlordContext(landlordId: string): Promise<LandlordPortfolio | null> {
+  if (!isDbEnabled || !landlordId) return null;
+  try {
+    const landlord = await db.landlord.findUnique({
+      where: { id: landlordId },
+      include: {
+        units: {
+          include: {
+            tenants: {
+              include: {
+                tenant: { select: { id: true, name: true, phone: true, email: true } },
+              },
+            },
+          },
+        },
+        tenants: { select: { id: true } },
+      },
+    });
+    if (!landlord) return null;
+
+    // Count active maintenance
+    const activeMaintenanceCount = await db.maintenanceRequest.count({
+      where: { landlordId, status: { in: ["OPEN", "PENDING", "IN_TRIAGE", "SCHEDULED", "IN_PROGRESS"] } },
+    });
+
+    // Count reminders
+    const remindersCount = await db.reminder.count({ where: { landlordId, active: true } });
+
+    return {
+      landlordName: landlord.name,
+      company: landlord.company || "",
+      plan: landlord.plan,
+      province: landlord.province,
+      totalUnits: landlord.units.length,
+      totalTenants: landlord.tenants.length,
+      units: landlord.units.map((u) => ({
+        id: u.id,
+        label: u.label,
+        address: u.address,
+        tenants: u.tenants.map((ut) => ({
+          id: ut.tenant.id,
+          name: ut.tenant.name,
+          phone: ut.tenant.phone,
+          email: ut.tenant.email,
+          leaseStart: ut.startDate ? ut.startDate.toISOString().split("T")[0] : null,
+          leaseEnd: ut.endDate ? ut.endDate.toISOString().split("T")[0] : null,
+        })),
+      })),
+      activeMaintenanceCount,
+      remindersCount,
+    };
+  } catch (err) {
+    console.warn("loadLandlordContext failed", err);
+    return null;
+  }
+}

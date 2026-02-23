@@ -13,6 +13,8 @@ import { registerWebTools, closeBrowser } from "./tools/webAgent";
 import { getProfile } from "../config/rtaProfiles";
 import { db } from "../config/database";
 import { getActivePlugin } from "./verticalPlugin";
+import repo, { loadLandlordContext, LandlordPortfolio } from "./repository";
+import conversationMemory from "./conversationMemory";
 
 /** Build a fully-loaded tool registry based on the account's plan */
 export function buildToolRegistry(plan: "FREE" | "PRO" | "ENTERPRISE" = "FREE"): ToolRegistry {
@@ -65,6 +67,29 @@ async function getAccountContext(accountId: string) {
 }
 /** @deprecated Use getAccountContext */
 const getLandlordContext = getAccountContext;
+
+/** Format portfolio data into a concise text block for prompt injection */
+function formatPortfolioSummary(p: LandlordPortfolio): string {
+    const lines: string[] = [];
+    lines.push(`Landlord: ${p.landlordName}${p.company ? ` (${p.company})` : ""}`);
+    lines.push(`Plan: ${p.plan} | Province: ${p.province}`);
+    lines.push(`Portfolio: ${p.totalUnits} unit(s), ${p.totalTenants} tenant(s), ${p.activeMaintenanceCount} active maintenance, ${p.remindersCount} active reminder(s)`);
+    lines.push("");
+    for (const u of p.units) {
+        lines.push(`📍 Unit "${u.label}" — ${u.address}`);
+        if (u.tenants.length === 0) {
+            lines.push("   (vacant)");
+        } else {
+            for (const t of u.tenants) {
+                const lease = t.leaseStart
+                    ? ` | Lease: ${t.leaseStart} → ${t.leaseEnd || "ongoing"}`
+                    : "";
+                lines.push(`   • ${t.name} (${t.phone || "no phone"})${lease}`);
+            }
+        }
+    }
+    return lines.join("\n");
+}
 
 // ═══════════════════════════════════════════════════════════
 //  TENANT MESSAGE HANDLER — The heart of the agent system
@@ -230,9 +255,23 @@ export async function landlordAssistantAgent(opts: {
     landlordId: string;
     question: string;
     maintenanceId?: string;
+    /** Optional media parts for multimodal analysis */
+    mediaParts?: Array<{ base64: string; mimeType: string }>;
 }): Promise<AgentRunResult> {
     const ctx = await getAccountContext(opts.landlordId);
     const registry = buildToolRegistry(ctx.plan);
+
+    // Load full portfolio context for injection into prompt
+    const portfolio = await loadLandlordContext(opts.landlordId);
+    const portfolioSummary = portfolio ? formatPortfolioSummary(portfolio) : undefined;
+
+    // Load recent dashboard conversation history for continuity
+    const recentHistory = await conversationMemory.getHistory({
+        phone: "dashboard-agent",
+        landlordId: opts.landlordId,
+        limit: 10,
+    });
+    const historyText = conversationMemory.formatHistory(recentHistory, 10);
 
     const plugin = getActivePlugin();
     let systemPrompt: string;
@@ -244,6 +283,7 @@ export async function landlordAssistantAgent(opts: {
             region: ctx.province,
             accountName: ctx.name,
             company: ctx.company,
+            portfolioSummary,
         });
         if (opts.maintenanceId) {
             systemPrompt += `\n\nContext: This is about maintenance request ID ${opts.maintenanceId}.`;
@@ -252,12 +292,18 @@ export async function landlordAssistantAgent(opts: {
         systemPrompt = buildFallbackAssistantPrompt(ctx, opts.maintenanceId);
     }
 
+    // Prepend conversation history to the user message for continuity
+    const userMessage = historyText
+        ? `[Previous Conversation]\n${historyText}\n\n[Current Question]\n${opts.question}`
+        : opts.question;
+
     return runAgent({
         systemPrompt,
-        userMessage: opts.question,
+        userMessage,
         tools: registry,
         context: { landlordId: opts.landlordId, province: ctx.province },
         maxIterations: 10,
+        mediaParts: opts.mediaParts,
         taskType: "landlord-assistant",
     });
 }

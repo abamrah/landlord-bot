@@ -2632,15 +2632,22 @@
             <div class="chat-messages" id="agentChatLog">
               <div class="chat-msg ai">
                 <div>Hi! I can help with maintenance tickets, tenancy law, drafting replies, checking utilities,
-                  <strong>searching the web for product manuals & guides</strong>, and more. Ask me anything.
+                  <strong>searching the web for product manuals & guides</strong>, lease info, reminders, and more. Ask me anything — I already know your portfolio.
                 </div>
               </div>
             </div>
+            <div id="agentMediaPreview" style="display:none; padding:4px 8px; background:var(--surface-2); border-radius:8px; margin-bottom:4px;">
+              <span id="agentMediaName" style="font-size:0.85rem; color:var(--text-muted);"></span>
+              <button onclick="clearAgentMedia()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-left:8px;">✕</button>
+            </div>
             <div class="chat-input-row">
+              <input type="file" id="agentFileInput" accept="image/*,video/*,application/pdf" style="display:none;" />
+              <button onclick="document.getElementById('agentFileInput').click()" class="btn" style="align-self:end; padding:8px;" title="Attach image, video, or PDF">📎</button>
               <textarea id="agentQuestion"
                 placeholder="Ask anything — maintenance, tenancy law, find a product manual, search the web for appliance info..."
                 rows="2"></textarea>
               <button class="btn btn-primary" id="agentAskBtn" style="align-self:end;">Send</button>
+              <button onclick="clearAgentHistory()" class="btn" style="align-self:end; padding:8px; font-size:0.8rem;" title="Clear chat history">🗑️</button>
             </div>
           </div>
         </div>
@@ -3268,9 +3275,14 @@
       if (!state.tenants.length) { grid.innerHTML = '<div class="panel" style="text-align:center;color:var(--text-muted);padding:40px;">No tenants yet. Add your first tenant above.</div>'; return; }
       grid.innerHTML = state.tenants.map(function (t) {
         var unitId = t.unitId || (t.units && t.units[0]?.unitId);
+        var unitTenantId = t.units && t.units[0]?.id;
         var unit = state.units.find(function (u) { return u.id === unitId; }) || {};
         var arEnabled = t.autoReplyEnabled !== false;
         var initials = t.name.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+        var leaseStart = t.units && t.units[0]?.startDate ? new Date(t.units[0].startDate).toLocaleDateString() : '';
+        var leaseEnd = t.units && t.units[0]?.endDate ? new Date(t.units[0].endDate).toLocaleDateString() : '';
+        var leaseInfo = leaseStart ? '<span>📄 Lease: ' + leaseStart + (leaseEnd ? ' → ' + leaseEnd : ' → ongoing') + '</span>' : '';
+        var leaseUploadBtn = unitTenantId ? '<button class="btn btn-ghost btn-sm lease-upload-btn" data-ut-id="' + unitTenantId + '" data-tenant="' + t.name + '">📤 Upload Lease</button>' : '';
         return '<div class="tenant-card">' +
           '<div class="tenant-card-header">' +
           '<div class="tenant-avatar">' + initials + '</div>' +
@@ -3282,6 +3294,7 @@
           '<div class="tenant-card-info">' +
           '<span>\uD83D\uDCF1 ' + (t.phone || '\u2014') + '</span>' +
           '<span>\u2709\uFE0F ' + (t.email || '\u2014') + '</span>' +
+          leaseInfo +
           '</div>' +
           '<div class="tenant-card-footer">' +
           '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -3289,6 +3302,7 @@
           '<span style="font-size:11px;color:var(--text-muted)">Auto-reply</span>' +
           '</div>' +
           '<div class="actions-cell">' +
+          leaseUploadBtn +
           '<button class="btn btn-ghost btn-sm tenant-edit" data-id="' + t.id + '">Edit</button>' +
           '<button class="btn btn-danger btn-sm tenant-delete" data-id="' + t.id + '">Delete</button>' +
           '</div>' +
@@ -4114,16 +4128,67 @@
     });
 
     // ── AI AGENT CHAT ──
+    var agentMediaData = null; // { base64, mimeType, name }
     document.getElementById('agentAskBtn').addEventListener('click', sendAgentMessage);
     document.getElementById('agentQuestion').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); } });
+    document.getElementById('agentFileInput').addEventListener('change', function (e) {
+      var file = e.target.files[0]; if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        var base64 = reader.result.split(',')[1];
+        agentMediaData = { base64: base64, mimeType: file.type, name: file.name };
+        document.getElementById('agentMediaName').textContent = '📎 ' + file.name;
+        document.getElementById('agentMediaPreview').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function clearAgentMedia() {
+      agentMediaData = null;
+      document.getElementById('agentMediaPreview').style.display = 'none';
+      document.getElementById('agentFileInput').value = '';
+    }
+    window.clearAgentMedia = clearAgentMedia;
+
+    async function clearAgentHistory() {
+      if (!confirm('Clear all agent chat history?')) return;
+      try {
+        await fetchJson('/admin/agent/history', { method: 'DELETE' });
+        var log = document.getElementById('agentChatLog');
+        log.innerHTML = '<div class="chat-msg ai"><div>Chat history cleared. How can I help?</div></div>';
+        toast('Chat history cleared');
+      } catch (err) { toast('Failed: ' + err.message); }
+    }
+    window.clearAgentHistory = clearAgentHistory;
+
+    async function loadAgentChatHistory() {
+      try {
+        var res = await fetchJson('/admin/agent/history?limit=50');
+        if (!res.messages || !res.messages.length) return;
+        var log = document.getElementById('agentChatLog');
+        // Clear default welcome message
+        log.innerHTML = '';
+        res.messages.forEach(function (m) {
+          var div = document.createElement('div');
+          div.className = 'chat-msg ' + (m.role === 'landlord' ? 'user' : 'ai');
+          var time = new Date(m.createdAt).toLocaleTimeString();
+          var meta = m.meta && m.meta.toolCalls ? ' · ' + m.meta.toolCalls + ' tools' : '';
+          div.innerHTML = '<div style="white-space:pre-wrap">' + m.content + '</div><div class="meta">' + (m.role === 'landlord' ? 'You' : 'Agent') + meta + ' · ' + time + '</div>';
+          log.appendChild(div);
+        });
+        log.scrollTop = log.scrollHeight;
+      } catch (err) { console.warn('Failed to load agent history', err); }
+    }
 
     async function sendAgentMessage() {
       var input = document.getElementById('agentQuestion');
-      var q = input.value.trim(); if (!q) return;
+      var q = input.value.trim(); if (!q && !agentMediaData) return;
       var log = document.getElementById('agentChatLog');
       var userMsg = document.createElement('div');
       userMsg.className = 'chat-msg user';
-      userMsg.innerHTML = '<div>' + q + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+      var displayText = q || '';
+      if (agentMediaData) displayText += (displayText ? '\n' : '') + '📎 ' + agentMediaData.name;
+      userMsg.innerHTML = '<div>' + displayText + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
       log.appendChild(userMsg);
       input.value = '';
       log.scrollTop = log.scrollHeight;
@@ -4135,7 +4200,13 @@
       log.scrollTop = log.scrollHeight;
 
       try {
-        var res = await fetchJson('/admin/agent/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: q }) });
+        var body = { question: q || 'Analyze this file' };
+        if (agentMediaData) {
+          body.mediaBase64 = agentMediaData.base64;
+          body.mediaMimeType = agentMediaData.mimeType;
+        }
+        clearAgentMedia();
+        var res = await fetchJson('/admin/agent/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         var answer = res?.answer || res?.finalAnswer || 'No response.';
         var tools = res?.toolCallCount ? res.toolCallCount + ' tools used' : '';
         thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + '</div><div class="meta">Agent' + (tools ? ' \u00B7 ' + tools : '') + ' \u00B7 ' + new Date().toLocaleTimeString() + '</div>';
@@ -4364,6 +4435,52 @@
       }
     });
 
+    // Lease upload (delegated click handler)
+    document.body.addEventListener('click', function (e) {
+      var btn = e.target.closest('.lease-upload-btn');
+      if (!btn) return;
+      var utId = btn.dataset.utId;
+      var tenantName = btn.dataset.tenant;
+      var fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'application/pdf,image/*';
+      fileInput.onchange = async function () {
+        var file = fileInput.files[0]; if (!file) return;
+        btn.textContent = 'Uploading...'; btn.disabled = true;
+        try {
+          var reader = new FileReader();
+          reader.onload = async function () {
+            var base64 = reader.result.split(',')[1];
+            var res = await fetchJson('/admin/leases/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ unitTenantId: utId, fileName: file.name, fileBase64: base64, mimeType: file.type })
+            });
+            btn.textContent = '📤 Upload Lease'; btn.disabled = false;
+            if (res.extractedTerms) {
+              var terms = res.extractedTerms;
+              var msg = 'Lease uploaded for ' + tenantName + '!\n\n';
+              if (terms.rentAmount) msg += '💰 Rent: $' + terms.rentAmount + '/mo\n';
+              if (terms.startDate) msg += '📅 Start: ' + terms.startDate + '\n';
+              if (terms.endDate) msg += '📅 End: ' + terms.endDate + '\n';
+              if (terms.securityDeposit) msg += '🔒 Deposit: $' + terms.securityDeposit + '\n';
+              if (res.summary) msg += '\n' + res.summary;
+              toast('Lease uploaded & analyzed!');
+              alert(msg);
+            } else {
+              toast('Lease uploaded (no AI extraction available)');
+            }
+            loadTenants();
+          };
+          reader.readAsDataURL(file);
+        } catch (err) {
+          btn.textContent = '📤 Upload Lease'; btn.disabled = false;
+          toast('Upload failed: ' + err.message);
+        }
+      };
+      fileInput.click();
+    });
+
     // ── GREEN BUTTON ──
     state.gbProviders = [];
     state.gbConnections = [];
@@ -4530,6 +4647,7 @@
       loadContractors(); loadMaintenance(); loadUtilities(); loadUtilCreds(); loadGreenButtonData();
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();
+      loadAgentChatHistory();
     }
 
     async function loadAccount() {

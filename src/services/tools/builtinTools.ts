@@ -551,6 +551,235 @@ export function fetchPageContentTool(): ToolDefinition {
     };
 }
 
+// ═══════════════════════════════════════════════════════════
+//  NEW PORTFOLIO TOOLS — List tenants, units, reminders, leases
+// ═══════════════════════════════════════════════════════════
+
+export function listTenantsTool(): ToolDefinition {
+    return {
+        name: "list_tenants",
+        description: "List all tenants for this landlord. Returns tenant names, phone numbers, emails, unit assignments, and lease dates. Use this when the landlord asks about their tenants, occupancy, or wants to find a tenant by name.",
+        parameters: {},
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+            if (!landlordId) return { error: "No landlord context" };
+            const tenants = await db.tenant.findMany({
+                where: { landlordId },
+                include: {
+                    units: {
+                        include: { unit: { select: { label: true, address: true } } },
+                    },
+                },
+                orderBy: { name: "asc" },
+            });
+            return {
+                tenants: tenants.map((t: any) => ({
+                    id: t.id,
+                    name: t.name,
+                    phone: t.phone,
+                    email: t.email,
+                    autoReplyEnabled: t.autoReplyEnabled,
+                    units: t.units.map((ut: any) => ({
+                        unitLabel: ut.unit?.label,
+                        unitAddress: ut.unit?.address,
+                        leaseStart: ut.startDate?.toISOString?.().split("T")[0] || null,
+                        leaseEnd: ut.endDate?.toISOString?.().split("T")[0] || null,
+                    })),
+                })),
+                total: tenants.length,
+            };
+        },
+    };
+}
+
+export function listUnitsTool(): ToolDefinition {
+    return {
+        name: "list_units",
+        description: "List all rental units for this landlord. Returns unit labels, addresses, and how many tenants are in each unit. Use this when the landlord asks about their properties or occupancy.",
+        parameters: {},
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+            if (!landlordId) return { error: "No landlord context" };
+            const units = await db.unit.findMany({
+                where: { landlordId },
+                include: {
+                    tenants: {
+                        include: { tenant: { select: { id: true, name: true, phone: true } } },
+                    },
+                },
+                orderBy: { label: "asc" },
+            });
+            return {
+                units: units.map((u: any) => ({
+                    id: u.id,
+                    label: u.label,
+                    address: u.address,
+                    tenantCount: u.tenants.length,
+                    tenants: u.tenants.map((ut: any) => ({
+                        name: ut.tenant?.name,
+                        phone: ut.tenant?.phone,
+                        leaseStart: ut.startDate?.toISOString?.().split("T")[0] || null,
+                        leaseEnd: ut.endDate?.toISOString?.().split("T")[0] || null,
+                    })),
+                })),
+                total: units.length,
+            };
+        },
+    };
+}
+
+export function listRemindersTool(): ToolDefinition {
+    return {
+        name: "list_reminders",
+        description: "List all active reminders (rent due dates, utility payment schedules) for this landlord. Shows scheduled day of month, time, type, and status.",
+        parameters: {},
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+            if (!landlordId) return { error: "No landlord context" };
+            const reminders = await db.reminder.findMany({
+                where: { landlordId },
+                orderBy: { dayOfMonth: "asc" },
+            });
+            return {
+                reminders: reminders.map((r: any) => ({
+                    id: r.id,
+                    type: r.type,
+                    dayOfMonth: r.dayOfMonth,
+                    timeUtc: r.timeUtc,
+                    style: r.style,
+                    active: r.active,
+                    lastSentAt: r.lastSentAt?.toISOString?.() || null,
+                })),
+                total: reminders.length,
+            };
+        },
+    };
+}
+
+export function expiringLeasesTool(): ToolDefinition {
+    return {
+        name: "expiring_leases",
+        description: "Check for leases expiring within a given number of days (default 90). Returns tenant names, units, and days remaining. Use when the landlord asks about lease renewals or upcoming expirations.",
+        parameters: {
+            daysAhead: { type: "number", description: "Number of days to look ahead (default 90)" },
+        },
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const { findExpiringLeases } = await import("../leaseExpiryService");
+            const daysAhead = Number(args.daysAhead) || 90;
+            const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+            const all = await findExpiringLeases(daysAhead);
+            const filtered = landlordId ? all.filter((a) => a.landlordId === landlordId) : all;
+            return {
+                expiringLeases: filtered.map((a) => ({
+                    tenantName: a.tenantName,
+                    tenantPhone: a.tenantPhone,
+                    unitLabel: a.unitLabel,
+                    unitAddress: a.unitAddress,
+                    endDate: a.endDate.toISOString().split("T")[0],
+                    daysRemaining: a.daysRemaining,
+                })),
+                total: filtered.length,
+                lookAheadDays: daysAhead,
+            };
+        },
+    };
+}
+
+export function lookupLeaseTool(): ToolDefinition {
+    return {
+        name: "lookup_lease",
+        description: "Look up lease documents and extracted terms for a specific unit or tenant. Returns AI-extracted lease terms (rent, dates, deposit, clauses) from uploaded lease PDFs.",
+        parameters: {
+            unitId: { type: "string", description: "Unit ID to look up leases for" },
+            tenantId: { type: "string", description: "Tenant ID to look up leases for" },
+        },
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const where: any = {};
+            if (args.unitId) where.unitId = String(args.unitId);
+            if (args.tenantId) where.tenantId = String(args.tenantId);
+            if (!args.unitId && !args.tenantId) {
+                // If landlordId is available, get all leases for this landlord
+                if (args.landlordId) {
+                    const unitTenants = await db.unitTenant.findMany({
+                        where: { unit: { landlordId: String(args.landlordId) } },
+                        include: {
+                            tenant: { select: { name: true, phone: true } },
+                            unit: { select: { label: true, address: true } },
+                            leaseDocuments: { select: { id: true, fileName: true, extractedTerms: true, summary: true, uploadedAt: true } },
+                        },
+                    });
+                    return {
+                        leases: unitTenants.map((ut: any) => ({
+                            tenantName: ut.tenant?.name,
+                            unitLabel: ut.unit?.label,
+                            startDate: ut.startDate?.toISOString?.().split("T")[0],
+                            endDate: ut.endDate?.toISOString?.().split("T")[0],
+                            documents: ut.leaseDocuments,
+                        })),
+                        total: unitTenants.length,
+                    };
+                }
+                return { error: "Provide unitId or tenantId" };
+            }
+            const unitTenants = await db.unitTenant.findMany({
+                where,
+                include: {
+                    tenant: { select: { name: true, phone: true } },
+                    unit: { select: { label: true, address: true } },
+                    leaseDocuments: { select: { id: true, fileName: true, extractedTerms: true, summary: true, uploadedAt: true } },
+                },
+            });
+            return {
+                leases: unitTenants.map((ut: any) => ({
+                    tenantName: ut.tenant?.name,
+                    unitLabel: ut.unit?.label,
+                    startDate: ut.startDate?.toISOString?.().split("T")[0],
+                    endDate: ut.endDate?.toISOString?.().split("T")[0],
+                    documents: ut.leaseDocuments,
+                })),
+                total: unitTenants.length,
+            };
+        },
+    };
+}
+
+export function maintenanceGuidanceTool(): ToolDefinition {
+    return {
+        name: "maintenance_guidance",
+        description: "Get property maintenance guidance, seasonal checklists, preventive maintenance schedules, and general landlord help. Searches the web for best practices and provides actionable advice.",
+        parameters: {
+            topic: { type: "string", description: "The maintenance topic or question (e.g., 'winter preparation checklist', 'HVAC maintenance schedule', 'how often to inspect fire alarms')" },
+        },
+        required: ["topic"],
+        category: "utility",
+        enabled: true,
+        async execute(args) {
+            const topic = String(args.topic);
+            // Use web search internally for real-time guidance
+            const searchTool = webSearchTool();
+            const searchResult = await searchTool.execute({
+                ...args,
+                query: `property maintenance landlord guide: ${topic}`,
+            });
+            return {
+                topic,
+                guidance: searchResult,
+                note: "This guidance is based on general best practices. Always check local regulations.",
+            };
+        },
+    };
+}
+
 /**
  * Register all built-in tools. Call this at startup.
  */
@@ -581,6 +810,13 @@ export function registerBuiltinTools(): ToolDefinition[] {
         // Utility
         rtaInfoTool(),
         currentTimeTool(),
+        // Portfolio tools
+        listTenantsTool(),
+        listUnitsTool(),
+        listRemindersTool(),
+        expiringLeasesTool(),
+        lookupLeaseTool(),
+        maintenanceGuidanceTool(),
     ];
 }
 

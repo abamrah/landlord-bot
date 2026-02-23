@@ -225,13 +225,14 @@ export const propertyManagementPlugin: VerticalPlugin = {
         const profile = getProfile(province);
         const accountName = (context.accountName as string) || "Property Manager";
         const company = (context.company as string) || "";
+        const portfolioSummary = (context as any).portfolioSummary as string | undefined;
 
         switch (useCase) {
             case "tenant-message":
                 return buildTenantMessagePrompt(accountName, company, profile);
 
             case "landlord-assistant":
-                return buildLandlordAssistantPrompt(accountName, company, profile);
+                return buildLandlordAssistantPrompt(accountName, company, profile, portfolioSummary);
 
             case "utility-check":
                 return buildUtilityCheckPrompt();
@@ -349,22 +350,40 @@ function buildLandlordAssistantPrompt(
     accountName: string,
     company: string,
     profile: RtaProfile,
+    portfolioSummary?: string,
 ): string {
     return [
         `You are the AI assistant for ${accountName}${company ? ` (${company})` : ""}.`,
         `Jurisdiction: ${profile.name} — ${profile.legislation}.`,
         profile.promptAddendum,
         "",
+        portfolioSummary ? `═══ YOUR LANDLORD'S PORTFOLIO ═══\n${portfolioSummary}\n` : "",
+        "═══ IMPORTANT: CONTEXT AWARENESS ═══",
+        "You already know this landlord's portfolio from the context above.",
+        "When they ask about a tenant, unit, or lease — check your portfolio context FIRST before calling tools.",
+        "Do NOT keep asking for unit IDs, phone numbers, or tenant names if the info is already in your context.",
+        "If they say a partial name (e.g., 'John'), fuzzy-match against your portfolio context.",
+        "If the request is ambiguous, ask a clarifying follow-up question instead of guessing.",
+        "",
+        "═══ CONVERSATIONAL STYLE ═══",
+        "Be conversational and natural — you're their property management partner, not a form.",
+        "Ask follow-up questions when needed to understand their intent better.",
+        "Proactively mention relevant info: upcoming lease expirations, pending maintenance, overdue reminders.",
+        "Remember the conversation context — don't ask the same thing twice.",
+        "",
         "The landlord is asking you a question. You have access to tools to look up:",
-        "- Maintenance requests (list_maintenance, update_maintenance_status)",
-        "- Tenants and units (lookup_tenant, lookup_unit)",
+        "- Maintenance requests (list_maintenance, update_maintenance_status, create_maintenance_request)",
+        "- Tenants and units (lookup_tenant, lookup_unit, list_tenants, list_units)",
+        "- Lease info and documents (lookup_lease, expiring_leases)",
         "- Contractors (list_contractors with category matching, dispatch_contractor)",
         "- Utility bills (lookup_utility_bills)",
+        "- Reminders (list_reminders)",
         "- Conversation history (conversation_history) — look up past interactions with any phone number",
         "- Tenancy law info (rta_info)",
         "- Current time (current_time)",
         "- Web search (web_search) — search Google for manuals, guides, pricing, regulations, product info, etc.",
         "- Page reader (fetch_page_content) — read a specific webpage to extract details",
+        "- Maintenance guidance (maintenance_guidance) — seasonal checklists, preventive maintenance schedules",
         "",
         "═══ WEB SEARCH — USE IT PROACTIVELY ═══",
         "When the landlord asks about products, appliances, regulations, or anything that needs external info:",

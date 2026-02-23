@@ -9,6 +9,7 @@ import orchestrator from "../services/agentOrchestrator";
 import { processMedia, buildMediaEnrichedMessage, ExtractedMedia } from "../services/mediaService";
 import conversationMemory from "../services/conversationMemory";
 import { webhookRateLimit } from "../services/rateLimiter";
+import { db } from "../config/database";
 
 const AGENTIC_MODE = process.env.AGENTIC_MODE === "true";
 
@@ -54,7 +55,20 @@ function extractDraftReply(raw: string): string {
     }
   }
 
-  // Absolute fallback: return as-is (should rarely happen with updated prompts)
+  // Absolute fallback: strip markdown artifacts and return cleaned text
+  // Remove tool-call artifacts, internal reasoning markers, and markdown headers
+  const cleaned = trimmed
+    .replace(/^#+\s+.*$/gm, "")               // remove markdown headers
+    .replace(/\*\*[^*]+\*\*/g, (m) => m.replace(/\*\*/g, ""))  // remove bold markers
+    .replace(/^\s*[-*]\s+(Action|Step|Tool|Called).*$/gim, "") // remove action/step lines
+    .replace(/\n{3,}/g, "\n\n")                // collapse excess newlines
+    .trim();
+  if (cleaned.length > 10) {
+    console.info("extractDraftReply: using cleaned fallback", { originalLength: trimmed.length, cleanedLength: cleaned.length });
+    return cleaned;
+  }
+
+  // Last absolute fallback: return as-is
   return trimmed;
 }
 
@@ -109,7 +123,7 @@ router.post("/twilio", async (req, res, next) => {
 const SAFE_AUTOPILOT_SEVERITIES = new Set(["low", "normal"]);
 const CRITICAL_KEYWORDS = ["fire", "water leak", "gas leak", "gas", "no power", "no heat", "flood", "smoke"];
 const DEFAULT_REPLY_DELAY_MS = 5 * 60 * 1000; // 5 minutes
-const DEFAULT_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour between replies per tenant
+const DEFAULT_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes between replies per tenant (was 1 hour)
 const pendingTenantReplies = new Map<
   string,
   {
@@ -899,9 +913,23 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         console.info("whatsapp routed contractor message", { sender, remoteJid, participant, isGroup });
         return respond({ ok: true, routed: "contractor", llmInvoked, autoReplySent, autoReplyReason });
       }
-      // Ignore messages from numbers that are not registered tenants.
+      // Notify landlord about unknown sender instead of silently ignoring
       // eslint-disable-next-line no-console
-      console.warn("whatsapp ignored unknown sender", { sender, remoteJid, participant, isGroup });
+      console.warn("whatsapp unknown sender — notifying landlord", { sender, remoteJid, participant, isGroup });
+      // Try to find which landlord this instance belongs to and alert them
+      if (landlordId) {
+        try {
+          await db.notification.create({
+            data: {
+              landlordId,
+              type: "info",
+              title: "Message from unregistered number",
+              body: `An unregistered number (${sender}) sent a message: "${(inboundContent || "").substring(0, 200)}". Register them as a tenant to enable AI responses.`,
+              data: { phone: sender, message: (inboundContent || "").substring(0, 500) } as any,
+            },
+          });
+        } catch (e) { console.warn("failed to create unknown-sender notification", e); }
+      }
       return respond({ ok: true, ignored: "unknown_sender", llmInvoked, autoReplySent, autoReplyReason });
     }
 

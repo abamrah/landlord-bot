@@ -139,6 +139,24 @@ model UnitTenant {
 	unitId    String
 	startDate DateTime @default(now())
 	endDate   DateTime?
+	leaseDocuments LeaseDocument[]
+}
+
+// ── Lease Documents ─────────────────────────────────────
+
+model LeaseDocument {
+	id              String      @id @default(cuid())
+	unitTenant      UnitTenant  @relation(fields: [unitTenantId], references: [id], onDelete: Cascade)
+	unitTenantId    String
+	fileName        String
+	fileSize        Int         @default(0)
+	mimeType        String      @default("application/pdf")
+	fileData        Bytes?      // raw file bytes (optional — may store externally)
+	extractedTerms  Json?       // AI-extracted: { rent, startDate, endDate, deposit, clauses[], ... }
+	summary         String?     // AI-generated plain-text summary
+	uploadedAt      DateTime    @default(now())
+
+	@@index([unitTenantId])
 }
 
 model MaintenanceRequest {

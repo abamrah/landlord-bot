@@ -1019,17 +1019,73 @@ router.post("/agent/ask", async (req, res) => {
   const schema = z.object({
     question: z.string().min(1),
     maintenanceId: z.string().optional(),
+    mediaBase64: z.string().optional(),
+    mediaMimeType: z.string().optional(),
   });
   const parsed = schema.safeParse(req.body || {});
   if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
 
   try {
+    // Save the user's question to conversation memory
+    await conversationMemory.saveMessage({
+      phone: "dashboard-agent",
+      landlordId: authReq.landlordId,
+      role: "landlord",
+      content: parsed.data.question,
+    });
+
+    // Build media parts if provided
+    const mediaParts: Array<{ base64: string; mimeType: string }> = [];
+    if (parsed.data.mediaBase64 && parsed.data.mediaMimeType) {
+      mediaParts.push({ base64: parsed.data.mediaBase64, mimeType: parsed.data.mediaMimeType });
+    }
+
     const result = await orchestrator.landlordAssistantAgent({
       landlordId: authReq.landlordId,
       question: parsed.data.question,
       maintenanceId: parsed.data.maintenanceId,
+      mediaParts: mediaParts.length ? mediaParts : undefined,
     });
+
+    // Save the AI response to conversation memory
+    await conversationMemory.saveMessage({
+      phone: "dashboard-agent",
+      landlordId: authReq.landlordId,
+      role: "ai",
+      content: result.finalAnswer || "",
+      meta: { toolCalls: result.toolCallCount, steps: result.steps.length },
+    });
+
     res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/agent/history — Retrieve dashboard agent chat history */
+router.get("/agent/history", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const limit = Math.min(Number(req.query.limit) || 50, 200);
+    const history = await conversationMemory.getHistory({
+      phone: "dashboard-agent",
+      landlordId: authReq.landlordId,
+      limit,
+    });
+    res.json({ messages: history, total: history.length });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** DELETE /admin/agent/history — Clear dashboard agent chat history */
+router.delete("/agent/history", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const result = await db.conversationMessage.deleteMany({
+      where: { phone: "dashboard-agent", landlordId: authReq.landlordId },
+    });
+    res.json({ ok: true, deleted: result.count });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
@@ -1885,6 +1941,155 @@ router.delete("/push/unsubscribe", async (req, res) => {
 router.get("/push/vapid-key", (_req, res) => {
   const key = process.env.VAPID_PUBLIC_KEY || "";
   res.json({ vapidPublicKey: key });
+});
+
+// ═══════════════════════════════════════════════════════════
+//  LEASE DOCUMENT UPLOAD & AI EXTRACTION
+// ═══════════════════════════════════════════════════════════
+
+/** POST /admin/leases/upload — Upload a lease PDF and extract key terms via AI */
+router.post("/leases/upload", async (req, res) => {
+  const authReq = req as AuthRequest;
+  const schema = z.object({
+    unitTenantId: z.string().min(1),
+    fileName: z.string().min(1),
+    fileBase64: z.string().min(1),
+    mimeType: z.string().default("application/pdf"),
+  });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  try {
+    // Verify the UnitTenant belongs to this landlord
+    const ut = await db.unitTenant.findUnique({
+      where: { id: parsed.data.unitTenantId },
+      include: { unit: true, tenant: true },
+    });
+    if (!ut || ut.unit?.landlordId !== authReq.landlordId) {
+      return res.status(404).json({ error: "unit_tenant_not_found" });
+    }
+
+    const fileBuffer = Buffer.from(parsed.data.fileBase64, "base64");
+
+    // Use Gemini to extract lease terms from the PDF
+    let extractedTerms: any = null;
+    let summary: string | null = null;
+    try {
+      const { vertexAI } = await import("../config/gemini");
+      if (vertexAI) {
+        const model = vertexAI.getGenerativeModel({ model: process.env.GOOGLE_VERTEX_MODEL || "gemini-2.5-pro" });
+        const result = await model.generateContent({
+          contents: [{
+            role: "user",
+            parts: [
+              { inlineData: { data: parsed.data.fileBase64, mimeType: parsed.data.mimeType } },
+              { text: `Extract key lease terms from this document. Return a JSON object with these fields (use null for missing):
+{
+  "rentAmount": number or null (monthly rent in dollars),
+  "rentCurrency": "CAD" or "USD",
+  "startDate": "YYYY-MM-DD" or null,
+  "endDate": "YYYY-MM-DD" or null,
+  "securityDeposit": number or null,
+  "tenantNames": ["name1", "name2"],
+  "landlordName": "name" or null,
+  "propertyAddress": "address" or null,
+  "latePaymentFee": number or null,
+  "parkingIncluded": boolean,
+  "petsAllowed": boolean,
+  "utilityResponsibilities": {"electricity": "tenant"|"landlord", "water": "tenant"|"landlord", "gas": "tenant"|"landlord", "internet": "tenant"|"landlord"},
+  "specialClauses": ["clause 1", "clause 2"],
+  "renewalTerms": "description" or null,
+  "noticeToVacateDays": number or null
+}
+
+Also provide a 2-3 sentence plain-text summary of the lease.
+Return ONLY valid JSON wrapped in \`\`\`json ... \`\`\` followed by the summary.` },
+            ],
+          }],
+        });
+        const responseText = result.response?.text?.() || "";
+        // Extract JSON from response
+        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)```/);
+        if (jsonMatch?.[1]) {
+          extractedTerms = JSON.parse(jsonMatch[1].trim());
+        }
+        // Extract summary (text after the JSON block)
+        const summaryMatch = responseText.match(/```[\s\S]*?```\s*([\s\S]+)/);
+        summary = summaryMatch?.[1]?.trim() || null;
+      }
+    } catch (err) {
+      console.warn("Lease AI extraction failed, saving without terms", err);
+    }
+
+    // Save the lease document
+    const doc = await db.leaseDocument.create({
+      data: {
+        unitTenantId: parsed.data.unitTenantId,
+        fileName: parsed.data.fileName,
+        fileSize: fileBuffer.length,
+        mimeType: parsed.data.mimeType,
+        fileData: fileBuffer,
+        extractedTerms: extractedTerms || undefined,
+        summary,
+      },
+    });
+
+    // Update UnitTenant dates from extracted terms if available
+    if (extractedTerms?.startDate || extractedTerms?.endDate) {
+      const updateData: any = {};
+      if (extractedTerms.startDate) updateData.startDate = new Date(extractedTerms.startDate);
+      if (extractedTerms.endDate) updateData.endDate = new Date(extractedTerms.endDate);
+      await db.unitTenant.update({ where: { id: parsed.data.unitTenantId }, data: updateData });
+    }
+
+    res.json({
+      ok: true,
+      documentId: doc.id,
+      extractedTerms,
+      summary,
+      fileName: doc.fileName,
+      fileSize: doc.fileSize,
+    });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/leases/:unitTenantId — Get lease documents for a unit-tenant assignment */
+router.get("/leases/:unitTenantId", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const ut = await db.unitTenant.findUnique({
+      where: { id: req.params.unitTenantId },
+      include: { unit: true, tenant: true, leaseDocuments: { select: { id: true, fileName: true, fileSize: true, mimeType: true, extractedTerms: true, summary: true, uploadedAt: true } } },
+    });
+    if (!ut || ut.unit?.landlordId !== authReq.landlordId) {
+      return res.status(404).json({ error: "not_found" });
+    }
+    res.json({
+      unitTenantId: ut.id,
+      tenant: ut.tenant?.name,
+      unit: ut.unit?.label,
+      startDate: ut.startDate,
+      endDate: ut.endDate,
+      documents: ut.leaseDocuments,
+    });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/portfolio — Get full landlord portfolio summary */
+router.get("/portfolio", async (req, res) => {
+  const authReq = req as AuthRequest;
+  try {
+    const { loadLandlordContext } = await import("../services/repository");
+    const portfolio = await loadLandlordContext(authReq.landlordId);
+    if (!portfolio) return res.status(404).json({ error: "not_found" });
+    res.json(portfolio);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
 });
 
 export default router;
