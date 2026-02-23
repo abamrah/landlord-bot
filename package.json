@@ -40,6 +40,7 @@
     "@types/node": "^20.10.6",
     "@types/twilio": "^3.19.2",
     "@types/ws": "^8.18.1",
+    "pg": "^8.18.0",
     "prisma": "^5.21.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"

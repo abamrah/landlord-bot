@@ -5,7 +5,7 @@
         "dockerfilePath": "Dockerfile"
     },
     "deploy": {
-        "startCommand": "dumb-init -- sh -c 'Xvfb :99 -screen 0 1280x900x24 -ac &>/dev/null & sleep 1 && npx prisma migrate deploy && npx ts-node src/index.ts'",
+        "startCommand": "dumb-init -- sh -c 'Xvfb :99 -screen 0 1280x900x24 -ac &>/dev/null & sleep 1 && npx prisma db push --accept-data-loss && npx ts-node src/index.ts'",
         "healthcheckPath": "/health",
         "healthcheckTimeout": 30,
         "restartPolicyType": "ON_FAILURE",
