@@ -625,10 +625,22 @@
                     manager.<br>
                     <strong>WhatsApp → Settings → Linked Devices → Link a Device</strong>
                 </p>
-                <p class="onb-mobile-hint" style="display:none;">Enter the pairing code below in WhatsApp to link your
-                    AI property manager.<br>
+                <p class="onb-mobile-hint" style="display:none;">Enter your phone number to get a pairing code, then enter it in WhatsApp.<br>
                     <strong>WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</strong>
                 </p>
+
+                <!-- Mobile: phone number input for pairing code -->
+                <div id="pairingPhoneInput" style="display:none;text-align:center;margin:16px 0;">
+                    <label style="font-size:14px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:8px;">
+                        Enter your WhatsApp phone number</label>
+                    <div style="display:flex;gap:8px;max-width:320px;margin:0 auto;">
+                        <input type="tel" id="pairingPhoneNumber" placeholder="+1 234 567 8900"
+                            style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-primary);font-size:16px;text-align:center;letter-spacing:1px;" />
+                        <button class="btn btn-primary" onclick="requestPairingCode()" id="pairingRequestBtn"
+                            style="white-space:nowrap;padding:12px 18px;">Get Code</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Include country code (e.g. +1 for US/Canada)</div>
+                </div>
 
                 <div id="qrArea" style="text-align:center;margin:16px 0;">
                     <div id="qrLoading" style="color:var(--text-muted);font-size:14px;padding:32px 0;">
@@ -665,7 +677,7 @@
                     Tenants will message this number for maintenance requests.</div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" id="retryQrBtn" onclick="initWhatsAppQR()" style="display:none;">↻
-                        Retry QR</button>
+                        Retry</button>
                     <button class="btn btn-primary" onclick="completeStep(0)">Next →</button>
                 </div>
             </div>
@@ -1127,6 +1139,7 @@
         // ── WhatsApp QR Code Logic ──
         var qrInstanceName = null;
         var qrPollTimer = null;
+        var isMobileDevice = window.matchMedia('(max-width: 768px)').matches;
 
         async function initWhatsAppQR() {
             var loading = document.getElementById('qrLoading');
@@ -1135,6 +1148,7 @@
             var connectedEl = document.getElementById('qrConnected');
             var errorEl = document.getElementById('qrError');
             var retryBtn = document.getElementById('retryQrBtn');
+            var phoneInput = document.getElementById('pairingPhoneInput');
 
             loading.style.display = 'block';
             container.style.display = 'none';
@@ -1142,6 +1156,7 @@
             connectedEl.style.display = 'none';
             errorEl.style.display = 'none';
             retryBtn.style.display = 'none';
+            if (phoneInput) phoneInput.style.display = 'none';
             if (qrPollTimer) clearInterval(qrPollTimer);
 
             try {
@@ -1153,16 +1168,76 @@
                         connectedEl.style.display = 'block';
                         return;
                     }
+                    // On mobile, show phone input instead of fetching QR
+                    if (isMobileDevice) {
+                        loading.style.display = 'none';
+                        phoneInput.style.display = 'block';
+                        return;
+                    }
                     await fetchQRCode();
                     return;
                 }
                 var createResult = await API('/admin/whatsapp/instance/create', { method: 'POST', body: JSON.stringify({}) });
                 qrInstanceName = createResult && createResult.instance && createResult.instance.instanceName;
                 if (!qrInstanceName) throw new Error('Failed to create instance');
+                // On mobile, show phone input instead of QR
+                if (isMobileDevice) {
+                    loading.style.display = 'none';
+                    phoneInput.style.display = 'block';
+                    return;
+                }
                 await fetchQRCode();
             } catch (err) {
                 loading.style.display = 'none';
                 errorEl.textContent = err.message || 'Failed to initialize WhatsApp.';
+                errorEl.style.display = 'block';
+                retryBtn.style.display = 'inline-flex';
+            }
+        }
+
+        /** Mobile: request pairing code using the entered phone number */
+        async function requestPairingCode() {
+            if (!qrInstanceName) { initWhatsAppQR(); return; }
+            var phoneEl = document.getElementById('pairingPhoneNumber');
+            var phone = (phoneEl.value || '').replace(/[^0-9+]/g, '');
+            if (phone.length < 8) { phoneEl.style.borderColor = 'var(--error-border)'; return; }
+            phoneEl.style.borderColor = 'var(--border)';
+
+            var loading = document.getElementById('qrLoading');
+            var pairingEl = document.getElementById('qrPairingCode');
+            var connectedEl = document.getElementById('qrConnected');
+            var errorEl = document.getElementById('qrError');
+            var retryBtn = document.getElementById('retryQrBtn');
+            var requestBtn = document.getElementById('pairingRequestBtn');
+
+            loading.style.display = 'block';
+            loading.innerHTML = '<div style="margin-bottom:10px;font-size:24px;">⏳</div>Requesting pairing code…';
+            pairingEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            requestBtn.disabled = true;
+            requestBtn.textContent = 'Requesting…';
+
+            try {
+                var result = await API('/admin/whatsapp/instance/connect/' + encodeURIComponent(qrInstanceName) + '?number=' + encodeURIComponent(phone));
+                loading.style.display = 'none';
+                requestBtn.disabled = false;
+                requestBtn.textContent = 'Get Code';
+
+                if (result && result.pairingCode) {
+                    pairingEl.style.display = 'block';
+                    document.getElementById('pairingCodeText').textContent = result.pairingCode;
+                    document.getElementById('pairingPhoneInput').style.display = 'none';
+                    // Start polling
+                    if (qrPollTimer) clearInterval(qrPollTimer);
+                    qrPollTimer = setInterval(checkConnectionState, 4000);
+                } else {
+                    throw new Error('No pairing code returned. Try again.');
+                }
+            } catch (err) {
+                loading.style.display = 'none';
+                requestBtn.disabled = false;
+                requestBtn.textContent = 'Get Code';
+                errorEl.textContent = err.message || 'Failed to get pairing code.';
                 errorEl.style.display = 'block';
                 retryBtn.style.display = 'inline-flex';
             }
@@ -1230,9 +1305,8 @@
 
         // Mobile: show pairing code hints, hide QR hints
         (function () {
-            var isMobile = window.matchMedia('(max-width: 768px)').matches;
-            document.querySelectorAll('.onb-mobile-hint').forEach(function (el) { el.style.display = isMobile ? '' : 'none'; });
-            document.querySelectorAll('.onb-desktop-hint').forEach(function (el) { el.style.display = isMobile ? 'none' : ''; });
+            document.querySelectorAll('.onb-mobile-hint').forEach(function (el) { el.style.display = isMobileDevice ? '' : 'none'; });
+            document.querySelectorAll('.onb-desktop-hint').forEach(function (el) { el.style.display = isMobileDevice ? 'none' : ''; });
         })();
     </script>
 </body>

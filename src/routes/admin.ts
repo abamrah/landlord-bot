@@ -1963,13 +1963,17 @@ router.get("/whatsapp/instance/mine", async (req, res) => {
   }
 });
 
-/** Get QR code / connect an existing instance */
+/** Get QR code / pairing code to connect an existing instance.
+ *  Pass ?number=+1234567890 to request a pairing code (useful on mobile). */
 router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
   if (landlord?.evolutionInstanceName !== req.params.instanceName) return res.status(403).json({ error: "forbidden" });
   try {
-    const result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`);
+    // If a phone number is provided, append it so Evolution API returns a pairing code
+    const phoneNumber = (req.query.number as string || "").replace(/[^0-9]/g, "");
+    const qs = phoneNumber ? `?number=${phoneNumber}` : "";
+    const result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}${qs}`);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });

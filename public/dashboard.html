@@ -3019,6 +3019,20 @@
             <h3>📱 WhatsApp Connection</h3>
             <span class="chip chip-muted" id="waConnState">Checking…</span>
           </div>
+
+          <!-- Mobile: phone number input for pairing code -->
+          <div id="dashPairingPhoneInput" style="display:none;text-align:center;margin:16px 0;">
+            <label style="font-size:14px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:8px;">
+              Enter your WhatsApp phone number</label>
+            <div style="display:flex;gap:8px;max-width:320px;margin:0 auto;">
+              <input type="tel" id="dashPairingPhone" placeholder="+1 234 567 8900"
+                style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-primary);font-size:16px;text-align:center;letter-spacing:1px;" />
+              <button class="btn btn-primary btn-sm" onclick="dashRequestPairingCode()" id="dashPairingRequestBtn"
+                style="white-space:nowrap;padding:10px 16px;">Get Code</button>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Include country code (e.g. +1 for US/Canada)</div>
+          </div>
+
           <div id="waQrArea" style="text-align:center;margin:16px 0;">
             <div id="waQrLoading" style="color:var(--text-muted);font-size:14px;padding:20px 0;display:none;">
               ⏳ Initializing…
@@ -3029,9 +3043,10 @@
               <div style="font-size:12px;color:var(--text-muted);">Open WhatsApp → Linked Devices → Scan QR</div>
             </div>
             <div id="waPairingCode" style="display:none;margin-top:10px;">
-              <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Or enter pairing code:</div>
-              <div style="font-size:24px;font-weight:700;letter-spacing:3px;color:var(--accent);" id="waPairingText">
+              <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">Enter this code in WhatsApp:</div>
+              <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:var(--accent);" id="waPairingText">
               </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</div>
             </div>
             <div id="waConnected" style="display:none;padding:20px 0;">
               <div style="font-size:36px;margin-bottom:8px;">✅</div>
@@ -4612,6 +4627,7 @@
     // ── WhatsApp QR Code Connection Management ──────────────
     var dashQrInstance = null;
     var dashQrPollTimer = null;
+    var dashIsMobile = window.matchMedia('(max-width: 768px)').matches;
 
     async function dashCheckState() {
       var stateChip = document.getElementById('waConnState');
@@ -4622,6 +4638,7 @@
       var qrContainer = document.getElementById('waQrContainer');
       var pairingEl = document.getElementById('waPairingCode');
       var errorEl = document.getElementById('waQrError');
+      var phoneInput = document.getElementById('dashPairingPhoneInput');
 
       try {
         // Use the per-landlord endpoint first
@@ -4633,6 +4650,7 @@
           disconnectBtn.style.display = 'none';
           restartBtn.style.display = 'none';
           connectedEl.style.display = 'none';
+          if (phoneInput) phoneInput.style.display = 'none';
           return;
         }
         dashQrInstance = mine.instanceName;
@@ -4644,6 +4662,7 @@
           connectedEl.style.display = 'block';
           qrContainer.style.display = 'none';
           pairingEl.style.display = 'none';
+          if (phoneInput) phoneInput.style.display = 'none';
           var infoEl = document.getElementById('waConnInfo');
           infoEl.textContent = 'Instance: ' + dashQrInstance;
           connectBtn.style.display = 'none';
@@ -4676,12 +4695,14 @@
       var errorEl = document.getElementById('waQrError');
       var connectBtn = document.getElementById('waConnectBtn');
       var stateChip = document.getElementById('waConnState');
+      var phoneInput = document.getElementById('dashPairingPhoneInput');
 
       loading.style.display = 'block';
       container.style.display = 'none';
       pairingEl.style.display = 'none';
       connectedEl.style.display = 'none';
       errorEl.style.display = 'none';
+      if (phoneInput) phoneInput.style.display = 'none';
       if (dashQrPollTimer) clearInterval(dashQrPollTimer);
 
       try {
@@ -4707,7 +4728,17 @@
 
         if (!dashQrInstance) throw new Error('Failed to get instance name');
 
-        // Get QR code
+        // On mobile: show phone number input for pairing code
+        if (dashIsMobile) {
+          loading.style.display = 'none';
+          phoneInput.style.display = 'block';
+          stateChip.textContent = 'Enter phone number';
+          stateChip.className = 'chip chip-warn';
+          connectBtn.style.display = 'none';
+          return;
+        }
+
+        // Desktop: Get QR code
         var result = await fetchJson('/admin/whatsapp/instance/connect/' + encodeURIComponent(dashQrInstance));
         loading.style.display = 'none';
 
@@ -4745,6 +4776,67 @@
         errorEl.textContent = err.message || 'Failed to connect. Check Evolution API settings.';
         errorEl.style.display = 'block';
         connectBtn.style.display = '';
+      }
+    }
+
+    /** Mobile: request pairing code using phone number */
+    async function dashRequestPairingCode() {
+      var phoneEl = document.getElementById('dashPairingPhone');
+      var phone = (phoneEl.value || '').replace(/[^0-9+]/g, '');
+      if (phone.length < 8) { phoneEl.style.borderColor = 'var(--error-border)'; return; }
+      phoneEl.style.borderColor = 'var(--border)';
+
+      if (!dashQrInstance) { dashInitQR(); return; }
+
+      var loading = document.getElementById('waQrLoading');
+      var pairingEl = document.getElementById('waPairingCode');
+      var errorEl = document.getElementById('waQrError');
+      var stateChip = document.getElementById('waConnState');
+      var requestBtn = document.getElementById('dashPairingRequestBtn');
+      var phoneInput = document.getElementById('dashPairingPhoneInput');
+
+      loading.style.display = 'block';
+      loading.innerHTML = '⏳ Requesting pairing code…';
+      pairingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      requestBtn.disabled = true;
+      requestBtn.textContent = 'Requesting…';
+
+      try {
+        var result = await fetchJson('/admin/whatsapp/instance/connect/' + encodeURIComponent(dashQrInstance) + '?number=' + encodeURIComponent(phone));
+        loading.style.display = 'none';
+        requestBtn.disabled = false;
+        requestBtn.textContent = 'Get Code';
+
+        if (result?.pairingCode) {
+          pairingEl.style.display = 'block';
+          document.getElementById('waPairingText').textContent = result.pairingCode;
+          phoneInput.style.display = 'none';
+          stateChip.textContent = 'Enter code in WhatsApp';
+          stateChip.className = 'chip chip-warn';
+
+          // Start polling
+          if (dashQrPollTimer) clearInterval(dashQrPollTimer);
+          dashQrPollTimer = setInterval(async function () {
+            try {
+              var state = await fetchJson('/admin/whatsapp/instance/state/' + encodeURIComponent(dashQrInstance));
+              if (state?.instance?.state === 'open') {
+                clearInterval(dashQrPollTimer);
+                dashQrPollTimer = null;
+                dashCheckState();
+                toast('WhatsApp connected!');
+              }
+            } catch { }
+          }, 4000);
+        } else {
+          throw new Error('No pairing code returned. Try again.');
+        }
+      } catch (err) {
+        loading.style.display = 'none';
+        requestBtn.disabled = false;
+        requestBtn.textContent = 'Get Code';
+        errorEl.textContent = err.message || 'Failed to get pairing code.';
+        errorEl.style.display = 'block';
       }
     }
 
