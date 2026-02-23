@@ -36,6 +36,11 @@ enum Plan {
 	ENTERPRISE
 }
 
+enum UnitUtilityType {
+	SINGLE
+	SHARED
+}
+
 enum FinancialType {
 	RENT_PAYMENT
 	EXPENSE
@@ -65,6 +70,7 @@ model Landlord {
 	updatedAt        DateTime @updatedAt
 
 	settings         LandlordSettings?
+	properties       Property[]
 	tenants          Tenant[]
 	units            Unit[]
 	financialRecords FinancialRecord[]
@@ -97,8 +103,8 @@ model LandlordSettings {
 model Tenant {
 	id          String               @id @default(cuid())
 	name        String
-	phone       String?              @unique
-	email       String?              @unique
+	phone       String?
+	email       String?
 	autoReplyEnabled Boolean          @default(true)
 	landlord    Landlord?            @relation(fields: [landlordId], references: [id])
 	landlordId  String?
@@ -108,7 +114,11 @@ model Tenant {
 	createdAt   DateTime             @default(now())
 	updatedAt   DateTime             @updatedAt
 
+	@@unique([phone, landlordId])
+	@@unique([email, landlordId])
 	@@index([landlordId])
+	@@index([phone])
+	@@index([email])
 }
 
 model AppSetting {
@@ -123,32 +133,52 @@ model AppSetting {
   @@unique([key, landlordId])
 }
 
-model Unit {
-	id            String               @id @default(cuid())
-	label         String
-	address       String
-	landlord      Landlord?            @relation(fields: [landlordId], references: [id])
-	landlordId    String?
-	tenants       UnitTenant[]
-	requests      MaintenanceRequest[]
-	utilityBills  UtilityBill[]
-	utilityCredentials UtilityCredential[]
-	greenButtonConnections GreenButtonConnection[]
-	createdAt     DateTime             @default(now())
-	updatedAt     DateTime             @updatedAt
+model Property {
+	id         String    @id @default(cuid())
+	address    String
+	landlord   Landlord? @relation(fields: [landlordId], references: [id])
+	landlordId String?
+	units      Unit[]
+	createdAt  DateTime  @default(now())
+	updatedAt  DateTime  @updatedAt
 
 	@@index([landlordId])
 }
 
+model Unit {
+	id               String               @id @default(cuid())
+	label            String
+	address          String               @default("")
+	property         Property?            @relation(fields: [propertyId], references: [id])
+	propertyId       String?
+	utilityType      UnitUtilityType      @default(SINGLE)
+	whatsappGroupJid String?
+	landlord         Landlord?            @relation(fields: [landlordId], references: [id])
+	landlordId       String?
+	tenants          UnitTenant[]
+	requests         MaintenanceRequest[]
+	utilityBills     UtilityBill[]
+	utilityCredentials UtilityCredential[]
+	greenButtonConnections GreenButtonConnection[]
+	reminders        Reminder[]
+	createdAt        DateTime             @default(now())
+	updatedAt        DateTime             @updatedAt
+
+	@@index([landlordId])
+	@@index([propertyId])
+}
+
 model UnitTenant {
-	id        String   @id @default(cuid())
-	tenant    Tenant   @relation(fields: [tenantId], references: [id])
-	tenantId  String
-	unit      Unit     @relation(fields: [unitId], references: [id])
-	unitId    String
-	startDate DateTime @default(now())
-	endDate   DateTime?
-	leaseDocuments LeaseDocument[]
+	id                  String   @id @default(cuid())
+	tenant              Tenant   @relation(fields: [tenantId], references: [id])
+	tenantId            String
+	unit                Unit     @relation(fields: [unitId], references: [id])
+	unitId              String
+	role                String   @default("tenant") // "tenant" | "resident"
+	utilitySharePercent Float?
+	startDate           DateTime @default(now())
+	endDate             DateTime?
+	leaseDocuments      LeaseDocument[]
 }
 
 // ── Lease Documents ─────────────────────────────────────
@@ -281,10 +311,13 @@ model ConversationMessage {
 model Reminder {
 	id          String   @id @default(cuid())
 	landlordId  String?
+	unit        Unit?    @relation(fields: [unitId], references: [id])
+	unitId      String?
 	type        String   // "rent" | "utility"
 	dayOfMonth  Int
 	timeUtc     String
 	style       String   // "short" | "medium" | "professional" | "casual"
+	amountCents Int?     // optional pre-filled utility bill amount
 	active      Boolean  @default(true)
 	lastSentAt  DateTime?
 	createdAt   DateTime @default(now())
@@ -292,6 +325,7 @@ model Reminder {
 
 	@@index([landlordId])
 	@@index([active])
+	@@index([unitId])
 }
 
 // ── Agent Token / Cost Tracking ─────────────────────────

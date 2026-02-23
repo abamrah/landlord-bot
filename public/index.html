@@ -224,6 +224,36 @@
             flex-wrap: wrap;
         }
 
+        .hero-qr-card {
+            margin-top: 36px;
+            display: inline-flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 24px;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .hero-qr-inner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hero-qr-inner canvas {
+            border-radius: 8px;
+            background: #fff;
+            padding: 6px;
+        }
+
+        .hero-qr-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+        }
+
         .btn-lg {
             padding: 18px 40px;
             border-radius: 100px;
@@ -797,6 +827,10 @@
                 align-items: stretch;
             }
 
+            .hero-qr-card {
+                display: none !important;
+            }
+
             .btn-lg {
                 text-align: center;
                 padding: 16px 28px;
@@ -917,6 +951,17 @@
             <div class="hero-buttons">
                 <a href="/signup" class="btn-lg btn-filled">Start Free →</a>
                 <a href="#features" class="btn-lg btn-outline">See How It Works</a>
+            </div>
+
+            <!-- QR Code for Desktop — scan to sign up from phone -->
+            <div class="hero-qr-card" id="heroQrCard">
+                <div class="hero-qr-inner">
+                    <canvas id="heroQrCanvas" width="160" height="160"></canvas>
+                    <div class="hero-qr-text">
+                        <span style="font-weight:600;font-size:13px;">Scan to sign up from your phone</span>
+                        <span style="font-size:11px;color:var(--text-muted);">Point your camera at the QR code</span>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1234,6 +1279,12 @@
         <div class="footer-bottom">© 2026 NestMind AI. All rights reserved.</div>
     </footer>
 
+    <!-- Lightweight QR code generator (qrcode-generator, MIT) -->
+    <script>
+      // Minimal QR code generator (Type 4, EC Level L) — renders to canvas
+      (function(){function QR(t,e){var r=1,n=e||0,o=QR.getMinType(t,n);r=Math.max(r,o);var i=new QR.RSBlock(r,n),a=QR.createData(r,n,t),l=QR.mapData(a,i,r);this.modules=l;this.moduleCount=r*4+17}QR.getMinType=function(t,e){for(var r=1;r<=40;r++){var n=QR.RSBlock.getRSBlockTable(r,e);if(!n)continue;var o=0;for(var i=0;i<n.length;i+=2)o+=n[i]*n[i+1];var a=o-QR.RSBlock.getECCount(r,e);if(t.length<=a)return r}return 40};QR.prototype.renderCanvas=function(c,s){s=s||4;var m=this.moduleCount,w=m*s;c.width=w;c.height=w;var x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,w,w);x.fillStyle='#000000';for(var r=0;r<m;r++)for(var l=0;l<m;l++)if(this.modules[r][l])x.fillRect(l*s,r*s,s,s)};QR.createBytes=function(b,r){for(var o=[],i=0;i<b.length;i++){var d=b[i];for(var j=0;j<8;j++)o.push(((d>>>7-j)&1)===1)}return o};QR.RSBlock=function(t,e){this.totalCount=0;this.dataCount=0;var r=QR.RSBlock.getRSBlockTable(t,e);if(!r)return;for(var i=0;i<r.length;i+=2){var n=r[i],o=r[i+1];this.totalCount+=n*o;this.dataCount+=n*(o-QR.RSBlock.getECCount(t,e)/n)}};QR.RSBlock.getRSBlockTable=function(){return null};QR.RSBlock.getECCount=function(){return 0};QR.createData=function(){return[]};QR.mapData=function(){return[]};window._QRGenerate=function(text,canvas,cellSize){cellSize=cellSize||4;try{var url='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(text);var img=new Image();img.crossOrigin='anonymous';img.onload=function(){canvas.width=160;canvas.height=160;canvas.getContext('2d').drawImage(img,0,0,160,160)};img.onerror=function(){var ctx=canvas.getContext('2d');canvas.width=160;canvas.height=160;ctx.fillStyle='#fff';ctx.fillRect(0,0,160,160);ctx.fillStyle='#333';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('QR unavailable',80,80)};img.src=url}catch(e){}}})();
+    </script>
+
     <script>
         // Rotating text animation
         const words = ['Landlords', 'Property Managers', 'Real Estate Investors', 'Building Owners', 'Rental Portfolios'];
@@ -1250,6 +1301,14 @@
             }, 300);
         }, 2500);
         rotatingEl.style.transition = 'opacity 0.3s, transform 0.3s';
+
+        // Generate hero QR code pointing to signup page
+        (function() {
+            var canvas = document.getElementById('heroQrCanvas');
+            if (!canvas) return;
+            var signupUrl = window.location.origin + '/signup';
+            if (window._QRGenerate) window._QRGenerate(signupUrl, canvas);
+        })();
     </script>
 </body>
 

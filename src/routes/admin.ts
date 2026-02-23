@@ -1,7 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import repo from "../services/repository";
-import { MaintenanceStatus, UtilityType } from "@prisma/client";
+import { MaintenanceStatus, UtilityType, UnitUtilityType } from "@prisma/client";
 import whatsappService from "../services/whatsappService";
 import agentService from "../services/agentService";
 import { getWebhookStatus } from "../services/webhookStatus";
@@ -20,6 +20,15 @@ import greenButton from "../services/greenButtonService";
 
 const router = express.Router();
 
+// Helper to resolve Evolution API instance for a landlord
+async function resolveInstanceForLandlord(landlordId: string): Promise<string> {
+  try {
+    const landlord = await db.landlord.findUnique({ where: { id: landlordId }, select: { evolutionInstanceName: true } });
+    if (landlord?.evolutionInstanceName) return landlord.evolutionInstanceName;
+  } catch { /* ignore */ }
+  return (process.env.EVOLUTION_API_INSTANCE || process.env.EVOLUTION_API_SESSION || "default").trim();
+}
+
 // All admin routes require authentication
 router.use(requireAuth);
 
@@ -30,6 +39,8 @@ const tenantSchema = z.object({
   email: z.string().optional(),
   unitId: z.string().optional(),
   autoReplyEnabled: z.boolean().optional(),
+  role: z.enum(["tenant", "resident"]).optional(),
+  utilitySharePercent: z.number().min(0).max(100).optional(),
 });
 
 const tenantUpdateSchema = z.object({
@@ -53,12 +64,25 @@ const contractorUpdateSchema = contractorSchema.partial();
 const unitSchema = z.object({
   id: z.string().optional(),
   label: z.string().min(1, "label required"),
+  address: z.string().optional().default(""),
+  propertyId: z.string().optional(),
+  utilityType: z.enum(["SINGLE", "SHARED"]).optional(),
+});
+
+const unitUpdateSchema = z.object({
+  label: z.string().optional(),
+  address: z.string().optional(),
+  propertyId: z.string().nullable().optional(),
+  utilityType: z.enum(["SINGLE", "SHARED"]).optional(),
+});
+
+const propertySchema = z.object({
   address: z.string().min(1, "address required"),
 });
 
-const unitUpdateSchema = unitSchema.partial().omit({ id: true }).extend({
-  label: z.string().optional(),
-  address: z.string().optional(),
+const unitTenantUpdateSchema = z.object({
+  role: z.enum(["tenant", "resident"]).optional(),
+  utilitySharePercent: z.number().min(0).max(100).nullable().optional(),
 });
 
 const tenantContactSchema = z.object({
@@ -119,11 +143,11 @@ router.post("/tenants", async (req, res) => {
     return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
   }
   if (parsed.data.phone) {
-    const existing = await repo.findTenantByPhone(parsed.data.phone);
+    const existing = await repo.findTenantByPhone(parsed.data.phone, authReq.landlordId);
     if (existing) return res.status(409).json({ error: "phone_in_use" });
   }
   if (parsed.data.email) {
-    const existing = await repo.findTenantByEmail(parsed.data.email);
+    const existing = await repo.findTenantByEmail(parsed.data.email, authReq.landlordId);
     if (existing) return res.status(409).json({ error: "email_in_use" });
   }
   if (parsed.data.unitId) {
@@ -132,6 +156,52 @@ router.post("/tenants", async (req, res) => {
   }
   const tenant = await repo.createTenant({ ...parsed.data, landlordId: authReq.landlordId });
   if (!tenant) return res.status(500).json({ error: "tenant_create_failed" });
+
+  // Set role and utilitySharePercent on UnitTenant if provided
+  if (parsed.data.unitId && (parsed.data.role || parsed.data.utilitySharePercent !== undefined)) {
+    try {
+      const unitTenants = await db.unitTenant.findMany({ where: { tenantId: tenant.id, unitId: parsed.data.unitId } });
+      if (unitTenants.length > 0) {
+        await repo.updateUnitTenant({
+          id: unitTenants[0].id,
+          role: parsed.data.role,
+          utilitySharePercent: parsed.data.utilitySharePercent,
+        });
+      }
+    } catch (err) {
+      console.warn("Failed to update unit-tenant role/share:", (err as Error).message);
+    }
+  }
+
+  // Check if unit already has multiple occupants — if so, skip individual welcome (wait for group)
+  let skipIndividualWelcome = false;
+  if (parsed.data.unitId) {
+    try {
+      const unitOccupants = await db.unitTenant.count({ where: { unitId: parsed.data.unitId } });
+      if (unitOccupants > 1) skipIndividualWelcome = true;
+    } catch { /* ignore */ }
+  }
+
+  // Send automated welcome message if tenant has a phone number (only for single-occupant units)
+  if (parsed.data.phone && !skipIndividualWelcome) {
+    try {
+      const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { name: true, company: true } });
+      const landlordName = landlord?.company || landlord?.name || "Your Landlord";
+      const tenantName = parsed.data.name;
+      const welcomeMsg = `*Welcome to ${landlordName}'s Property Management!*\n\nHi ${tenantName}, your landlord has decided to use NestMind — an AI-powered platform for property management, making communication faster and easier for everyone.\n\n*How it works:*\n• Send a message here anytime to report maintenance issues\n• You'll receive rent reminders before due dates\n• AI-assisted support means faster response times\n\n*Dos:*\n✅ Report maintenance issues promptly — attach photos if possible\n✅ Respond to rent reminders and payment confirmations\n✅ Keep this chat for property-related communication\n\n*Don'ts:*\n❌ Don't share personal financial info (bank passwords, SIN, etc.)\n❌ Don't ignore maintenance follow-ups\n\nWe're here to help! Send \"Hi\" anytime to get started.`;
+      await whatsappService.sendWhatsAppText({ to: parsed.data.phone, text: welcomeMsg, landlordId: authReq.landlordId });
+      // Log the welcome message in conversation history
+      await conversationMemory.saveMessage({
+        phone: parsed.data.phone,
+        landlordId: authReq.landlordId,
+        role: "system",
+        content: welcomeMsg,
+      });
+    } catch (welcomeErr) {
+      console.warn("Failed to send welcome message:", (welcomeErr as Error).message);
+    }
+  }
+
   res.json({ tenant });
 });
 
@@ -199,6 +269,31 @@ router.get("/tenants", async (req, res) => {
   res.json({ items: tenants });
 });
 
+/** POST /admin/tenants/:id/message — Send a direct message to a tenant via WhatsApp */
+router.post("/tenants/:id/message", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  if (!(await repo.verifyTenantOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
+  const msgSchema = z.object({ text: z.string().min(1, "message required") });
+  const parsed = msgSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const tenant = await db.tenant.findUnique({ where: { id: req.params.id }, select: { phone: true, name: true } });
+  if (!tenant?.phone) return res.status(400).json({ error: "tenant_has_no_phone", message: "Tenant does not have a phone number" });
+  try {
+    const result = await whatsappService.sendWhatsAppText({ to: tenant.phone, text: parsed.data.text, landlordId: authReq.landlordId });
+    if (!result.ok) return res.status(500).json({ error: "send_failed", details: result.error });
+    // Log the message in conversation history
+    await conversationMemory.saveMessage({
+      phone: tenant.phone,
+      landlordId: authReq.landlordId,
+      role: "landlord",
+      content: parsed.data.text,
+    });
+    res.json({ sent: true, to: tenant.phone });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 router.get("/contractors", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   const contractors = await repo.listContractors(authReq.landlordId);
@@ -216,7 +311,11 @@ router.post("/units", async (req, res) => {
   if (!limit.allowed) {
     return res.status(403).json({ error: "plan_limit_reached", message: `Your ${limit.plan} plan allows ${limit.max} units. You have ${limit.current}.`, current: limit.current, max: limit.max });
   }
-  const unit = await repo.createUnit({ ...parsed.data, landlordId: authReq.landlordId });
+  const unit = await repo.createUnit({
+    ...parsed.data,
+    utilityType: (parsed.data.utilityType as UnitUtilityType) || undefined,
+    landlordId: authReq.landlordId,
+  });
   res.json({ unit });
 });
 
@@ -225,7 +324,12 @@ router.patch("/units/:id", async (req, res) => {
   if (!(await repo.verifyUnitOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
   const parsed = unitUpdateSchema.safeParse(req.body || {});
   if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
-  const unit = await repo.updateUnit({ id: req.params.id, ...parsed.data });
+  const unit = await repo.updateUnit({
+    id: req.params.id,
+    ...parsed.data,
+    utilityType: (parsed.data.utilityType as UnitUtilityType) || undefined,
+    propertyId: parsed.data.propertyId ?? undefined,
+  });
   if (!unit) return res.status(404).json({ error: "not_found" });
   res.json({ unit });
 });
@@ -242,6 +346,121 @@ router.get("/units", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   const units = await repo.listUnits(authReq.landlordId);
   res.json({ items: units });
+});
+
+// ── Property CRUD ────────────────────────────────────────
+
+router.post("/properties", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const parsed = propertySchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const property = await repo.createProperty({ address: parsed.data.address, landlordId: authReq.landlordId });
+  if (!property) return res.status(500).json({ error: "property_create_failed" });
+  res.json({ property });
+});
+
+router.get("/properties", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const properties = await repo.listProperties(authReq.landlordId);
+  res.json({ items: properties });
+});
+
+router.delete("/properties/:id", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  if (!(await repo.verifyPropertyOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
+  const deleted = await repo.deleteProperty(req.params.id);
+  if (!deleted) return res.status(404).json({ error: "not_found" });
+  res.json({ deleted: true });
+});
+
+// ── UnitTenant Management ────────────────────────────────
+
+router.patch("/unit-tenants/:id", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  // Verify via unit ownership
+  const ut = await db.unitTenant.findUnique({ where: { id: req.params.id }, include: { unit: true } });
+  if (!ut || ut.unit.landlordId !== authReq.landlordId) return res.status(403).json({ error: "forbidden" });
+  const parsed = unitTenantUpdateSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.updateUnitTenant({ id: req.params.id, ...parsed.data });
+  if (!updated) return res.status(404).json({ error: "not_found" });
+  res.json({ unitTenant: updated });
+});
+
+/** POST /admin/units/:id/utility-shares — Set utility share percentages for all occupants */
+router.post("/units/:id/utility-shares", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  if (!(await repo.verifyUnitOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
+  const sharesSchema = z.object({
+    shares: z.array(z.object({
+      unitTenantId: z.string(),
+      percent: z.number().min(0).max(100),
+    })),
+  });
+  const parsed = sharesSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  // Validate total = 100
+  const total = parsed.data.shares.reduce((sum, s) => sum + s.percent, 0);
+  if (Math.abs(total - 100) > 0.01) return res.status(400).json({ error: "shares_must_total_100", total });
+  const ok = await repo.setUtilityShares(req.params.id, parsed.data.shares);
+  if (!ok) return res.status(500).json({ error: "set_shares_failed" });
+  res.json({ ok: true });
+});
+
+/** GET /admin/units/:id/occupants — Get unit with all occupants, roles, and share percentages */
+router.get("/units/:id/occupants", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  if (!(await repo.verifyUnitOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
+  const unit = await repo.getUnitWithOccupants(req.params.id);
+  if (!unit) return res.status(404).json({ error: "not_found" });
+  res.json({ unit });
+});
+
+/** POST /admin/units/:id/whatsapp-group — Create a WhatsApp group for a unit's occupants */
+router.post("/units/:id/whatsapp-group", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  if (!(await repo.verifyUnitOwnership(req.params.id, authReq.landlordId))) return res.status(403).json({ error: "forbidden" });
+  const unit = await repo.getUnitWithOccupants(req.params.id);
+  if (!unit) return res.status(404).json({ error: "unit_not_found" });
+
+  // Collect phone numbers from all occupants
+  const phones = unit.tenants
+    .map((ut: any) => ut.tenant?.phone)
+    .filter(Boolean) as string[];
+  if (phones.length < 2) return res.status(400).json({ error: "need_at_least_2_members", message: "Need at least 2 occupants with phone numbers to create a group" });
+
+  // Also add landlord's own WhatsApp number(s) to the group
+  const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { whatsappNumbers: true, name: true, company: true } });
+  const landlordPhones = landlord?.whatsappNumbers || [];
+  const allParticipants = [...new Set([...landlordPhones, ...phones])];
+
+  // Resolve instance name
+  const instanceName = await resolveInstanceForLandlord(authReq.landlordId);
+
+  // Build group name from unit label and property address
+  const propertyAddress = (unit as any).property?.address || unit.address || "";
+  const groupSubject = propertyAddress
+    ? `${unit.label} - ${propertyAddress}`
+    : unit.label;
+
+  const result = await whatsappService.createWhatsAppGroup(instanceName, groupSubject, allParticipants);
+  if (!result.ok) return res.status(500).json({ error: "group_creation_failed", details: result.error });
+
+  // Save the group JID on the unit
+  await repo.updateUnit({ id: unit.id, whatsappGroupJid: result.groupJid || "" });
+
+  // Send welcome message to the group
+  const landlordName = landlord?.company || landlord?.name || "Your Landlord";
+  const occupantNames = unit.tenants.map((ut: any) => ut.tenant?.name).filter(Boolean).join(", ");
+  const welcomeMsg = `*Welcome to ${landlordName}'s Property Group — ${unit.label}!*\n\nHi ${occupantNames}, your landlord has set up this group for property communication regarding your unit.\n\n*How it works:*\n• Report maintenance issues here or in your personal chat\n• Utility reminders and updates will be sent to this group\n• AI-assisted support for faster responses\n\n*Dos:*\n✅ Report maintenance issues promptly\n✅ Respond to utility and rent reminders\n✅ Keep this group for property-related communication\n\n*Don'ts:*\n❌ Don't share personal financial info\n❌ Don't ignore follow-ups\n\nWelcome aboard! 🏠`;
+
+  await whatsappService.sendWhatsAppGroupText({
+    groupJid: result.groupJid || "",
+    text: welcomeMsg,
+    landlordId: authReq.landlordId,
+  });
+
+  res.json({ ok: true, groupJid: result.groupJid });
 });
 
 router.post("/utilities/credentials", async (req, res) => {
@@ -1056,7 +1275,18 @@ router.post("/agent/ask", async (req, res) => {
       meta: { toolCalls: result.toolCallCount, steps: result.steps.length },
     });
 
-    res.json(result);
+    // Extract any PDF artifacts from tool results (for download in dashboard)
+    const pdfArtifacts: Array<{ pdfBase64: string; fileName: string }> = [];
+    for (const step of result.steps || []) {
+      for (const tr of step.toolResults || []) {
+        const r = tr.result as any;
+        if (r && r.pdfBase64 && r.fileName) {
+          pdfArtifacts.push({ pdfBase64: r.pdfBase64, fileName: r.fileName });
+        }
+      }
+    }
+
+    res.json({ ...result, pdfArtifacts });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }

@@ -32,7 +32,7 @@ export function lookupTenantTool(): ToolDefinition {
         enabled: true,
         async execute(args) {
             if (args.phone) {
-                const tenant = await repo.findTenantByPhone(String(args.phone));
+                const tenant = await repo.findTenantByPhone(String(args.phone), args.landlordId ? String(args.landlordId) : undefined);
                 return tenant || { error: "Tenant not found" };
             }
             if (args.tenantId) {
@@ -1180,7 +1180,7 @@ export function checkMyRequestStatusTool(): ToolDefinition {
             const phone = String(args.tenantPhone).trim();
             if (!phone) return { error: "Tenant phone number is required" };
 
-            const tenant = await repo.findTenantByPhone(phone);
+            const tenant = await repo.findTenantByPhone(phone, args.landlordId ? String(args.landlordId) : undefined);
             if (!tenant) return { requests: [], message: "No tenant found with this phone number." };
 
             const requests = await db.maintenanceRequest.findMany({

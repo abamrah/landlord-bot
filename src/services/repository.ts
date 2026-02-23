@@ -1,5 +1,5 @@
 import { db } from "../config/database";
-import { Prisma, Priority, MaintenanceStatus, UtilityType } from "@prisma/client";
+import { Prisma, Priority, MaintenanceStatus, UtilityType, UnitUtilityType } from "@prisma/client";
 import { encrypt, decrypt } from "./encryption";
 
 const isDbEnabled = Boolean(process.env.DATABASE_URL);
@@ -533,14 +533,16 @@ export async function updateTenantContact(params: { id: string; phone?: string; 
   }
 }
 
-export async function createUnit(params: { id?: string; label: string; address: string; landlordId?: string }) {
+export async function createUnit(params: { id?: string; label: string; address?: string; propertyId?: string; utilityType?: UnitUtilityType; landlordId?: string }) {
   if (!isDbEnabled) return null;
   try {
     return await db.unit.create({
       data: {
         id: params.id,
         label: params.label,
-        address: params.address,
+        address: params.address || "",
+        propertyId: params.propertyId || null,
+        utilityType: params.utilityType || "SINGLE",
         landlordId: params.landlordId,
       },
     });
@@ -761,7 +763,16 @@ export async function listUnits(landlordId?: string) {
   const where: Prisma.UnitWhereInput = {};
   if (landlordId) where.landlordId = landlordId;
   try {
-    return await db.unit.findMany({ where, orderBy: { createdAt: "desc" } });
+    return await db.unit.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: {
+        property: true,
+        tenants: {
+          include: { tenant: { select: { id: true, name: true, phone: true, email: true } } },
+        },
+      },
+    });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn("list units failed", err);
@@ -769,11 +780,14 @@ export async function listUnits(landlordId?: string) {
   }
 }
 
-export async function updateUnit(params: { id: string; label?: string; address?: string }) {
+export async function updateUnit(params: { id: string; label?: string; address?: string; utilityType?: UnitUtilityType; whatsappGroupJid?: string; propertyId?: string }) {
   if (!isDbEnabled || !params.id) return null;
   const data: Record<string, unknown> = {};
   if (typeof params.label === "string") data.label = params.label;
   if (typeof params.address === "string") data.address = params.address;
+  if (params.utilityType) data.utilityType = params.utilityType;
+  if (typeof params.whatsappGroupJid === "string") data.whatsappGroupJid = params.whatsappGroupJid;
+  if (typeof params.propertyId === "string") data.propertyId = params.propertyId || null;
   try {
     return await db.unit.update({ where: { id: params.id }, data });
   } catch (err) {
@@ -820,12 +834,27 @@ export async function getUnitById(id?: string) {
   }
 }
 
-export async function findTenantByEmail(email?: string) {
+export async function findUnitByGroupJid(groupJid: string) {
+  if (!isDbEnabled || !groupJid) return null;
+  try {
+    return await db.unit.findFirst({
+      where: { whatsappGroupJid: groupJid },
+      include: { tenants: { include: { tenant: true } }, property: true },
+    });
+  } catch (err) {
+    console.warn("findUnitByGroupJid failed", err);
+    return null;
+  }
+}
+
+export async function findTenantByEmail(email?: string, landlordId?: string) {
   if (!isDbEnabled || !email) return null;
   const trimmed = email.trim();
   if (!trimmed) return null;
   try {
-    return await db.tenant.findFirst({ where: { email: trimmed } });
+    const where: Prisma.TenantWhereInput = { email: trimmed };
+    if (landlordId) where.landlordId = landlordId;
+    return await db.tenant.findFirst({ where });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn("find tenant by email failed", err);
@@ -833,7 +862,7 @@ export async function findTenantByEmail(email?: string) {
   }
 }
 
-export async function findTenantByPhone(phone?: string) {
+export async function findTenantByPhone(phone?: string, landlordId?: string) {
   if (!isDbEnabled || !phone) return null;
   const trimmed = phone.trim();
   if (!trimmed) return null;
@@ -841,11 +870,11 @@ export async function findTenantByPhone(phone?: string) {
   const withPlus = normalized ? `+${normalized}` : "";
   const candidates = Array.from(new Set([trimmed, normalized, withPlus].filter(Boolean)));
   try {
-    return await db.tenant.findFirst({
-      where: {
-        OR: candidates.map((value) => ({ phone: value })),
-      },
-    });
+    const where: Prisma.TenantWhereInput = {
+      OR: candidates.map((value) => ({ phone: value })),
+    };
+    if (landlordId) where.landlordId = landlordId;
+    return await db.tenant.findFirst({ where });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn("find tenant by phone failed", err);
@@ -1071,6 +1100,7 @@ export default {
   deleteUnit,
   getTenantById,
   getUnitById,
+  findUnitByGroupJid,
   findTenantByPhone,
   findTenantByEmail,
   findContractorByPhone,
@@ -1108,6 +1138,15 @@ export default {
   verifyUtilityCredentialOwnership,
   verifyUtilityBillOwnership,
   verifyReminderOwnership,
+  // Property management
+  createProperty,
+  listProperties,
+  deleteProperty,
+  verifyPropertyOwnership,
+  // UnitTenant management
+  updateUnitTenant,
+  getUnitWithOccupants,
+  setUtilityShares,
   // Account deletion
   deleteAllLandlordData,
   // Financial records
@@ -1175,6 +1214,113 @@ export async function verifyReminderOwnership(reminderId: string, landlordId: st
   } catch { return false; }
 }
 
+// ── Property helpers ──────────────────────────────────────
+
+export async function createProperty(params: { address: string; landlordId: string }) {
+  if (!isDbEnabled) return null;
+  try {
+    return await db.property.create({
+      data: { address: params.address, landlordId: params.landlordId },
+    });
+  } catch (err) {
+    console.warn("property create failed", err);
+    return null;
+  }
+}
+
+export async function listProperties(landlordId: string) {
+  if (!isDbEnabled) return [];
+  try {
+    return await db.property.findMany({
+      where: { landlordId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        units: {
+          include: {
+            tenants: {
+              include: { tenant: { select: { id: true, name: true, phone: true, email: true } } },
+            },
+          },
+        },
+      },
+    });
+  } catch (err) {
+    console.warn("list properties failed", err);
+    return [];
+  }
+}
+
+export async function deleteProperty(id: string) {
+  if (!isDbEnabled || !id) return null;
+  try {
+    // Unlink units from property (don't delete the units themselves)
+    await db.unit.updateMany({ where: { propertyId: id }, data: { propertyId: null } });
+    return await db.property.delete({ where: { id } });
+  } catch (err) {
+    console.warn("property delete failed", err);
+    return null;
+  }
+}
+
+export async function verifyPropertyOwnership(propertyId: string, landlordId: string): Promise<boolean> {
+  if (!isDbEnabled) return false;
+  try {
+    const p = await db.property.findUnique({ where: { id: propertyId }, select: { landlordId: true } });
+    return p?.landlordId === landlordId;
+  } catch { return false; }
+}
+
+// ── UnitTenant management ───────────────────────────────
+
+export async function updateUnitTenant(params: { id: string; role?: string; utilitySharePercent?: number | null }) {
+  if (!isDbEnabled || !params.id) return null;
+  const data: Record<string, unknown> = {};
+  if (typeof params.role === "string") data.role = params.role;
+  if (params.utilitySharePercent !== undefined) data.utilitySharePercent = params.utilitySharePercent;
+  try {
+    return await db.unitTenant.update({ where: { id: params.id }, data });
+  } catch (err) {
+    console.warn("unitTenant update failed", err);
+    return null;
+  }
+}
+
+export async function getUnitWithOccupants(unitId: string) {
+  if (!isDbEnabled || !unitId) return null;
+  try {
+    return await db.unit.findUnique({
+      where: { id: unitId },
+      include: {
+        property: true,
+        tenants: {
+          include: {
+            tenant: { select: { id: true, name: true, phone: true, email: true } },
+          },
+        },
+      },
+    });
+  } catch (err) {
+    console.warn("getUnitWithOccupants failed", err);
+    return null;
+  }
+}
+
+export async function setUtilityShares(unitId: string, shares: { unitTenantId: string; percent: number }[]) {
+  if (!isDbEnabled || !unitId) return false;
+  try {
+    for (const share of shares) {
+      await db.unitTenant.update({
+        where: { id: share.unitTenantId },
+        data: { utilitySharePercent: share.percent },
+      });
+    }
+    return true;
+  } catch (err) {
+    console.warn("setUtilityShares failed", err);
+    return false;
+  }
+}
+
 /**
  * Delete ALL data for a landlord — full account wipe.
  * Returns evolution API instance names that need external cleanup.
@@ -1206,6 +1352,7 @@ export async function deleteAllLandlordData(landlordId: string): Promise<{ insta
     db.appSetting.deleteMany({ where: { landlordId } }),
     db.tenant.deleteMany({ where: { landlordId } }),
     db.unit.deleteMany({ where: { landlordId } }),
+    db.property.deleteMany({ where: { landlordId } }),
     db.landlord.delete({ where: { id: landlordId } }),
   ]);
 
@@ -1225,11 +1372,16 @@ export interface LandlordPortfolio {
     id: string;
     label: string;
     address: string;
+    utilityType: string;
+    whatsappGroupJid: string | null;
+    propertyAddress: string | null;
     tenants: {
       id: string;
       name: string;
       phone: string | null;
       email: string | null;
+      role: string;
+      utilitySharePercent: number | null;
       leaseStart: string | null;
       leaseEnd: string | null;
     }[];
@@ -1252,6 +1404,7 @@ export async function loadLandlordContext(landlordId: string): Promise<LandlordP
       include: {
         units: {
           include: {
+            property: true,
             tenants: {
               include: {
                 tenant: { select: { id: true, name: true, phone: true, email: true } },
@@ -1283,11 +1436,16 @@ export async function loadLandlordContext(landlordId: string): Promise<LandlordP
         id: u.id,
         label: u.label,
         address: u.address,
+        utilityType: u.utilityType,
+        whatsappGroupJid: u.whatsappGroupJid,
+        propertyAddress: (u as any).property?.address || null,
         tenants: u.tenants.map((ut) => ({
           id: ut.tenant.id,
           name: ut.tenant.name,
           phone: ut.tenant.phone,
           email: ut.tenant.email,
+          role: ut.role,
+          utilitySharePercent: ut.utilitySharePercent,
           leaseStart: ut.startDate ? ut.startDate.toISOString().split("T")[0] : null,
           leaseEnd: ut.endDate ? ut.endDate.toISOString().split("T")[0] : null,
         })),

@@ -160,8 +160,8 @@ export const propertyManagementPlugin: VerticalPlugin = {
         }
 
         // Check if sender is a tenant belonging to this account
-        const tenant = await repo.findTenantByPhone(phone);
-        if (tenant && tenant.landlordId === accountId) {
+        const tenant = await repo.findTenantByPhone(phone, accountId);
+        if (tenant) {
             return {
                 role: "tenant",
                 personId: tenant.id,

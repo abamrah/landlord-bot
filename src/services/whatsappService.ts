@@ -62,8 +62,24 @@ export function normalizeWhatsAppNumber(raw: string) {
 }
 
 /**
+ * Convert markdown-style formatting to WhatsApp native formatting.
+ * **bold** → *bold*, __italic__ → _italic_, ~~strike~~ → ~strike~
+ */
+export function formatWhatsAppText(text: string): string {
+  if (!text) return text;
+  // Convert **bold** to *bold* (WhatsApp native bold)
+  let formatted = text.replace(/\*\*(.+?)\*\*/g, '*$1*');
+  // Convert __italic__ to _italic_ (WhatsApp native italic)
+  formatted = formatted.replace(/__(.+?)__/g, '_$1_');
+  // Convert ~~strike~~ to ~strike~ (WhatsApp native strikethrough)
+  formatted = formatted.replace(/~~(.+?)~~/g, '~$1~');
+  return formatted;
+}
+
+/**
  * Send a WhatsApp text message via Evolution API.
  * Now accepts optional landlordId for multi-tenant instance routing (future use).
+ * Automatically applies WhatsApp rich text formatting.
  */
 export async function sendWhatsAppText(params: SendTextParams): Promise<SendResult> {
   const cfg = getConfig();
@@ -77,7 +93,7 @@ export async function sendWhatsAppText(params: SendTextParams): Promise<SendResu
   const url = buildSendUrl(cfg.baseUrl, cfg.sendPath, instanceName);
   const payload: Record<string, unknown> = {
     number: normalizeWhatsAppNumber(params.to),
-    text: params.text,
+    text: formatWhatsAppText(params.text),
   };
   // eslint-disable-next-line no-console
   console.info("sendWhatsAppText →", { url, to: payload.number, textLen: (params.text || "").length });
@@ -102,6 +118,103 @@ export async function sendWhatsAppText(params: SendTextParams): Promise<SendResu
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error("sendWhatsAppText EXCEPTION", { error: (err as Error).message, url });
+    return { ok: false, error: (err as Error).message };
+  }
+}
+
+// ── WhatsApp Group Management ──
+
+type CreateGroupResult = {
+  ok: boolean;
+  groupJid?: string;
+  error?: string;
+  response?: unknown;
+};
+
+/**
+ * Create a WhatsApp group via Evolution API.
+ * @param instanceName Evolution API instance name
+ * @param subject Group name/subject (e.g. "Unit 201 - 123 Main St")
+ * @param participants Array of phone numbers to add to the group
+ */
+export async function createWhatsAppGroup(
+  instanceName: string,
+  subject: string,
+  participants: string[]
+): Promise<CreateGroupResult> {
+  const cfg = getConfig();
+  if (!cfg.baseUrl || !cfg.token) {
+    console.error("createWhatsAppGroup BLOCKED: Evolution API not configured");
+    return { ok: false, error: "evolution_api_not_configured" };
+  }
+  const url = buildSendUrl(cfg.baseUrl, "/group/create", instanceName);
+  const payload = {
+    subject,
+    participants: participants.map((p) => normalizeWhatsAppNumber(p)),
+  };
+  console.info("createWhatsAppGroup →", { url, subject, participantCount: participants.length });
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        [cfg.tokenHeader]: cfg.token,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("createWhatsAppGroup FAILED", { status: res.status, error: data?.error || data?.message });
+      return { ok: false, error: data?.error || `create_group_failed_${res.status}`, response: data };
+    }
+    // Evolution API returns the group JID in the response
+    const groupJid = data?.id || data?.groupJid || data?.jid || data?.group?.id || "";
+    console.info("createWhatsAppGroup OK", { subject, groupJid });
+    return { ok: true, groupJid, response: data };
+  } catch (err) {
+    console.error("createWhatsAppGroup EXCEPTION", { error: (err as Error).message });
+    return { ok: false, error: (err as Error).message };
+  }
+}
+
+/**
+ * Send a text message to a WhatsApp group.
+ * Uses the same sendText endpoint but with the group JID.
+ */
+export async function sendWhatsAppGroupText(params: {
+  groupJid: string;
+  text: string;
+  landlordId?: string;
+}): Promise<SendResult> {
+  const cfg = getConfig();
+  if (!cfg.baseUrl || !cfg.token) {
+    return { ok: false, error: "evolution_api_not_configured" };
+  }
+  const instanceName = await resolveInstance(params.landlordId);
+  const url = buildSendUrl(cfg.baseUrl, cfg.sendPath, instanceName);
+  const payload = {
+    number: params.groupJid,
+    text: formatWhatsAppText(params.text),
+  };
+  console.info("sendWhatsAppGroupText →", { url, groupJid: params.groupJid, textLen: params.text.length });
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        [cfg.tokenHeader]: cfg.token,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("sendWhatsAppGroupText FAILED", { status: res.status, error: data?.error || data?.message });
+      return { ok: false, error: data?.error || `send_failed_${res.status}`, response: data };
+    }
+    console.info("sendWhatsAppGroupText OK", { groupJid: params.groupJid, status: res.status });
+    return { ok: true, response: data };
+  } catch (err) {
+    console.error("sendWhatsAppGroupText EXCEPTION", { error: (err as Error).message });
     return { ok: false, error: (err as Error).message };
   }
 }
@@ -206,4 +319,7 @@ export default {
   sendWhatsAppDocument,
   normalizeWhatsAppNumber,
   alertLandlord,
+  formatWhatsAppText,
+  createWhatsAppGroup,
+  sendWhatsAppGroupText,
 };

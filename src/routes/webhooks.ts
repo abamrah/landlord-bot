@@ -726,9 +726,18 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
     const resolvedLandlordId = instanceLandlord?.id || "";
 
-    // Ignore group messages — we only process direct messages
+    // ── Group message handling ──
+    // If the message comes from a known unit WhatsApp group, route it to the
+    // landlord's agent. Otherwise ignore group chatter.
     if (isGroup) {
-      return res.json({ ok: true, ignored: "group_message" });
+      const unitForGroup = await repo.findUnitByGroupJid(remoteJid);
+      if (!unitForGroup) {
+        return res.json({ ok: true, ignored: "group_message" });
+      }
+      // We have a recognized unit group — resolve landlord from unit owner and
+      // treat the sender (participant) as the speaking tenant.  Fall through to
+      // the normal tenant processing flow below.
+      console.info("group message from known unit", { unitId: unitForGroup.id, sender, groupJid: remoteJid });
     }
 
     // Ignore bot-echoed/own messages (except landlord self-chat)
@@ -740,6 +749,8 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
     // ── Multi-landlord resolution ──
     // First try to resolve by Evolution API instance name (most reliable for multi-tenant)
+    // IMPORTANT: Scope tenant/contractor lookups to the instance landlord to prevent cross-tenant data leaks
+    const effectiveLandlordId = resolvedLandlordId || "";
 
     let ctx = await resolveContext(sender);
     // If sender is unknown but we know the instance, resolve via instance owner
@@ -747,9 +758,14 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       // Sender is a tenant/unknown person messaging a landlord's WhatsApp — treat as tenant
       ctx = { role: "unknown", landlordId: instanceLandlord.id, entity: null };
     }
+    // If sender was resolved as a tenant of a DIFFERENT landlord but the message arrived
+    // on THIS landlord's instance, override: treat as unknown to this instance owner
+    if (ctx.role === "tenant" && effectiveLandlordId && ctx.landlordId && ctx.landlordId !== effectiveLandlordId) {
+      ctx = { role: "unknown", landlordId: effectiveLandlordId, entity: null };
+    }
 
     const isLandlord = ctx.role === "landlord";
-    const landlordId = resolvedLandlordId || ctx.landlordId || "";
+    const landlordId = effectiveLandlordId || ctx.landlordId || "";
     const effectiveReplyTo = replyTo;
 
     const respond = (payload: Record<string, unknown>) => {
@@ -982,7 +998,8 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       return respond({ ok: true, routed: "landlord", llmInvoked, autoReplySent, autoReplyReason });
     }
 
-    const tenant = await repo.findTenantByPhone(sender);
+    // Scope tenant lookup to THIS landlord's instance to prevent cross-tenant data leaks
+    const tenant = await repo.findTenantByPhone(sender, landlordId || undefined);
     if (!tenant) {
       const contractor = await repo.findContractorByPhone(sender);
       if (contractor) {
@@ -1021,7 +1038,8 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
     let record = await repo.findLatestMaintenanceForTenantId(tenant.id);
     const baseConversationLog = Array.isArray(record?.chatLog) ? (record?.chatLog as any[]) : [];
-    const tenantLandlordId = tenant.landlordId || landlordId || "";
+    // Instance-resolved landlordId takes priority to prevent cross-tenant routing
+    const tenantLandlordId = landlordId || tenant.landlordId || "";
 
     // ── UNIFIED MEDIA PROCESSING ──
     // processMedia handles image vision, audio transcription, video analysis,

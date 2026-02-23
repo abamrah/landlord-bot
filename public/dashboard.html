@@ -1884,6 +1884,29 @@
         margin-bottom: 12px;
       }
 
+      /* Guide cards mobile-friendly inside overlay */
+      .mobile-overlay-content .grid-2 {
+        grid-template-columns: 1fr !important;
+      }
+      .mobile-overlay-content .guide-card {
+        padding: 14px;
+      }
+      .mobile-overlay-content .guide-card-header h3 {
+        font-size: 15px;
+      }
+      .mobile-overlay-content .guide-body {
+        font-size: 13px;
+      }
+      .mobile-overlay-content .guide-step {
+        padding: 10px 12px;
+      }
+      .mobile-overlay-content .guide-checklist-item {
+        font-size: 13px;
+      }
+      .mobile-overlay-content .panel {
+        padding: 14px;
+      }
+
       /* ── Approval Modal ── */
       .approval-modal-backdrop {
         position: fixed;
@@ -2041,6 +2064,54 @@
         margin-top: 3px;
       }
     }
+
+    /* ── TIPS & GUIDES ── */
+    .guide-card { transition: border-color 0.2s; }
+    .guide-card:hover { border-color: var(--accent); }
+    .guide-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; padding: 4px 0; user-select: none; min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .guide-card-header h3 { margin: 0; font-size: 15px; }
+    .guide-toggle { color: var(--text-muted); font-size: 12px; transition: transform 0.2s; }
+    .guide-card-header[aria-expanded="true"] .guide-toggle { transform: rotate(180deg); }
+    .guide-body { padding-top: 14px; border-top: 1px solid var(--border); margin-top: 12px; }
+    .guide-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5;
+    }
+    .guide-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 6px; background: var(--accent);
+      color: #000; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+    .guide-tip {
+      font-size: 13px; color: var(--accent); line-height: 1.5;
+      padding: 8px 12px; background: rgba(0,200,150,.06); border-radius: 8px;
+      margin-top: 8px;
+    }
+    .guide-checklist-item {
+      display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+      border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.5;
+    }
+    .guide-checklist-item:last-child { border-bottom: none; }
+    .guide-check { font-size: 16px; color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
+    .guide-check.done { color: var(--accent); }
+    .guide-sub { font-size: 13px; color: var(--text-muted); }
+    .guide-sub a { color: var(--accent); text-decoration: none; }
+    .guide-sub a:hover { text-decoration: underline; }
+
+    /* Contextual help tooltip icons */
+    .help-tip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border-light);
+      font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer;
+      margin-left: 8px; vertical-align: middle; text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .help-tip:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,200,150,.08); }
   </style>
 </head>
 
@@ -2069,6 +2140,8 @@
     <a class="nav-item" data-target="whatsapp">💬 <span>WhatsApp</span></a>
     <a class="nav-item" data-target="reminders">⏰ <span>Reminders</span></a>
     <a class="nav-item" data-target="leases">📋 <span>Leases</span></a>
+    <div class="nav-title">Help</div>
+    <a class="nav-item" data-target="guides">📖 <span>Tips & Guides</span></a>
     <div class="nav-spacer"></div>
     <a class="nav-item" data-target="account">👤 <span>Account</span></a>
     <a class="nav-item" onclick="logout()" style="cursor:pointer">🚪 <span>Logout</span></a>
@@ -2197,6 +2270,40 @@
           </div>
         </div>
 
+        <!-- FINANCIAL SUMMARY CARDS -->
+        <div class="panel panel-sm" style="margin-top:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h3 style="font-size:14px;font-weight:600;">💰 Financial Overview</h3>
+            <span class="chip chip-muted" id="financialCurrency">CAD</span>
+          </div>
+          <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="kpi" style="--kpi-accent:#22c55e;">
+              <div class="kpi-top">
+                <div class="kpi-label">Total Income</div>
+                <div class="kpi-icon" style="background:rgba(34,197,94,.1);color:#22c55e;">📈</div>
+              </div>
+              <div class="kpi-value" id="finIncome" style="color:#22c55e;">$0</div>
+              <div class="kpi-sub" id="finIncomeBreakdown" style="font-size:11px;color:var(--text-muted);"></div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#ef4444;">
+              <div class="kpi-top">
+                <div class="kpi-label">Total Expenses</div>
+                <div class="kpi-icon" style="background:rgba(239,68,68,.1);color:#ef4444;">📉</div>
+              </div>
+              <div class="kpi-value" id="finExpenses" style="color:#ef4444;">$0</div>
+              <div class="kpi-sub" id="finExpensesBreakdown" style="font-size:11px;color:var(--text-muted);"></div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#3b82f6;">
+              <div class="kpi-top">
+                <div class="kpi-label">Net Cash Flow</div>
+                <div class="kpi-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;">💵</div>
+              </div>
+              <div class="kpi-value" id="finNet" style="color:#3b82f6;">$0</div>
+              <div class="kpi-sub" id="finNetSub" style="font-size:11px;color:var(--text-muted);"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- AUTOPILOT CONTROLS -->
         <div class="panel panel-sm">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
@@ -2283,7 +2390,7 @@
       <!-- ═══════════════════ MAINTENANCE ═══════════════════ -->
       <section id="maintenance" class="section">
         <div class="section-header">
-          <h2>Maintenance</h2>
+          <h2>Maintenance<a class="help-tip" onclick="openGuideFor('guideMaint')" title="How maintenance works">?</a></h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <select id="maintStatusFilter" style="width:auto;padding:6px 10px;font-size:12px;">
               <option value="">All Statuses</option>
@@ -2333,7 +2440,7 @@
       <!-- ═══════════════════ TENANTS ═══════════════════ -->
       <section id="tenants" class="section">
         <div class="section-header">
-          <h2>Tenants</h2>
+          <h2>Tenants<a class="help-tip" onclick="openGuideFor('guideTenants')" title="Tenants & residents guide">?</a></h2>
           <div style="display:flex;gap:8px;align-items:center;">
             <label class="toggle" title="Global auto-reply">
               <input type="checkbox" id="globalAutoReplyToggle" />
@@ -2353,40 +2460,91 @@
             <div class="form-field"><label>Unit</label><select id="tenantUnit">
                 <option value="">Select...</option>
               </select></div>
+            <div class="form-field"><label>Role</label><select id="tenantRole">
+                <option value="tenant">Tenant (lease signer)</option>
+                <option value="resident">Resident (co-occupant)</option>
+              </select></div>
+            <div class="form-field" id="tenantShareField" style="display:none;"><label>Utility Share %</label><input id="tenantSharePercent" type="number" min="0" max="100" placeholder="e.g. 50" /></div>
             <button class="btn btn-primary" id="createTenantBtn" style="align-self:end;">+ Add Tenant</button>
           </div>
         </div>
 
         <!-- TENANT CARDS -->
         <div class="tenant-grid" id="tenantGrid"></div>
+
+        <!-- TENANT MESSAGE MODAL -->
+        <div class="drawer-backdrop" id="tenantMsgBackdrop" onclick="closeTenantMsgModal()">
+          <div class="drawer" onclick="event.stopPropagation()">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3 id="tenantMsgTitle">Send Message</h3>
+              <button class="btn btn-ghost" onclick="closeTenantMsgModal()">✕</button>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);" id="tenantMsgInfo"></div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="form-field">
+                <label>Message</label>
+                <textarea id="tenantMsgText" rows="5" placeholder="Type your message to the tenant..."
+                  style="width:100%;resize:vertical;font-size:13px;"></textarea>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-secondary btn-sm" id="tenantMsgDraftBtn" onclick="aiDraftTenantMsg()">🤖 AI Draft</button>
+                <button class="btn btn-primary btn-sm" id="tenantMsgSendBtn" onclick="sendTenantMsg()">📤 Send via WhatsApp</button>
+              </div>
+              <div id="tenantMsgStatus" style="font-size:12px;display:none;"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ═══════════════════ UNITS ═══════════════════ -->
       <section id="units" class="section">
         <div class="section-header">
-          <h2>Units</h2>
+          <h2>Properties &amp; Units<a class="help-tip" onclick="openGuideFor('guideUnits')" title="Properties & units guide">?</a></h2>
           <button class="btn btn-secondary btn-sm" id="refreshUnits">↻</button>
         </div>
-        <div class="panel panel-sm">
+
+        <!-- Property creation -->
+        <div class="panel panel-sm" style="margin-bottom:12px;">
+          <h3 style="margin:0 0 8px 0;font-size:14px;color:var(--text-muted)">Add Property</h3>
           <div class="form-row">
+            <div class="form-field" style="flex:2;"><label>Address</label><input id="propertyAddress" placeholder="123 Main St, Toronto, ON" /></div>
+            <button class="btn btn-primary" id="createPropertyBtn" style="align-self:end;">+ Add Property</button>
+          </div>
+        </div>
+
+        <!-- Unit creation -->
+        <div class="panel panel-sm">
+          <h3 style="margin:0 0 8px 0;font-size:14px;color:var(--text-muted)">Add Unit</h3>
+          <div class="form-row">
+            <div class="form-field"><label>Property</label><select id="unitProperty"><option value="">No property</option></select></div>
             <div class="form-field"><label>Label</label><input id="unitLabel" placeholder="Unit 201" /></div>
-            <div class="form-field"><label>Address</label><input id="unitAddress" placeholder="123 Main St" /></div>
+            <div class="form-field"><label>Utility Type</label><select id="unitUtilityType">
+              <option value="SINGLE">Single (1 tenant, 100%)</option>
+              <option value="SHARED">Shared (split by %)</option>
+            </select></div>
             <button class="btn btn-primary" id="createUnitBtn" style="align-self:end;">+ Add Unit</button>
           </div>
         </div>
-        <div class="table-wrap">
+
+        <!-- Properties list -->
+        <div id="propertiesContainer"></div>
+
+        <!-- Units without property -->
+        <div class="table-wrap" style="margin-top:12px;">
           <table class="data-table" id="unitTable">
             <thead>
               <tr>
                 <th>Label</th>
-                <th>Address</th>
-                <th>Created</th>
+                <th>Property</th>
+                <th>Utility</th>
+                <th>Occupants</th>
+                <th>WA Group</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="4" style="color:var(--text-muted)">Loading...</td>
+                <td colspan="6" style="color:var(--text-muted)">Loading...</td>
               </tr>
             </tbody>
           </table>
@@ -2396,7 +2554,7 @@
       <!-- ═══════════════════ CONTRACTORS ═══════════════════ -->
       <section id="contractors" class="section">
         <div class="section-header">
-          <h2>Contractors</h2>
+          <h2>Contractors<a class="help-tip" onclick="openGuideFor('guideContractors')" title="Contractors guide">?</a></h2>
           <button class="btn btn-secondary btn-sm" id="refreshContractors">↻</button>
         </div>
         <div class="panel panel-sm">
@@ -2431,7 +2589,7 @@
       <!-- ═══════════════════ UTILITIES ═══════════════════ -->
       <section id="utilities" class="section">
         <div class="section-header">
-          <h2>Utilities</h2>
+          <h2>Utilities<a class="help-tip" onclick="openGuideFor('guideUtility')" title="Utility billing guide">?</a></h2>
           <button class="btn btn-secondary btn-sm" id="refreshUtilities">↻</button>
         </div>
 
@@ -2540,6 +2698,18 @@
               portal. Supports 15 providers across Ontario.
             </p>
 
+            <!-- IN-PROGRESS BANNER -->
+            <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:18px;">⚠️</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:#f59e0b;margin-bottom:4px;">This feature is in progress</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
+                  We are registering as a third-party provider with each utility company to enable automatic API connections.
+                  In the meantime, you can upload Green Button XML files manually using the upload section below.
+                </div>
+              </div>
+            </div>
+
             <!-- Provider List -->
             <div style="margin-bottom:16px;">
               <h4 style="font-size:13px;margin-bottom:8px;color:var(--text)">Ontario Providers</h4>
@@ -2572,7 +2742,7 @@
                 <div class="form-field"><label>Account #</label>
                   <input id="gbAccountNum" placeholder="Optional" />
                 </div>
-                <button class="btn btn-primary" id="gbConnectBtn" style="align-self:end;">Connect</button>
+                <button class="btn btn-primary" id="gbConnectBtn" style="align-self:end;opacity:0.5;cursor:not-allowed;" disabled title="API connections coming soon — use XML upload below">Connect (Coming Soon)</button>
               </div>
             </div>
 
@@ -2626,7 +2796,7 @@
       <!-- ═══════════════════ AI AGENT (unified) ═══════════════════ -->
       <section id="agent" class="section">
         <div class="section-header">
-          <h2>AI Agent</h2>
+          <h2>AI Agent<a class="help-tip" onclick="openGuideFor('guideAgent')" title="AI Agent guide">?</a></h2>
           <span class="chip chip-accent">Powered by Gemini</span>
         </div>
 
@@ -2834,17 +3004,19 @@
       <!-- ═══════════════════ REMINDERS ═══════════════════ -->
       <section id="reminders" class="section">
         <div class="section-header">
-          <h2>Reminders</h2><button class="btn btn-secondary btn-sm" id="refreshReminders">↻</button>
+          <h2>Reminders<a class="help-tip" onclick="openGuideFor('guideReminders')" title="Reminders guide">?</a></h2><button class="btn btn-secondary btn-sm" id="refreshReminders">↻</button>
         </div>
         <div class="panel panel-sm">
           <div class="form-row">
-            <div class="form-field"><label>Type</label><select id="reminderType">
+            <div class="form-field"><label>Type</label><select id="reminderType" onchange="toggleReminderUtilityFields()">
                 <option value="rent">Rent</option>
                 <option value="utility">Utility</option>
               </select></div>
+            <div class="form-field" id="reminderUnitField" style="display:none;"><label>Unit</label><select id="reminderUnit"><option value="">All tenants</option></select></div>
+            <div class="form-field" id="reminderAmountField" style="display:none;"><label>Amount ($)</label><input id="reminderAmount" type="number" min="0" step="0.01" placeholder="Auto from bills" /></div>
             <div class="form-field"><label>Day</label><input id="reminderDay" type="number" min="1" max="28"
                 placeholder="1-28" /></div>
-            <div class="form-field"><label>Time (UTC)</label><input id="reminderTime" placeholder="14:00" /></div>
+            <div class="form-field"><label>Time (local)</label><input id="reminderTime" placeholder="14:00" /></div>
             <div class="form-field"><label>Style</label><select id="reminderStyle">
                 <option value="short">Short</option>
                 <option value="medium">Medium</option>
@@ -2859,6 +3031,7 @@
             <thead>
               <tr>
                 <th>Type</th>
+                <th>Unit</th>
                 <th>Day</th>
                 <th>Time</th>
                 <th>Style</th>
@@ -2867,7 +3040,7 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="5" style="color:var(--text-muted)">No reminders</td>
+                <td colspan="6" style="color:var(--text-muted)">No reminders</td>
               </tr>
             </tbody>
           </table>
@@ -2924,7 +3097,7 @@
       <!-- ═══════════════════ LEASES ═══════════════════ -->
       <section id="leases" class="section">
         <div class="section-header">
-          <h2>Lease Management</h2>
+          <h2>Lease Management<a class="help-tip" onclick="openGuideFor('guideLeases')" title="Lease management guide">?</a></h2>
           <div style="display:flex;gap:8px">
             <button class="btn btn-secondary" onclick="loadExpiringLeases()">Refresh</button>
             <button class="btn btn-primary" onclick="sendLeaseAlerts()">Send Alerts Now</button>
@@ -2935,6 +3108,223 @@
             <h3>Expiring Soon (next 60 days)</h3>
           </div>
           <div id="leasesList" style="color:var(--text-secondary)">Loading...</div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ TIPS & GUIDES ═══════════════════ -->
+      <section id="guides" class="section">
+        <div class="section-header">
+          <h2>Tips & Guides</h2>
+        </div>
+
+        <!-- Getting started checklist -->
+        <div class="panel" style="margin-bottom:20px;border-left:3px solid var(--accent);">
+          <div class="panel-header"><h3>🚀 Getting Started Checklist</h3></div>
+          <div style="padding:4px 0;">
+            <div class="guide-checklist-item" id="gCheck1">
+              <span class="guide-check">○</span>
+              <div><strong>Connect WhatsApp</strong><br><span class="guide-sub">Link your WhatsApp number so the AI can send and receive messages. Go to <a href="#" onclick="showView('whatsapp');return false;">WhatsApp Settings</a>.</span></div>
+            </div>
+            <div class="guide-checklist-item" id="gCheck2">
+              <span class="guide-check">○</span>
+              <div><strong>Add a Property</strong><br><span class="guide-sub">Create your first property (building address) under <a href="#" onclick="showView('units');return false;">Properties & Units</a>.</span></div>
+            </div>
+            <div class="guide-checklist-item" id="gCheck3">
+              <span class="guide-check">○</span>
+              <div><strong>Add a Unit</strong><br><span class="guide-sub">Add at least one rental unit to your property.</span></div>
+            </div>
+            <div class="guide-checklist-item" id="gCheck4">
+              <span class="guide-check">○</span>
+              <div><strong>Add a Tenant</strong><br><span class="guide-sub">Add a tenant with their WhatsApp number so they can message the AI.</span></div>
+            </div>
+            <div class="guide-checklist-item" id="gCheck5">
+              <span class="guide-check">○</span>
+              <div><strong>Send a Test Message</strong><br><span class="guide-sub">Have your tenant (or yourself from another phone) send a message like "My faucet is leaking" to test the AI.</span></div>
+            </div>
+            <div class="guide-checklist-item" id="gCheck6">
+              <span class="guide-check">○</span>
+              <div><strong>Enable Autopilot</strong><br><span class="guide-sub">Turn on autopilot in the Dashboard to let the AI auto-reply to low-severity messages.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Guides -->
+        <div class="grid-2" style="gap:16px;">
+
+          <!-- Guide: Properties & Units -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideUnits')">
+              <h3>🏢 Properties & Units</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideUnits" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Properties & Units</strong> from the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Click <strong>+ Add Property</strong> and enter your building address.</div>
+              <div class="guide-step"><span class="guide-num">3</span> Select the property from the dropdown, enter a unit label (e.g. "Apt 4B").</div>
+              <div class="guide-step"><span class="guide-num">4</span> Choose <strong>Utility Type</strong>: Single (one tenant pays full bill) or Shared (split among occupants).</div>
+              <div class="guide-step"><span class="guide-num">5</span> Click <strong>+ Add Unit</strong>. Repeat for each unit in the property.</div>
+              <div class="guide-tip">💡 Properties group units by address. One property can have many units.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Tenants & Residents -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideTenants')">
+              <h3>👥 Tenants & Residents</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideTenants" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Tenants</strong> from the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Enter the tenant's name, WhatsApp phone number, and optionally email.</div>
+              <div class="guide-step"><span class="guide-num">3</span> Select the <strong>Unit</strong> they belong to from the dropdown.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Choose their <strong>Role</strong>: Tenant (lease holder) or Resident (co-occupant like a roommate).</div>
+              <div class="guide-step"><span class="guide-num">5</span> For Shared utility units, enter the tenant's <strong>Utility Share %</strong>.</div>
+              <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add Tenant</strong>.</div>
+              <div class="guide-tip">💡 <strong>Tenant</strong> = primary lease signer who receives notices. <strong>Resident</strong> = co-occupant who can message the AI for maintenance.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Maintenance -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideMaint')">
+              <h3>🛠️ Maintenance Requests</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideMaint" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Tenants send a WhatsApp message describing their issue (e.g. "My kitchen faucet is dripping").</div>
+              <div class="guide-step"><span class="guide-num">2</span> The AI automatically classifies the severity: <strong>Emergency</strong>, <strong>Normal</strong>, or <strong>Cosmetic</strong>.</div>
+              <div class="guide-step"><span class="guide-num">3</span> A maintenance ticket is created in your dashboard with the AI's triage assessment.</div>
+              <div class="guide-step"><span class="guide-num">4</span> For low-severity issues, autopilot sends a reply automatically. For high/critical issues, the AI holds the reply and notifies you.</div>
+              <div class="guide-step"><span class="guide-num">5</span> You can reply "approve" or "deny" to the WhatsApp notification to control the AI's response.</div>
+              <div class="guide-step"><span class="guide-num">6</span> View tickets in List or Kanban view. Drag cards to update status.</div>
+              <div class="guide-tip">💡 The AI also accepts photos, voice notes, and documents. It analyzes images to assess damage severity.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Autopilot -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideAutopilot')">
+              <h3>🤖 Autopilot Settings</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideAutopilot" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Toggle <strong>Autopilot</strong> on from the Dashboard or AI Agent page.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Set the <strong>Reply Delay</strong> — how long the AI waits before replying (allows batching multiple messages).</div>
+              <div class="guide-step"><span class="guide-num">3</span> Set the <strong>Cooldown</strong> — minimum time between auto-replies to the same tenant.</div>
+              <div class="guide-step"><span class="guide-num">4</span> The AI automatically holds replies for <strong>High</strong> and <strong>Critical</strong> severity issues for your approval.</div>
+              <div class="guide-tip">💡 A 2-minute delay is recommended. This gives tenants time to send follow-up details before the AI responds.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Utility Billing -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideUtility')">
+              <h3>💰 Utility Billing & Splits</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideUtility" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Utilities</strong> and click <strong>Log Bill</strong>.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Select the unit, utility type (electricity, gas, water, etc.), and enter the bill amount.</div>
+              <div class="guide-step"><span class="guide-num">3</span> For <strong>SHARED</strong> units, go to Properties & Units and click <strong>% Shares</strong> to set each tenant's percentage.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Set up a <strong>Utility Reminder</strong> under Reminders → select type "Utility", pick the target unit, and enter the bill amount.</div>
+              <div class="guide-step"><span class="guide-num">5</span> When the reminder fires, the AI calculates each tenant's share and sends personalized messages.</div>
+              <div class="guide-tip">💡 For SHARED units with WhatsApp groups, utility reminders are sent to the group with a breakdown of each person's share.</div>
+              <div class="guide-tip">💡 You can save utility credentials (login details for your utility provider) so the AI agent can fetch bills automatically.</div>
+            </div>
+          </div>
+
+          <!-- Guide: WhatsApp Groups -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideGroups')">
+              <h3>💬 WhatsApp Groups</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideGroups" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Add 2 or more tenants/residents with phone numbers to a unit.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Go to <strong>Properties & Units</strong> and find the unit in the table.</div>
+              <div class="guide-step"><span class="guide-num">3</span> Click the <strong>Create Group</strong> button in the "WA Group" column.</div>
+              <div class="guide-step"><span class="guide-num">4</span> A WhatsApp group is created with all occupants + your AI's number. A welcome message is sent automatically.</div>
+              <div class="guide-step"><span class="guide-num">5</span> Messages sent in the group are routed to your AI agent — tenants can report issues directly in the group.</div>
+              <div class="guide-tip">💡 Groups are great for shared housing situations. Utility reminders and announcements go to the group instead of individual DMs.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Reminders -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideReminders')">
+              <h3>⏰ Reminders</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideReminders" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Reminders</strong> from the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Choose the reminder type: <strong>Rent</strong>, <strong>Utility</strong>, <strong>Lease</strong>, or <strong>Custom</strong>.</div>
+              <div class="guide-step"><span class="guide-num">3</span> For <strong>Utility</strong> reminders, select the target unit and optionally enter the bill amount.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Set the <strong>Day of Month</strong> (1–28) and <strong>Time</strong> (in your local timezone).</div>
+              <div class="guide-step"><span class="guide-num">5</span> Choose message <strong>Style</strong>: Friendly, Formal, or Urgent.</div>
+              <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add</strong>. The reminder will fire automatically each month.</div>
+              <div class="guide-tip">💡 Rent reminders go to all tenants. Utility reminders go to the specific unit's tenants (or WhatsApp group for shared units).</div>
+            </div>
+          </div>
+
+          <!-- Guide: AI Agent -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideAgent')">
+              <h3>🧠 AI Agent</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideAgent" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>AI Agent</strong> from the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Use the <strong>Chat</strong> panel to test the AI — ask it questions about your properties, tenants, or maintenance.</div>
+              <div class="guide-step"><span class="guide-num">3</span> The AI has access to your full portfolio context: units, tenants, bills, lease expiry dates, and more.</div>
+              <div class="guide-step"><span class="guide-num">4</span> Ask it things like: "Draft a rent increase notice for unit 4B" or "What maintenance issues are open?"</div>
+              <div class="guide-tip">💡 The AI agent can also use web tools to search for contractors, look up regulations, and fetch utility bills if credentials are saved.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Contractors -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideContractors')">
+              <h3>🧰 Contractors</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideContractors" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Contractors</strong> from the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Add a contractor with their name, phone, email, and role (e.g. Plumber, Electrician).</div>
+              <div class="guide-step"><span class="guide-num">3</span> When a maintenance ticket comes in, the AI will suggest relevant contractors based on the issue type.</div>
+              <div class="guide-tip">💡 The more contractors you add by specialty, the better the AI can match them to incoming issues.</div>
+            </div>
+          </div>
+
+          <!-- Guide: Leases -->
+          <div class="panel guide-card">
+            <div class="guide-card-header" onclick="toggleGuide('guideLeases')">
+              <h3>📋 Lease Management</h3>
+              <span class="guide-toggle">▼</span>
+            </div>
+            <div class="guide-body" id="guideLeases" style="display:none;">
+              <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Leases</strong> from the sidebar.</div>
+              <div class="guide-step"><span class="guide-num">2</span> Set lease start and end dates for each tenant.</div>
+              <div class="guide-step"><span class="guide-num">3</span> The dashboard shows upcoming lease expirations automatically.</div>
+              <div class="guide-step"><span class="guide-num">4</span> You can ask the AI agent to draft renewal notices or check regional requirements for notice periods.</div>
+              <div class="guide-tip">💡 The AI knows your region's tenancy laws and can advise on proper notice periods for non-renewal.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Pro Tips Section -->
+        <div class="panel" style="margin-top:20px;border-left:3px solid var(--accent-2);">
+          <div class="panel-header"><h3>⚡ Power User Tips</h3></div>
+          <div style="padding:8px 0;">
+            <div class="guide-tip" style="margin-bottom:12px;">🔍 Use the <strong>search bar</strong> at the top to quickly find tenants, units, or tickets by name.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">📊 Click any <strong>KPI card</strong> on the dashboard to jump directly to that section.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">📱 <strong>Enable push notifications</strong> (bell icon in the header) to get browser alerts for new tickets.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">🤖 Reply <strong>"approve"</strong> or <strong>"deny"</strong> to WhatsApp escalation alerts to control AI responses.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">📸 Tenants can send <strong>photos and voice notes</strong> — the AI analyzes images for damage and transcribes audio.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">💬 Use <strong>WhatsApp groups</strong> for shared units to send one message to all occupants at once.</div>
+            <div class="guide-tip" style="margin-bottom:12px;">💡 The <strong>Green Button</strong> integration can auto-import utility data if your provider supports it.</div>
+            <div class="guide-tip">📋 <strong>Download PDF reports</strong> of maintenance tickets by clicking the PDF icon on any ticket detail view.</div>
+          </div>
         </div>
       </section>
 
@@ -3032,6 +3422,7 @@
         <a class="mobile-nav-item" data-section="whatsapp"><span class="nav-emoji">💬</span> WhatsApp</a>
         <a class="mobile-nav-item" data-section="reminders"><span class="nav-emoji">⏰</span> Reminders</a>
         <a class="mobile-nav-item" data-section="leases"><span class="nav-emoji">📋</span> Leases</a>
+        <a class="mobile-nav-item" data-section="guides"><span class="nav-emoji">📖</span> Tips & Guides</a>
         <a class="mobile-nav-item" data-section="account"><span class="nav-emoji">👤</span> Account</a>
         <div style="height:16px;"></div>
         <a class="mobile-nav-item" onclick="logout()" style="color:var(--danger);"><span class="nav-emoji">🚪</span>
@@ -3200,16 +3591,97 @@
     let toastTimer;
 
     function showView(id) {
+      // On mobile, use the overlay system instead of desktop section toggling
+      if (window.innerWidth <= 640 && typeof openMobileOverlay === 'function') {
+        closeMobileOverlay();
+        setTimeout(function() { openMobileOverlay(id); }, 50);
+        return;
+      }
       sections.forEach(s => s.classList.toggle('active', s.id === id));
       navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
       closeSidebar();
       if (id === 'agent') setTimeout(populateAgentUnitDropdown, 100);
+      if (id === 'guides') updateGuidesChecklist();
     }
     navItems.forEach(n => n.addEventListener('click', () => showView(n.dataset.target)));
+
+    function toggleGuide(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var isOpen = el.style.display !== 'none';
+      el.style.display = isOpen ? 'none' : '';
+      var header = el.previousElementSibling || el.parentElement.querySelector('.guide-card-header');
+      if (header) header.setAttribute('aria-expanded', !isOpen);
+    }
+
+    function openGuideFor(guideId) {
+      showView('guides');
+      setTimeout(function() {
+        var el = document.getElementById(guideId);
+        if (el && el.style.display === 'none') toggleGuide(guideId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+
+    function updateGuidesChecklist() {
+      var checks = [
+        { id: 'gCheck1', done: state.health && state.health.whatsapp !== 'No instance' },
+        { id: 'gCheck2', done: state.properties && state.properties.length > 0 },
+        { id: 'gCheck3', done: state.units && state.units.length > 0 },
+        { id: 'gCheck4', done: state.tenants && state.tenants.length > 0 },
+        { id: 'gCheck5', done: state.issues && state.issues.length > 0 },
+        { id: 'gCheck6', done: state.autoReplyGlobalEnabled === true },
+      ];
+      checks.forEach(function(c) {
+        var el = document.getElementById(c.id);
+        if (!el) return;
+        var check = el.querySelector('.guide-check');
+        if (check) {
+          check.textContent = c.done ? '✅' : '○';
+          check.classList.toggle('done', !!c.done);
+        }
+      });
+    }
 
     function toast(msg) {
       toastEl.textContent = msg; toastEl.classList.add('show');
       clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+    }
+
+    // ── Rich text formatting & PDF download helpers ──
+    function formatChatText(text) {
+      if (!text) return text;
+      // Convert WhatsApp-style *bold* to <b> (but not **bold**)
+      var s = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+      s = s.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<b>$1</b>');
+      // Convert _italic_ to <i>
+      s = s.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<i>$1</i>');
+      // Convert ~strike~ to <s>
+      s = s.replace(/~(.+?)~/g, '<s>$1</s>');
+      // Convert ```code``` to <code>
+      s = s.replace(/```(.+?)```/gs, '<code style="background:var(--surface-2);padding:2px 6px;border-radius:4px;font-size:12px;">$1</code>');
+      return s;
+    }
+
+    function buildPdfDownloadButton(base64, fileName) {
+      var id = 'pdf-dl-' + Math.random().toString(36).substr(2, 9);
+      setTimeout(function() {
+        var btn = document.getElementById(id);
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+          try {
+            var byteChars = atob(base64);
+            var byteArr = new Uint8Array(byteChars.length);
+            for (var i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+            var blob = new Blob([byteArr], { type: 'application/pdf' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = fileName; a.click();
+            setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+          } catch(e) { toast('Download failed: ' + e.message); }
+        });
+      }, 100);
+      return '<div style="margin-top:8px;"><button id="' + id + '" class="btn btn-primary btn-sm" style="gap:6px;">\uD83D\uDCC4 Download ' + fileName + '</button></div>';
     }
 
     // ── Utility tabs ──
@@ -3236,7 +3708,7 @@
 
     // ── STATE ──
     const ACTIVE_STATUSES = ['OPEN', 'PENDING', 'IN_TRIAGE', 'SCHEDULED', 'IN_PROGRESS'];
-    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
+    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
 
     function severityOf(r) { return (r?.triageJson?.classification?.severity || r?.triage?.classification?.severity || 'unknown').toString().toLowerCase(); }
     function formatStatus(s) { return (s || '').replace(/_/g, ' '); }
@@ -3259,6 +3731,7 @@
     }
 
     // ── LOADERS ──
+    async function loadProperties() { const { items } = await fetchJson('/admin/properties'); state.properties = items || []; fillPropertySelects(); }
     async function loadUnits() { const { items } = await fetchJson('/admin/units'); state.units = items || []; renderUnits(); fillUnitSelects(); }
     async function loadTenants() { const { items } = await fetchJson('/admin/tenants'); state.tenants = items || []; renderTenants(); }
     async function loadAutoReplySettings() { try { const r = await fetchJson('/admin/auto-reply'); state.autoReplyGlobalEnabled = r.enabled !== false; } catch { state.autoReplyGlobalEnabled = true; } renderGlobalAutoReply(); }
@@ -3284,12 +3757,41 @@
     // ── RENDERERS ──
     function renderUnits() {
       var tbody = document.querySelector('#unitTable tbody');
-      if (!state.units.length) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted)">No units yet</td></tr>'; return; }
+      if (!state.units.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">No units yet</td></tr>'; return; }
       tbody.innerHTML = state.units.map(function (u) {
+        var propAddr = u.property ? u.property.address : (u.address || '—');
+        var occupantCount = u.tenants ? u.tenants.length : 0;
+        var occupantList = (u.tenants || []).map(function(ut) {
+          var role = ut.role === 'resident' ? '(res)' : '';
+          var share = u.utilityType === 'SHARED' && ut.utilitySharePercent != null ? ' ' + ut.utilitySharePercent + '%' : '';
+          return ut.tenant.name + ' ' + role + share;
+        }).join(', ') || '—';
+        var waGroupBadge = u.whatsappGroupJid
+          ? '<span class="chip chip-success" style="font-size:10px;">✓ Group</span>'
+          : (occupantCount >= 2 ? '<button class="btn btn-secondary btn-sm wa-group-btn" data-id="' + u.id + '" style="font-size:10px;">Create Group</button>' : '<span style="color:var(--text-muted);font-size:11px;">—</span>');
+        var utilBadge = u.utilityType === 'SHARED'
+          ? '<span class="chip chip-accent" style="font-size:10px;">Shared</span>'
+          : '<span class="chip chip-muted" style="font-size:10px;">Single</span>';
         return '<tr>' +
-          '<td style="font-weight:600;color:var(--text)">' + u.label + '</td><td>' + u.address + '</td><td>' + new Date(u.createdAt).toLocaleDateString() + '</td>' +
-          '<td><div class="actions-cell"><button class="btn btn-ghost btn-sm unit-edit" data-id="' + u.id + '">Edit</button><button class="btn btn-danger btn-sm unit-delete" data-id="' + u.id + '">Delete</button></div></td>' +
+          '<td style="font-weight:600;color:var(--text)">' + u.label + '</td>' +
+          '<td style="font-size:12px;">' + propAddr + '</td>' +
+          '<td>' + utilBadge + '</td>' +
+          '<td style="font-size:12px;" title="' + occupantList + '">' + occupantCount + ' person(s)</td>' +
+          '<td>' + waGroupBadge + '</td>' +
+          '<td><div class="actions-cell">' +
+            (u.utilityType === 'SHARED' && occupantCount > 0 ? '<button class="btn btn-ghost btn-sm set-shares-btn" data-id="' + u.id + '">% Shares</button>' : '') +
+            '<button class="btn btn-ghost btn-sm unit-edit" data-id="' + u.id + '">Edit</button>' +
+            '<button class="btn btn-danger btn-sm unit-delete" data-id="' + u.id + '">Delete</button>' +
+          '</div></td>' +
           '</tr>';
+      }).join('');
+    }
+
+    function fillPropertySelects() {
+      var sel = document.getElementById('unitProperty');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">No property</option>' + state.properties.map(function(p) {
+        return '<option value="' + p.id + '">' + p.address + '</option>';
       }).join('');
     }
 
@@ -3299,6 +3801,8 @@
       grid.innerHTML = state.tenants.map(function (t) {
         var unitId = t.unitId || (t.units && t.units[0]?.unitId);
         var unitTenantId = t.units && t.units[0]?.id;
+        var unitTenantRole = t.units && t.units[0]?.role || 'tenant';
+        var unitTenantShare = t.units && t.units[0]?.utilitySharePercent;
         var unit = state.units.find(function (u) { return u.id === unitId; }) || {};
         var arEnabled = t.autoReplyEnabled !== false;
         var initials = t.name.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
@@ -3306,11 +3810,16 @@
         var leaseEnd = t.units && t.units[0]?.endDate ? new Date(t.units[0].endDate).toLocaleDateString() : '';
         var leaseInfo = leaseStart ? '<span>📄 Lease: ' + leaseStart + (leaseEnd ? ' → ' + leaseEnd : ' → ongoing') + '</span>' : '';
         var leaseUploadBtn = unitTenantId ? '<button class="btn btn-ghost btn-sm lease-upload-btn" data-ut-id="' + unitTenantId + '" data-tenant="' + t.name + '">📤 Upload Lease</button>' : '';
+        var roleBadge = unitTenantRole === 'resident'
+          ? '<span class="chip chip-info" style="font-size:10px;margin-left:4px;">Resident</span>'
+          : '<span class="chip chip-accent" style="font-size:10px;margin-left:4px;">Tenant</span>';
+        var shareInfo = unit.utilityType === 'SHARED' && unitTenantShare != null
+          ? '<span>⚡ Utility share: ' + unitTenantShare + '%</span>' : '';
         return '<div class="tenant-card">' +
           '<div class="tenant-card-header">' +
           '<div class="tenant-avatar">' + initials + '</div>' +
           '<div>' +
-          '<div class="tenant-card-name">' + t.name + '</div>' +
+          '<div class="tenant-card-name">' + t.name + roleBadge + '</div>' +
           '<div style="font-size:11px;color:var(--text-muted)">' + (unit.label || 'No unit') + '</div>' +
           '</div>' +
           '</div>' +
@@ -3318,6 +3827,7 @@
           '<span>\uD83D\uDCF1 ' + (t.phone || '\u2014') + '</span>' +
           '<span>\u2709\uFE0F ' + (t.email || '\u2014') + '</span>' +
           leaseInfo +
+          shareInfo +
           '</div>' +
           '<div class="tenant-card-footer">' +
           '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -3325,6 +3835,7 @@
           '<span style="font-size:11px;color:var(--text-muted)">Auto-reply</span>' +
           '</div>' +
           '<div class="actions-cell">' +
+          (t.phone ? '<button class="btn btn-primary btn-sm tenant-msg-btn" data-id="' + t.id + '" data-name="' + t.name + '" data-phone="' + (t.phone || '') + '">💬 Message</button>' : '') +
           leaseUploadBtn +
           '<button class="btn btn-ghost btn-sm tenant-edit" data-id="' + t.id + '">Edit</button>' +
           '<button class="btn btn-danger btn-sm tenant-delete" data-id="' + t.id + '">Delete</button>' +
@@ -3361,8 +3872,12 @@
 
     function renderReminders() {
       var tbody = document.querySelector('#reminderTable tbody');
-      if (!state.reminders.length) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted)">No reminders</td></tr>'; return; }
-      tbody.innerHTML = state.reminders.map(function (r) { return '<tr><td>' + r.type + '</td><td>' + r.dayOfMonth + '</td><td>' + r.timeUtc + '</td><td>' + r.style + '</td><td><button class="btn btn-danger btn-sm reminder-delete" data-id="' + r.id + '">Delete</button></td></tr>'; }).join('');
+      if (!state.reminders.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">No reminders</td></tr>'; return; }
+      tbody.innerHTML = state.reminders.map(function (r) {
+        var unitLabel = r.unitId ? (state.units.find(function(u) { return u.id === r.unitId; }) || {}).label || '—' : 'All';
+        var amountInfo = r.amountCents ? ' ($' + (r.amountCents / 100).toFixed(2) + ')' : '';
+        return '<tr><td>' + r.type + amountInfo + '</td><td>' + unitLabel + '</td><td>' + r.dayOfMonth + '</td><td>' + r.timeUtc + '</td><td>' + r.style + '</td><td><button class="btn btn-danger btn-sm reminder-delete" data-id="' + r.id + '">Delete</button></td></tr>';
+      }).join('');
     }
 
     // ── MAINTENANCE KANBAN ──
@@ -3803,28 +4318,63 @@
     }
 
     function fillUnitSelects() {
-      var sels = [document.getElementById('tenantUnit'), document.getElementById('utilUnit'), document.getElementById('billUnit'), document.getElementById('gbUnit'), document.getElementById('gbUploadUnit')];
-      sels.forEach(function (sel) { if (!sel) return; sel.innerHTML = '<option value="">Select unit...</option>' + state.units.map(function (u) { return '<option value="' + u.id + '">' + u.label + '</option>'; }).join(''); });
+      var sels = [document.getElementById('tenantUnit'), document.getElementById('utilUnit'), document.getElementById('billUnit'), document.getElementById('gbUnit'), document.getElementById('gbUploadUnit'), document.getElementById('reminderUnit')];
+      sels.forEach(function (sel) { if (!sel) return; var defaultOpt = sel.id === 'reminderUnit' ? '<option value="">All tenants</option>' : '<option value="">Select unit...</option>'; sel.innerHTML = defaultOpt + state.units.map(function (u) { return '<option value="' + u.id + '">' + u.label + (u.property ? ' (' + u.property.address + ')' : '') + '</option>'; }).join(''); });
+    }
+
+    function toggleReminderUtilityFields() {
+      var type = document.getElementById('reminderType').value;
+      var unitField = document.getElementById('reminderUnitField');
+      var amtField = document.getElementById('reminderAmountField');
+      if (unitField) unitField.style.display = type === 'utility' ? '' : 'none';
+      if (amtField) amtField.style.display = type === 'utility' ? '' : 'none';
+    }
+
+    // Show/hide utility share field based on selected unit's utility type
+    function toggleTenantShareField() {
+      var unitId = document.getElementById('tenantUnit').value;
+      var shareField = document.getElementById('tenantShareField');
+      if (!shareField) return;
+      var unit = state.units.find(function(u) { return u.id === unitId; });
+      shareField.style.display = unit && unit.utilityType === 'SHARED' ? '' : 'none';
     }
 
     // ── EVENT LISTENERS ──
+    document.getElementById('createPropertyBtn').addEventListener('click', async function () {
+      var address = document.getElementById('propertyAddress').value.trim();
+      if (!address) return toast('Address required');
+      try {
+        await fetchJson('/admin/properties', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address: address }) });
+        toast('Property created'); document.getElementById('propertyAddress').value = '';
+        await loadProperties(); loadUnits();
+      } catch (err) { toast('Failed: ' + err.message); }
+    });
+
     document.getElementById('createUnitBtn').addEventListener('click', async function () {
       var label = document.getElementById('unitLabel').value.trim();
-      var address = document.getElementById('unitAddress').value.trim();
-      if (!label || !address) return toast('Label and address required');
-      await fetchJson('/admin/units', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label: label, address: address }) });
-      toast('Unit created'); document.getElementById('unitLabel').value = ''; document.getElementById('unitAddress').value = ''; loadUnits();
+      var propertyId = document.getElementById('unitProperty').value;
+      var utilityType = document.getElementById('unitUtilityType').value;
+      if (!label) return toast('Label required');
+      await fetchJson('/admin/units', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label: label, propertyId: propertyId || undefined, utilityType: utilityType }) });
+      toast('Unit created'); document.getElementById('unitLabel').value = ''; loadUnits();
     });
+
+    document.getElementById('tenantUnit').addEventListener('change', toggleTenantShareField);
 
     document.getElementById('createTenantBtn').addEventListener('click', async function () {
       var name = document.getElementById('tenantName').value.trim();
       var phone = document.getElementById('tenantPhone').value.trim();
       var email = document.getElementById('tenantEmail').value.trim();
       var unitId = document.getElementById('tenantUnit').value.trim();
+      var roleEl = document.getElementById('tenantRole');
+      var shareEl = document.getElementById('tenantSharePercent');
+      var role = roleEl ? roleEl.value : 'tenant';
+      var utilitySharePercent = shareEl && shareEl.value ? Number(shareEl.value) : undefined;
       if (!name) return toast('Name required');
       try {
-        await fetchJson('/admin/tenants', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, phone: phone, email: email, unitId: unitId || undefined }) });
-        toast('Tenant created');['tenantName', 'tenantPhone', 'tenantEmail'].forEach(function (id) { document.getElementById(id).value = ''; }); loadTenants();
+        await fetchJson('/admin/tenants', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, phone: phone, email: email, unitId: unitId || undefined, role: role, utilitySharePercent: utilitySharePercent }) });
+        toast('Tenant created');['tenantName', 'tenantPhone', 'tenantEmail'].forEach(function (id) { document.getElementById(id).value = ''; });
+        if (shareEl) shareEl.value = ''; loadTenants();
       } catch (err) { toast('Failed: ' + err.message); }
     });
 
@@ -4103,9 +4653,18 @@
       var timeUtc = document.getElementById('reminderTime').value.trim();
       var style = document.getElementById('reminderStyle').value;
       if (!dayOfMonth || !timeUtc) return toast('Day and time required');
-      await fetchJson('/admin/reminders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, dayOfMonth: dayOfMonth, timeUtc: timeUtc, style: style }) });
+      var body = { type: type, dayOfMonth: dayOfMonth, timeUtc: timeUtc, style: style };
+      if (type === 'utility') {
+        var unitSel = document.getElementById('reminderUnit');
+        var amtEl = document.getElementById('reminderAmount');
+        if (unitSel && unitSel.value) body.unitId = unitSel.value;
+        if (amtEl && amtEl.value) body.amountCents = Math.round(Number(amtEl.value) * 100);
+      }
+      await fetchJson('/admin/reminders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       toast('Reminder saved'); loadReminders();
     });
+
+    document.getElementById('reminderType').addEventListener('change', toggleReminderUtilityFields);
 
     // Refresh buttons
     document.getElementById('refreshBtn').addEventListener('click', function () { loadAll(); toast('Refreshed'); });
@@ -4232,7 +4791,27 @@
         var res = await fetchJson('/admin/agent/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         var answer = res?.answer || res?.finalAnswer || 'No response.';
         var tools = res?.toolCallCount ? res.toolCallCount + ' tools used' : '';
-        thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + '</div><div class="meta">Agent' + (tools ? ' \u00B7 ' + tools : '') + ' \u00B7 ' + new Date().toLocaleTimeString() + '</div>';
+        var formattedAnswer = formatChatText(answer);
+
+        // Check for PDF data in pdfArtifacts from agent response
+        var pdfButtons = '';
+        if (res?.pdfArtifacts && res.pdfArtifacts.length) {
+          res.pdfArtifacts.forEach(function(art) {
+            pdfButtons += buildPdfDownloadButton(art.pdfBase64, art.fileName);
+          });
+        }
+        // Also check in answer text for base64 PDF pattern
+        if (!pdfButtons && answer && answer.includes('pdfBase64')) {
+          try {
+            var pdfMatch = answer.match(/"pdfBase64"\s*:\s*"([^"]+)"/);
+            var fnMatch = answer.match(/"fileName"\s*:\s*"([^"]+)"/);
+            if (pdfMatch && fnMatch) {
+              pdfButtons += buildPdfDownloadButton(pdfMatch[1], fnMatch[1]);
+            }
+          } catch(e) {}
+        }
+
+        thinking.innerHTML = '<div style="white-space:pre-wrap">' + formattedAnswer + '</div>' + pdfButtons + '<div class="meta">Agent' + (tools ? ' \u00B7 ' + tools : '') + ' \u00B7 ' + new Date().toLocaleTimeString() + '</div>';
       } catch (err) {
         thinking.innerHTML = '<div style="color:var(--danger)">Error: ' + err.message + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
       }
@@ -4338,12 +4917,42 @@
 
       if (t.classList.contains('unit-edit')) {
         var id = t.dataset.id; var unit = state.units.find(function (u) { return u.id === id; }); if (!unit) return;
-        var label = prompt('Label', unit.label); var address = prompt('Address', unit.address);
-        if (label !== null) { await fetchJson('/admin/units/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label: label, address: address }) }); toast('Updated'); loadUnits(); }
+        var label = prompt('Label', unit.label);
+        if (label !== null) { await fetchJson('/admin/units/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label: label }) }); toast('Updated'); loadUnits(); }
       }
       if (t.classList.contains('unit-delete')) {
         var id = t.dataset.id; if (!confirm('Delete unit?')) return;
         await fetchJson('/admin/units/' + id, { method: 'DELETE' }); toast('Deleted'); loadUnits();
+      }
+      if (t.classList.contains('wa-group-btn')) {
+        var id = t.dataset.id; t.disabled = true; t.textContent = 'Creating...';
+        try {
+          var res = await fetchJson('/admin/units/' + id + '/whatsapp-group', { method: 'POST' });
+          toast('WhatsApp group created!'); loadUnits();
+        } catch (err) { toast('Failed: ' + err.message); t.disabled = false; t.textContent = 'Create Group'; }
+      }
+      if (t.classList.contains('set-shares-btn')) {
+        var id = t.dataset.id;
+        try {
+          var occupants = await fetchJson('/admin/units/' + id + '/occupants');
+          if (!occupants || !occupants.length) return toast('No occupants in this unit');
+          var shares = {}; var valid = true;
+          for (var i = 0; i < occupants.length; i++) {
+            var occ = occupants[i];
+            var val = prompt(occ.tenant.name + ' share % (current: ' + (occ.utilitySharePercent || 0) + '%)', occ.utilitySharePercent || Math.floor(100 / occupants.length));
+            if (val === null) { valid = false; break; }
+            shares[occ.tenantId] = Number(val);
+          }
+          if (!valid) return;
+          var total = Object.values(shares).reduce(function (a, b) { return a + b; }, 0);
+          if (Math.abs(total - 100) > 0.01) return toast('Shares must total 100% (got ' + total + '%)');
+          await fetchJson('/admin/units/' + id + '/utility-shares', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shares: shares }) });
+          toast('Shares saved'); loadUnits();
+        } catch (err) { toast('Failed: ' + err.message); }
+      }
+      if (t.classList.contains('prop-delete')) {
+        var id = t.dataset.id; if (!confirm('Delete property? Units will be unlinked.')) return;
+        await fetchJson('/admin/properties/' + id, { method: 'DELETE' }); toast('Deleted'); loadProperties(); loadUnits();
       }
       if (t.classList.contains('tenant-edit')) {
         var id = t.dataset.id; var tenant = state.tenants.find(function (x) { return x.id === id; }); if (!tenant) return;
@@ -4457,6 +5066,66 @@
         toast('Auto-reply ' + (t.checked ? 'on' : 'off'));
       }
     });
+
+    // ── Direct Tenant Messaging ──
+    var _tenantMsgState = { id: null, name: '', phone: '' };
+
+    document.body.addEventListener('click', function(e) {
+      var btn = e.target.closest('.tenant-msg-btn');
+      if (!btn) return;
+      openTenantMsgModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone);
+    });
+
+    function openTenantMsgModal(id, name, phone) {
+      _tenantMsgState = { id: id, name: name, phone: phone };
+      document.getElementById('tenantMsgTitle').textContent = 'Message ' + name;
+      document.getElementById('tenantMsgInfo').textContent = '📱 ' + phone;
+      document.getElementById('tenantMsgText').value = '';
+      document.getElementById('tenantMsgStatus').style.display = 'none';
+      document.getElementById('tenantMsgBackdrop').classList.add('open');
+    }
+
+    function closeTenantMsgModal() {
+      document.getElementById('tenantMsgBackdrop').classList.remove('open');
+      _tenantMsgState = { id: null, name: '', phone: '' };
+    }
+
+    async function sendTenantMsg() {
+      var text = document.getElementById('tenantMsgText').value.trim();
+      if (!text) return toast('Enter a message');
+      if (!_tenantMsgState.id) return toast('No tenant selected');
+      var statusEl = document.getElementById('tenantMsgStatus');
+      statusEl.style.display = 'block'; statusEl.style.color = 'var(--text-muted)'; statusEl.textContent = 'Sending...';
+      try {
+        await fetchJson('/admin/tenants/' + _tenantMsgState.id + '/message', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+        statusEl.style.color = 'var(--success)'; statusEl.textContent = '✅ Message sent to ' + _tenantMsgState.name;
+        document.getElementById('tenantMsgText').value = '';
+      } catch (err) {
+        statusEl.style.color = 'var(--danger)'; statusEl.textContent = '❌ Failed: ' + err.message;
+      }
+    }
+
+    async function aiDraftTenantMsg() {
+      if (!_tenantMsgState.name) return toast('No tenant selected');
+      var topic = prompt('What should the message be about? (e.g., rent reminder, maintenance update, lease renewal)');
+      if (!topic) return;
+      var statusEl = document.getElementById('tenantMsgStatus');
+      statusEl.style.display = 'block'; statusEl.style.color = 'var(--text-muted)'; statusEl.textContent = '🤖 Drafting...';
+      try {
+        var res = await fetchJson('/admin/agent/ask', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: 'Draft a professional WhatsApp message to my tenant ' + _tenantMsgState.name + ' about: ' + topic + '. Write ONLY the message text, no extra commentary. Use WhatsApp formatting (*bold* for emphasis).' })
+        });
+        var draft = res?.answer || res?.finalAnswer || '';
+        document.getElementById('tenantMsgText').value = draft;
+        statusEl.style.color = 'var(--accent)'; statusEl.textContent = '✏️ AI draft ready — edit as needed, then click Send.';
+      } catch (err) {
+        statusEl.style.color = 'var(--danger)'; statusEl.textContent = '❌ Draft failed: ' + err.message;
+      }
+    }
 
     // Lease upload (delegated click handler)
     document.body.addEventListener('click', function (e) {
@@ -4665,12 +5334,40 @@
 
     // ── LOAD ALL ──
     function loadAll() {
+      loadProperties().then(function () { fillPropertySelects(); });
       loadUnits().then(function () { fillUnitSelects(); });
       loadTenants(); loadAutoReplySettings(); loadAutoReplyDelay(); loadAutoReplyCooldown();
       loadContractors(); loadMaintenance(); loadUtilities(); loadUtilCreds(); loadGreenButtonData();
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();
-      loadAgentChatHistory();
+      loadAgentChatHistory(); loadFinancialSummary();
+    }
+
+    async function loadFinancialSummary() {
+      try {
+        var data = await fetchJson('/admin/financial/summary');
+        if (data && !data.error) {
+          var fmt = function(v) { return '$' + (v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+          document.getElementById('finIncome').textContent = fmt(data.totalIncome);
+          document.getElementById('finExpenses').textContent = fmt(data.totalExpenses);
+          var net = data.net || 0;
+          var netEl = document.getElementById('finNet');
+          netEl.textContent = (net >= 0 ? '+' : '') + fmt(net);
+          netEl.style.color = net >= 0 ? '#22c55e' : '#ef4444';
+          document.getElementById('financialCurrency').textContent = data.currency || 'CAD';
+          // Breakdown details
+          var byType = data.byType || {};
+          var incParts = [];
+          if (byType.RENT_PAYMENT) incParts.push('Rent: ' + fmt(byType.RENT_PAYMENT));
+          if (byType.DEPOSIT) incParts.push('Deposits: ' + fmt(byType.DEPOSIT));
+          document.getElementById('finIncomeBreakdown').textContent = incParts.join(' \u00B7 ') || 'No income recorded';
+          var expParts = [];
+          if (byType.EXPENSE) expParts.push('Expenses: ' + fmt(byType.EXPENSE));
+          if (byType.REFUND) expParts.push('Refunds: ' + fmt(byType.REFUND));
+          document.getElementById('finExpensesBreakdown').textContent = expParts.join(' \u00B7 ') || 'No expenses recorded';
+          document.getElementById('finNetSub').textContent = data.totalRecords + ' records total';
+        }
+      } catch(e) { console.warn('Financial summary load failed', e); }
     }
 
     async function loadAccount() {
@@ -5298,7 +5995,7 @@
         mission: 'Dashboard', maintenance: 'Maintenance', tenants: 'Tenants',
         units: 'Units', contractors: 'Contractors', utilities: 'Utilities',
         agent: 'AI Agent', usage: 'AI Usage', whatsapp: 'WhatsApp',
-        reminders: 'Reminders', leases: 'Leases', account: 'Account'
+        reminders: 'Reminders', leases: 'Leases', guides: 'Tips & Guides', account: 'Account'
       };
       title.textContent = titles[sectionId] || sectionId;
 

@@ -8,10 +8,12 @@ const isDbEnabled = Boolean(process.env.DATABASE_URL);
 type ReminderInput = {
   id?: string;
   landlordId?: string;
+  unitId?: string;
   type: "rent" | "utility";
   dayOfMonth: number;
   timeUtc: string;
   style: "short" | "medium" | "professional" | "casual";
+  amountCents?: number;
 };
 
 type ReminderResult = {
@@ -43,17 +45,58 @@ function parseTimeUtc(timeUtc: string) {
   return { hour, minute };
 }
 
-function shouldSendNow(reminder: { dayOfMonth: number; timeUtc: string; lastSentAt?: Date | null }, now: Date) {
+/**
+ * Convert UTC Date to a landlord's local time components.
+ * Uses Intl.DateTimeFormat for timezone conversion.
+ * Falls back to UTC if timezone is invalid.
+ */
+function getLocalTime(now: Date, timezone: string): { day: number; hour: number; minute: number } {
+  try {
+    const fmt = new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      hour: "numeric",
+      minute: "numeric",
+      day: "numeric",
+      hour12: false,
+    });
+    const parts = fmt.formatToParts(now);
+    const day = Number(parts.find(p => p.type === "day")?.value || now.getUTCDate());
+    const hour = Number(parts.find(p => p.type === "hour")?.value || now.getUTCHours());
+    const minute = Number(parts.find(p => p.type === "minute")?.value || now.getUTCMinutes());
+    return { day, hour, minute };
+  } catch {
+    // Invalid timezone — fall back to UTC
+    return { day: now.getUTCDate(), hour: now.getUTCHours(), minute: now.getUTCMinutes() };
+  }
+}
+
+/**
+ * Check if a reminder should fire now, using the landlord's timezone.
+ * The `timeUtc` field is treated as the landlord's LOCAL time.
+ * Widened check window to ±1 minute to handle 30-second polling edge case.
+ */
+function shouldSendNow(
+  reminder: { dayOfMonth: number; timeUtc: string; lastSentAt?: Date | null },
+  now: Date,
+  timezone?: string
+) {
   const time = parseTimeUtc(reminder.timeUtc);
   if (!time) return false;
-  if (now.getUTCDate() !== reminder.dayOfMonth) return false;
-  if (now.getUTCHours() !== time.hour) return false;
-  if (now.getUTCMinutes() !== time.minute) return false;
-  // Don't re-send if already sent this minute
+
+  const tz = timezone || "America/Toronto";
+  const local = getLocalTime(now, tz);
+
+  if (local.day !== reminder.dayOfMonth) return false;
+
+  // Check if we're within ±1 minute of the target time
+  const targetMin = time.hour * 60 + time.minute;
+  const currentMin = local.hour * 60 + local.minute;
+  if (Math.abs(currentMin - targetMin) > 1) return false;
+
+  // Don't re-send if already sent within the last 2 minutes
   if (reminder.lastSentAt) {
-    const lastMin = Math.floor(reminder.lastSentAt.getTime() / 60000);
-    const nowMin = Math.floor(now.getTime() / 60000);
-    if (lastMin === nowMin) return false;
+    const elapsed = now.getTime() - reminder.lastSentAt.getTime();
+    if (elapsed < 120000) return false; // 2 minute dedup window
   }
   return true;
 }
@@ -77,10 +120,12 @@ export async function addReminder(input: ReminderInput) {
       data: {
         id: input.id,
         landlordId: input.landlordId || null,
+        unitId: input.unitId || null,
         type: input.type,
         dayOfMonth: input.dayOfMonth,
         timeUtc: input.timeUtc,
         style: input.style,
+        amountCents: input.amountCents || null,
         active: true,
       },
     });
@@ -118,8 +163,22 @@ export async function runDueReminders(now = new Date()): Promise<ReminderResult[
   try {
     const reminders = await db.reminder.findMany({ where: { active: true } });
 
+    // Pre-fetch landlord timezones to avoid repeated DB queries
+    const landlordIds = [...new Set(reminders.map(r => r.landlordId).filter(Boolean))] as string[];
+    const landlordTimezones = new Map<string, string>();
+    if (landlordIds.length) {
+      const landlords = await db.landlord.findMany({
+        where: { id: { in: landlordIds } },
+        select: { id: true, timezone: true },
+      });
+      for (const l of landlords) {
+        landlordTimezones.set(l.id, l.timezone || "America/Toronto");
+      }
+    }
+
     for (const reminder of reminders) {
-      if (!shouldSendNow(reminder, now)) continue;
+      const tz = reminder.landlordId ? (landlordTimezones.get(reminder.landlordId) || "America/Toronto") : "America/Toronto";
+      if (!shouldSendNow(reminder, now, tz)) continue;
 
       // Mark as sent immediately to prevent duplicate sends
       await db.reminder.update({
@@ -127,6 +186,102 @@ export async function runDueReminders(now = new Date()): Promise<ReminderResult[
         data: { lastSentAt: now },
       });
 
+      let sent = 0;
+      let failed = 0;
+
+      // ── Utility reminder with unit targeting ──
+      if (reminder.type === "utility" && reminder.unitId) {
+        const unit = await db.unit.findUnique({
+          where: { id: reminder.unitId },
+          include: {
+            property: true,
+            tenants: {
+              include: { tenant: { select: { id: true, name: true, phone: true } } },
+            },
+          },
+        });
+
+        if (!unit || unit.tenants.length === 0) {
+          results.push({ reminderId: reminder.id, sent: 0, failed: 0 });
+          continue;
+        }
+
+        // Determine the utility amount — use reminder.amountCents or latest bill
+        let billAmountCents = reminder.amountCents || 0;
+        if (!billAmountCents) {
+          const latestBill = await db.utilityBill.findFirst({
+            where: { unitId: unit.id },
+            orderBy: { billingPeriodEnd: "desc" },
+            select: { amountCents: true },
+          });
+          billAmountCents = latestBill?.amountCents || 0;
+        }
+
+        const billAmount = billAmountCents / 100;
+        const propertyAddress = (unit as any).property?.address || unit.address || "";
+
+        if (unit.utilityType === "SHARED") {
+          // ── SHARED utility: calculate each person's share ──
+          const occupantShares = unit.tenants.map((ut: any) => ({
+            name: ut.tenant.name,
+            phone: ut.tenant.phone,
+            sharePercent: ut.utilitySharePercent || (100 / unit.tenants.length),
+          }));
+
+          // Build a group message listing all shares
+          let shareBreakdown = occupantShares.map((o: any) => {
+            const shareAmt = (billAmount * o.sharePercent / 100).toFixed(2);
+            return `• *${o.name}*: $${shareAmt} (${o.sharePercent}%)`;
+          }).join("\n");
+
+          const groupMsg = `*Utility Bill Reminder — ${unit.label}*${propertyAddress ? ` (${propertyAddress})` : ""}\n\nTotal utility bill: *$${billAmount.toFixed(2)}*\n\nShare breakdown:\n${shareBreakdown}\n\nPlease ensure your portion is paid on time. Let us know if you have any questions.`;
+
+          // Send to WhatsApp group if it exists, otherwise individual DMs
+          if (unit.whatsappGroupJid) {
+            const result = await whatsappService.sendWhatsAppGroupText({
+              groupJid: unit.whatsappGroupJid,
+              text: groupMsg,
+              landlordId: reminder.landlordId || undefined,
+            });
+            if (result.ok) sent += occupantShares.length;
+            else failed += occupantShares.length;
+          } else {
+            // Fallback: send individual DMs with their specific share
+            for (const o of occupantShares) {
+              if (!o.phone) continue;
+              const shareAmt = (billAmount * o.sharePercent / 100).toFixed(2);
+              const msg = `*Utility Bill Reminder — ${unit.label}*\n\nHi ${o.name}, your share of this month's utility bill is *$${shareAmt}* (${o.sharePercent}% of $${billAmount.toFixed(2)}).\n\nPlease ensure payment is made on time.`;
+              const result = await whatsappService.sendWhatsAppText({
+                to: o.phone,
+                text: msg,
+                landlordId: reminder.landlordId || undefined,
+              });
+              if (result.ok) sent++;
+              else failed++;
+            }
+          }
+        } else {
+          // ── SINGLE utility: 100% to the tenant ──
+          const msg = `*Utility Bill Reminder — ${unit.label}*${propertyAddress ? ` (${propertyAddress})` : ""}\n\nYour utility bill of *$${billAmount.toFixed(2)}* is due today. Please ensure payment is made on time. Reach out if you need the statement.`;
+
+          for (const ut of unit.tenants) {
+            const phone = (ut as any).tenant?.phone;
+            if (!phone) continue;
+            const result = await whatsappService.sendWhatsAppText({
+              to: phone,
+              text: msg,
+              landlordId: reminder.landlordId || undefined,
+            });
+            if (result.ok) sent++;
+            else failed++;
+          }
+        }
+
+        results.push({ reminderId: reminder.id, sent, failed });
+        continue;
+      }
+
+      // ── Standard rent/utility reminder (no unit targeting — goes to all tenants) ──
       const tenants = await repo.listTenants(reminder.landlordId || undefined);
       const generated = await agentService.generateReminderMessage({
         type: reminder.type as "rent" | "utility",
@@ -135,14 +290,13 @@ export async function runDueReminders(now = new Date()): Promise<ReminderResult[
       });
       const fallback = templates[reminder.type]?.[reminder.style] || templates.rent.medium;
       const message = generated.text || fallback;
-      let sent = 0;
-      let failed = 0;
 
       for (const tenant of tenants) {
         if (!tenant.phone) continue;
         const result = await whatsappService.sendWhatsAppText({
           to: tenant.phone,
           text: message,
+          landlordId: reminder.landlordId || undefined,
         });
         if (result.ok) sent += 1;
         else failed += 1;
