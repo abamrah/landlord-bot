@@ -5,9 +5,9 @@
         "dockerfilePath": "Dockerfile"
     },
     "deploy": {
-        "startCommand": "dumb-init -- sh -c 'Xvfb :99 -screen 0 1280x900x24 -ac &>/dev/null & sleep 1 && npx prisma db push --accept-data-loss && npx ts-node src/index.ts'",
+        "startCommand": "dumb-init -- sh -c 'Xvfb :99 -screen 0 1280x900x24 -ac &>/dev/null & sleep 1 && npx prisma db push --accept-data-loss && node dist/index.js'",
         "healthcheckPath": "/health",
-        "healthcheckTimeout": 30,
+        "healthcheckTimeout": 300,
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 5
     }

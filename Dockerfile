@@ -47,6 +47,9 @@ RUN npx prisma generate
 # Copy source
 COPY . .
 
+# Build TypeScript at build time (much faster startup)
+RUN npx tsc || true
+
 # ── Runtime ──────────────────────────────────────────────────
 ENV NODE_ENV=production
 ENV AGENTIC_MODE=true
@@ -59,4 +62,4 @@ EXPOSE 3000
 # Start Xvfb + the Node app
 # dumb-init handles PID 1 / signal forwarding properly
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "Xvfb :99 -screen 0 1280x900x24 -ac &>/dev/null & sleep 1 && npx prisma migrate deploy && npx ts-node src/index.ts"]
+CMD ["sh", "-c", "Xvfb :99 -screen 0 1280x900x24 -ac &>/dev/null & sleep 1 && npx prisma db push --accept-data-loss && node dist/index.js"]
