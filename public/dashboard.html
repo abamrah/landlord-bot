@@ -1978,13 +1978,17 @@
         border-bottom: 1px solid var(--border);
         box-shadow: var(--shadow-lg);
         z-index: 50;
-        transform: translateY(-100%);
-        transition: transform .25s ease;
+        transform: translateY(-110%);
+        transition: transform .25s ease, visibility .25s;
         overflow-y: auto;
+        visibility: hidden;
+        pointer-events: none;
       }
 
       .mobile-notif-panel.open {
         transform: translateY(0);
+        visibility: visible;
+        pointer-events: auto;
       }
 
       .mobile-notif-header {
@@ -5280,6 +5284,8 @@
 
     // ── Section Overlay (shared) ──
     var _overlayReturnSection = null;
+    var _overlayOriginalParent = null;
+    var _overlayNextSibling = null;
     function openMobileOverlay(sectionId) {
       var overlay = document.getElementById('mobileSectionOverlay');
       var content = document.getElementById('mobileOverlayContent');
@@ -5296,21 +5302,39 @@
       };
       title.textContent = titles[sectionId] || sectionId;
 
-      // Clone section content into overlay
+      // Move the actual section into the overlay (preserves event listeners & IDs)
+      _overlayOriginalParent = section.parentNode;
+      _overlayNextSibling = section.nextSibling;
       content.innerHTML = '';
-      var clone = section.cloneNode(true);
-      clone.className = 'section';
-      clone.removeAttribute('id');
-      content.appendChild(clone);
+      section.style.display = 'block';
+      content.appendChild(section);
 
       overlay.classList.add('open');
       _overlayReturnSection = sectionId;
+
+      // Re-fill any unit dropdowns that depend on loaded state
+      if (typeof fillUnitSelects === 'function') fillUnitSelects();
     }
 
     function closeMobileOverlay() {
       var overlay = document.getElementById('mobileSectionOverlay');
       if (overlay) overlay.classList.remove('open');
+
+      // Move section back to its original location in the DOM
+      if (_overlayReturnSection && _overlayOriginalParent) {
+        var section = document.getElementById(_overlayReturnSection);
+        if (section) {
+          section.style.display = '';
+          if (_overlayNextSibling && _overlayNextSibling.parentNode === _overlayOriginalParent) {
+            _overlayOriginalParent.insertBefore(section, _overlayNextSibling);
+          } else {
+            _overlayOriginalParent.appendChild(section);
+          }
+        }
+      }
       _overlayReturnSection = null;
+      _overlayOriginalParent = null;
+      _overlayNextSibling = null;
     }
 
     // ── Approval Modal (replaces browser prompt for drafts) ──
