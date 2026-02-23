@@ -178,23 +178,33 @@ function isLlmFallback(text: string) {
 export async function pingLlm() {
   const model = ensureModel();
   if (!model) return false;
-  try {
-    const result = await model.generateContent({
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: "ping" }],
-        },
-      ],
-    });
-    const parts = result.response?.candidates?.[0]?.content?.parts || [];
-    const text = parts.map((p) => (p as { text?: string }).text || "").join("");
-    return Boolean(text.trim());
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn("LLM ping failed", err);
-    return false;
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const result = await model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: "ping" }],
+          },
+        ],
+      });
+      const parts = result.response?.candidates?.[0]?.content?.parts || [];
+      const text = parts.map((p) => (p as { text?: string }).text || "").join("");
+      return Boolean(text.trim());
+    } catch (err) {
+      if (attempt >= maxAttempts || !shouldRetryLlm(err)) {
+        // eslint-disable-next-line no-console
+        console.warn("LLM ping failed", err);
+        return false;
+      }
+      const backoff = 600 * Math.pow(2, attempt - 1);
+      // eslint-disable-next-line no-console
+      console.log(`LLM ping attempt ${attempt} failed (503/429), retrying in ${backoff}ms…`);
+      await delayMs(backoff);
+    }
   }
+  return false;
 }
 
 async function runGemini(prompt: string) {
