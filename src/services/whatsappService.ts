@@ -44,6 +44,9 @@ function buildSendUrl(baseUrl: string, path: string, session: string) {
   let fullPath = path.startsWith("/") ? path : `/${path}`;
   if (fullPath.includes("{session}")) {
     fullPath = fullPath.replace("{session}", encodeURIComponent(session));
+  } else if (session) {
+    // Evolution API v2 requires instance name in the URL path
+    fullPath = `${fullPath}/${encodeURIComponent(session)}`;
   }
   return `${normalizedBase}${fullPath}`;
 }
