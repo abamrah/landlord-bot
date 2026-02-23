@@ -1983,7 +1983,8 @@ router.post("/leases/upload", async (req, res) => {
             role: "user",
             parts: [
               { inlineData: { data: parsed.data.fileBase64, mimeType: parsed.data.mimeType } },
-              { text: `Extract key lease terms from this document. Return a JSON object with these fields (use null for missing):
+              {
+                text: `Extract key lease terms from this document. Return a JSON object with these fields (use null for missing):
 {
   "rentAmount": number or null (monthly rent in dollars),
   "rentCurrency": "CAD" or "USD",

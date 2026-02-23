@@ -284,6 +284,43 @@ function containsCriticalKeyword(text: string) {
   return CRITICAL_KEYWORDS.some((kw) => normalized.includes(kw));
 }
 
+/**
+ * Build a landlord notification message. For HIGH/CRITICAL severity,
+ * includes AI recommendation and prompts landlord to reply "approve" or "deny".
+ */
+function buildLandlordAlert(opts: {
+  tenantName: string;
+  tenantPhone: string;
+  message: string;
+  severity: string;
+  draft: string;
+  isNewTicket?: boolean;
+}): string {
+  const sev = (opts.severity || "normal").toLowerCase();
+  const isEscalated = sev === "high" || sev === "critical" || containsCriticalKeyword(opts.message);
+  const effectiveSeverity = isEscalated ? (sev === "critical" ? "CRITICAL" : "HIGH") : sev.toUpperCase();
+  const ticketLabel = opts.isNewTicket ? "🆕 NEW TICKET" : "📩 TENANT MESSAGE";
+
+  let alert = `${ticketLabel}\n`;
+  alert += `👤 ${opts.tenantName} (${opts.tenantPhone})\n`;
+  alert += `⚠️ Severity: ${effectiveSeverity}\n`;
+  alert += `💬 Message: ${opts.message}\n`;
+
+  if (isEscalated) {
+    alert += `\n🤖 AI Recommendation:\n${opts.draft || "(No draft available yet)"}\n`;
+    alert += `\n⚡ This is a ${effectiveSeverity} severity issue. Auto-reply has been HELD for your review.`;
+    alert += `\n\n👉 Reply "approve" to send the AI draft to the tenant`;
+    alert += `\n👉 Reply "deny" to block the auto-reply`;
+  } else {
+    alert += `\n🤖 AI Draft: ${opts.draft || "(agent handled)"}\n`;
+    if (opts.draft) {
+      alert += `✅ Auto-reply was sent to tenant (severity: ${effectiveSeverity}).`;
+    }
+  }
+
+  return alert;
+}
+
 function isFromMe(payload: any): boolean {
   const data = payload?.data || payload;
   return Boolean(data?.key?.fromMe || data?.fromMe);
@@ -509,11 +546,23 @@ async function flushTenantReply(params: { tenantId: string }) {
       }
 
       // Notify landlord about tenant message (batched agentic path)
-      const agentAlert = `Tenant ${tenant.name} (${tenant.phone || bucket.replyTo}) says: ${combinedMessage}\nAI Draft: ${draftText || "(agent handled)"}`;
+      // Try to get severity from the latest maintenance record
+      const latestRecord = await repo.findLatestMaintenanceForTenantId(tenant.id);
+      const batchSeverity = ((latestRecord?.triageJson as any)?.classification?.severity || "normal").toString().toLowerCase();
+      const agentAlert = buildLandlordAlert({
+        tenantName: tenant.name,
+        tenantPhone: tenant.phone || bucket.replyTo,
+        message: combinedMessage,
+        severity: batchSeverity,
+        draft: draftText || "(agent handled)",
+        isNewTicket: !latestRecord,
+      });
       if (landlordId) {
         await whatsappService.alertLandlord(landlordId, agentAlert, {
-          type: "maintenance",
+          type: batchSeverity === "high" || batchSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
+          maintenanceId: latestRecord?.id,
           tenantPhone: tenant.phone || bucket.replyTo,
+          severity: batchSeverity,
         });
       }
 
@@ -609,15 +658,22 @@ async function flushTenantReply(params: { tenantId: string }) {
 
   const triageJson: any = record?.triageJson || triage || {};
   const aiDraft: any = record?.aiDraft || draftResponse || {};
-  const severity = triageJson?.classification?.severity || "normal";
+  const severity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
   const draft = aiDraft?.draft || "(no draft yet)";
-  const alert = `Tenant ${tenant.name} (${tenant.phone || bucket.replyTo}) says: ${combinedMessage}\nSeverity: ${severity}\nDraft: ${draft}`;
+  const alert = buildLandlordAlert({
+    tenantName: tenant.name,
+    tenantPhone: tenant.phone || bucket.replyTo,
+    message: combinedMessage,
+    severity,
+    draft,
+    isNewTicket: !existing,
+  });
   if (landlordId) {
     await whatsappService.alertLandlord(landlordId, alert, {
-      type: "maintenance",
+      type: severity === "high" || severity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
       maintenanceId: record?.id,
       tenantPhone: tenant.phone || bucket.replyTo,
-      severity: severity.toString(),
+      severity,
     });
   } else {
     for (const number of landlordNumbers()) {
@@ -762,9 +818,10 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             content: reply,
           });
 
-          // Approval path still works in agentic mode (only if a record exists)
+          // Approval / Deny path (agentic mode)
           if (record) {
             const approved = /approve|approved|send it|ok to send/i.test(text || "");
+            const denied = /deny|denied|reject|block/i.test(text || "");
             const forwardDraft = ((record.aiDraft as any)?.draft || "").trim();
             if (approved && record.tenantId && forwardDraft) {
               const tenantForForward = await repo.getTenantById(record.tenantId);
@@ -776,7 +833,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
                   content: forwardDraft,
                   meta: { channel: "whatsapp", forwarded: true, approvedBy: sender },
                 });
+                await whatsappService.sendWhatsAppText({ to: effectiveReplyTo, text: "\u2705 Draft approved and sent to tenant.", landlordId });
               }
+            } else if (denied && record.tenantId) {
+              await repo.appendChatMessage({
+                id: record.id,
+                role: "landlord",
+                content: "[DENIED] Landlord rejected the AI draft.",
+                meta: { channel: "whatsapp", denied: true, deniedBy: sender },
+              });
+              await whatsappService.sendWhatsAppText({ to: effectiveReplyTo, text: "\u274c Draft denied. The auto-reply was NOT sent to the tenant.", landlordId });
             }
           }
 
@@ -888,8 +954,9 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         });
       }
 
-      // Approval path: landlord can forward the latest AI draft to the tenant.
+      // Approval / Deny path: landlord can forward or block the AI draft.
       const approved = /approve|approved|send it|ok to send/i.test(text || "");
+      const denied = /deny|denied|reject|block/i.test(text || "");
       const forwardDraft = (tenantDraft || (record.aiDraft as any)?.draft || "").trim();
       if (approved && record.tenantId && forwardDraft) {
         const tenant = await repo.getTenantById(record.tenantId);
@@ -901,7 +968,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             content: forwardDraft,
             meta: { channel: "whatsapp", forwarded: true, approvedBy: sender },
           });
+          await whatsappService.sendWhatsAppText({ to: effectiveReplyTo, text: "\u2705 Draft approved and sent to tenant.", landlordId });
         }
+      } else if (denied && record.tenantId) {
+        await repo.appendChatMessage({
+          id: record.id,
+          role: "landlord",
+          content: "[DENIED] Landlord rejected the AI draft.",
+          meta: { channel: "whatsapp", denied: true, deniedBy: sender },
+        });
+        await whatsappService.sendWhatsAppText({ to: effectiveReplyTo, text: "\u274c Draft denied. The auto-reply was NOT sent to the tenant.", landlordId });
       }
       return respond({ ok: true, routed: "landlord", llmInvoked, autoReplySent, autoReplyReason });
     }
@@ -1089,10 +1165,17 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
         // Notify landlord about tenant message (agentic path)
         const agentSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
-        const agentAlert = `Tenant ${tenant.name} (${tenant.phone || sender}) says: ${tenantMessage}\nSeverity: ${agentSeverity}\nAI Draft: ${agentDraft || "(agent handled)"}`;
+        const agentAlert = buildLandlordAlert({
+          tenantName: tenant.name,
+          tenantPhone: tenant.phone || sender,
+          message: tenantMessage,
+          severity: agentSeverity,
+          draft: agentDraft || "(agent handled)",
+          isNewTicket: !record,
+        });
         if (tenantLandlordId) {
           await whatsappService.alertLandlord(tenantLandlordId, agentAlert, {
-            type: "maintenance",
+            type: agentSeverity === "high" || agentSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
             maintenanceId: record?.id,
             tenantPhone: tenant.phone || sender,
             severity: agentSeverity,
@@ -1154,19 +1237,26 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
     const triageJson: any = record?.triageJson || triage || {};
     const aiDraft: any = record?.aiDraft || draftResponse || {};
-    const severity = triageJson?.classification?.severity || "normal";
+    const immSeverity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
     const draft = aiDraft?.draft || "(no draft yet)";
-    const alert = `Tenant ${tenant.name} (${tenant.phone || sender}) says: ${tenantMessage}\nSeverity: ${severity}\nDraft: ${draft}`;
+    const immAlert = buildLandlordAlert({
+      tenantName: tenant.name,
+      tenantPhone: tenant.phone || sender,
+      message: tenantMessage,
+      severity: immSeverity,
+      draft,
+      isNewTicket: !record || record.id === (await repo.findLatestMaintenanceForTenantId(tenant.id))?.id,
+    });
     if (tenantLandlordId) {
-      await whatsappService.alertLandlord(tenantLandlordId, alert, {
-        type: "maintenance",
+      await whatsappService.alertLandlord(tenantLandlordId, immAlert, {
+        type: immSeverity === "high" || immSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
         maintenanceId: record?.id,
         tenantPhone: tenant.phone || sender,
-        severity: severity.toString(),
+        severity: immSeverity,
       });
     } else {
       for (const number of landlordNumbers()) {
-        await whatsappService.sendWhatsAppText({ to: number, text: alert });
+        await whatsappService.sendWhatsAppText({ to: number, text: immAlert });
       }
     }
 

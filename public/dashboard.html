@@ -2632,22 +2632,27 @@
             <div class="chat-messages" id="agentChatLog">
               <div class="chat-msg ai">
                 <div>Hi! I can help with maintenance tickets, tenancy law, drafting replies, checking utilities,
-                  <strong>searching the web for product manuals & guides</strong>, lease info, reminders, and more. Ask me anything — I already know your portfolio.
+                  <strong>searching the web for product manuals & guides</strong>, lease info, reminders, and more. Ask
+                  me anything — I already know your portfolio.
                 </div>
               </div>
             </div>
-            <div id="agentMediaPreview" style="display:none; padding:4px 8px; background:var(--surface-2); border-radius:8px; margin-bottom:4px;">
+            <div id="agentMediaPreview"
+              style="display:none; padding:4px 8px; background:var(--surface-2); border-radius:8px; margin-bottom:4px;">
               <span id="agentMediaName" style="font-size:0.85rem; color:var(--text-muted);"></span>
-              <button onclick="clearAgentMedia()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-left:8px;">✕</button>
+              <button onclick="clearAgentMedia()"
+                style="background:none; border:none; color:var(--danger); cursor:pointer; margin-left:8px;">✕</button>
             </div>
             <div class="chat-input-row">
               <input type="file" id="agentFileInput" accept="image/*,video/*,application/pdf" style="display:none;" />
-              <button onclick="document.getElementById('agentFileInput').click()" class="btn" style="align-self:end; padding:8px;" title="Attach image, video, or PDF">📎</button>
+              <button onclick="document.getElementById('agentFileInput').click()" class="btn"
+                style="align-self:end; padding:8px;" title="Attach image, video, or PDF">📎</button>
               <textarea id="agentQuestion"
                 placeholder="Ask anything — maintenance, tenancy law, find a product manual, search the web for appliance info..."
                 rows="2"></textarea>
               <button class="btn btn-primary" id="agentAskBtn" style="align-self:end;">Send</button>
-              <button onclick="clearAgentHistory()" class="btn" style="align-self:end; padding:8px; font-size:0.8rem;" title="Clear chat history">🗑️</button>
+              <button onclick="clearAgentHistory()" class="btn" style="align-self:end; padding:8px; font-size:0.8rem;"
+                title="Clear chat history">🗑️</button>
             </div>
           </div>
         </div>
@@ -3035,7 +3040,8 @@
           <h2>🧠 AI Agent</h2>
           <div style="display:flex;align-items:center;gap:8px;">
             <p style="margin:0;">Powered by Gemini — Ask me anything</p>
-            <button onclick="clearMobileAgentHistory()" title="Clear history" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px;">🗑️</button>
+            <button onclick="clearMobileAgentHistory()" title="Clear history"
+              style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px;">🗑️</button>
           </div>
         </div>
         <div class="mobile-chat-messages" id="mobileAgentChatLog">
@@ -3045,12 +3051,16 @@
             </div>
           </div>
         </div>
-        <div id="mobileAgentMediaPreview" style="display:none;padding:4px 12px;background:var(--bg-card);border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);align-items:center;gap:6px;">
+        <div id="mobileAgentMediaPreview"
+          style="display:none;padding:4px 12px;background:var(--bg-card);border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);align-items:center;gap:6px;">
           📎 <span id="mobileMediaFileName"></span>
-          <button onclick="clearMobileAgentMedia()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">✕</button>
+          <button onclick="clearMobileAgentMedia()"
+            style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">✕</button>
         </div>
         <div class="mobile-chat-input">
-          <button onclick="document.getElementById('mobileAgentFileInput').click()" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;" title="Attach file">📎</button>
+          <button onclick="document.getElementById('mobileAgentFileInput').click()"
+            style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;"
+            title="Attach file">📎</button>
           <input type="file" id="mobileAgentFileInput" accept="image/*,video/*,application/pdf" style="display:none">
           <textarea id="mobileAgentQuestion" placeholder="Ask anything..." rows="1"></textarea>
           <button class="mobile-chat-send" id="mobileAgentAskBtn">➤</button>
