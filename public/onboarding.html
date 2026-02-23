@@ -1223,15 +1223,21 @@
                 requestBtn.disabled = false;
                 requestBtn.textContent = 'Get Code';
 
-                if (result && result.pairingCode) {
+                // Extract pairing code from multiple possible fields
+                var code = result && (result.pairingCode || result.code);
+                if (!code && result && result.raw) {
+                    code = result.raw.pairingCode || result.raw.code || (result.raw.data && (result.raw.data.pairingCode || result.raw.data.code));
+                }
+                if (code) {
                     pairingEl.style.display = 'block';
-                    document.getElementById('pairingCodeText').textContent = result.pairingCode;
+                    document.getElementById('pairingCodeText').textContent = code;
                     document.getElementById('pairingPhoneInput').style.display = 'none';
                     // Start polling
                     if (qrPollTimer) clearInterval(qrPollTimer);
                     qrPollTimer = setInterval(checkConnectionState, 4000);
                 } else {
-                    throw new Error('No pairing code returned. Try again.');
+                    console.log('Pairing code response:', JSON.stringify(result));
+                    throw new Error('No pairing code returned. Response: ' + Object.keys(result || {}).join(', '));
                 }
             } catch (err) {
                 loading.style.display = 'none';

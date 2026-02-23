@@ -1970,10 +1970,33 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
   const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
   if (landlord?.evolutionInstanceName !== req.params.instanceName) return res.status(403).json({ error: "forbidden" });
   try {
-    // If a phone number is provided, append it so Evolution API returns a pairing code
     const phoneNumber = (req.query.number as string || "").replace(/[^0-9]/g, "");
-    const qs = phoneNumber ? `?number=${phoneNumber}` : "";
-    const result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}${qs}`);
+
+    if (phoneNumber) {
+      // Request pairing code: Evolution API v2 uses POST with number in body
+      // Try POST first (newer Evolution API), fall back to GET with query param
+      let result: any;
+      try {
+        result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
+          method: "POST",
+          body: { number: phoneNumber },
+        });
+      } catch {
+        // Fallback: GET with query param (older Evolution API)
+        result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
+      }
+
+      // Extract pairing code — check multiple possible response shapes
+      const pairingCode = result?.pairingCode || result?.code || result?.data?.pairingCode || result?.data?.code;
+      const base64 = result?.base64 || result?.data?.base64;
+
+      console.log("[WhatsApp] Pairing code response keys:", Object.keys(result || {}), "pairingCode:", pairingCode ? "found" : "not found");
+
+      return res.json({ pairingCode: pairingCode || null, base64: base64 || null, raw: result });
+    }
+
+    // No phone number — return QR code (desktop flow)
+    const result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
