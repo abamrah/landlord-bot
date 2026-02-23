@@ -36,6 +36,14 @@ enum Plan {
 	ENTERPRISE
 }
 
+enum FinancialType {
+	RENT_PAYMENT
+	EXPENSE
+	DEPOSIT
+	REFUND
+	OTHER
+}
+
 // ── Multi-landlord ──────────────────────────────────────
 
 model Landlord {
@@ -59,6 +67,7 @@ model Landlord {
 	settings         LandlordSettings?
 	tenants          Tenant[]
 	units            Unit[]
+	financialRecords FinancialRecord[]
 	contractors      Contractor[]
 	requests         MaintenanceRequest[]
 	utilityBills     UtilityBill[]
@@ -364,4 +373,27 @@ model PushSubscription {
 
 	@@unique([landlordId, endpoint])
 	@@index([landlordId])
+}
+
+// ── Financial Records / Ledger ──────────────────────────
+
+model FinancialRecord {
+	id              String        @id @default(cuid())
+	landlord        Landlord      @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+	landlordId      String
+	tenantName      String?
+	tenantPhone     String?
+	unitLabel       String?
+	type            FinancialType @default(OTHER)
+	amount          Float
+	currency        String        @default("CAD")
+	description     String?
+	date            DateTime      @default(now())
+	receiptData     Bytes?
+	receiptMimeType String?
+	createdAt       DateTime      @default(now())
+
+	@@index([landlordId])
+	@@index([landlordId, type])
+	@@index([landlordId, date])
 }

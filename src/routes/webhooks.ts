@@ -712,24 +712,18 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     };
     if (isLandlord) {
       const record = await repo.findLatestOpenMaintenance(landlordId || undefined);
-      if (!record) {
-        await whatsappService.sendWhatsAppText({
-          to: effectiveReplyTo,
-          text: "No active tenant requests right now.",
-          landlordId,
+      // If there IS an active maintenance record, attach landlord message to it
+      if (record) {
+        await repo.appendChatMessage({
+          id: record.id,
+          role: "landlord",
+          content: text,
+          meta: { channel: "whatsapp", sender },
+          setLandlordReply: text,
         });
-        return respond({ ok: true, routed: "landlord_no_active", llmInvoked, autoReplySent });
       }
-      await repo.appendChatMessage({
-        id: record.id,
-        role: "landlord",
-        content: text,
-        meta: { channel: "whatsapp", sender },
-        setLandlordReply: text,
-      });
-      // Offer the landlord an AI-assisted reply based on the current thread.
 
-      // ── AGENTIC LANDLORD PATH ──
+      // ── AGENTIC LANDLORD PATH (works with or without active maintenance) ──
       if (AGENTIC_MODE && landlordId) {
         try {
           // Save landlord message to conversation memory
@@ -743,18 +737,22 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           const agentResult = await orchestrator.landlordAssistantAgent({
             landlordId,
             question: text || "",
-            maintenanceId: record.id,
+            maintenanceId: record?.id,
+            channel: "whatsapp",
+            senderPhone: sender,
           });
           llmInvoked = true;
 
-          const reply = (agentResult.finalAnswer || "").trim() || "I'm here. Ask anything about the issue.";
+          const reply = (agentResult.finalAnswer || "").trim() || "I'm here. Ask me anything about your properties.";
           await whatsappService.sendWhatsAppText({ to: effectiveReplyTo, text: `AI Assistance: ${reply}`, landlordId });
-          await repo.appendChatMessage({
-            id: record.id,
-            role: "ai",
-            content: `AI Assistance: ${reply}`,
-            meta: { channel: "whatsapp", assistant: true, agentic: true, toolCalls: agentResult.toolCallCount, tokens: agentResult.totalTokensEstimate },
-          });
+          if (record) {
+            await repo.appendChatMessage({
+              id: record.id,
+              role: "ai",
+              content: `AI Assistance: ${reply}`,
+              meta: { channel: "whatsapp", assistant: true, agentic: true, toolCalls: agentResult.toolCallCount, tokens: agentResult.totalTokensEstimate },
+            });
+          }
 
           // Save AI reply to landlord conversation memory
           await conversationMemory.saveMessage({
@@ -764,19 +762,21 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             content: reply,
           });
 
-          // Approval path still works in agentic mode
-          const approved = /approve|approved|send it|ok to send/i.test(text || "");
-          const forwardDraft = ((record.aiDraft as any)?.draft || "").trim();
-          if (approved && record.tenantId && forwardDraft) {
-            const tenantForForward = await repo.getTenantById(record.tenantId);
-            if (tenantForForward?.phone) {
-              await whatsappService.sendWhatsAppText({ to: tenantForForward.phone, text: forwardDraft, landlordId });
-              await repo.appendChatMessage({
-                id: record.id,
-                role: "ai",
-                content: forwardDraft,
-                meta: { channel: "whatsapp", forwarded: true, approvedBy: sender },
-              });
+          // Approval path still works in agentic mode (only if a record exists)
+          if (record) {
+            const approved = /approve|approved|send it|ok to send/i.test(text || "");
+            const forwardDraft = ((record.aiDraft as any)?.draft || "").trim();
+            if (approved && record.tenantId && forwardDraft) {
+              const tenantForForward = await repo.getTenantById(record.tenantId);
+              if (tenantForForward?.phone) {
+                await whatsappService.sendWhatsAppText({ to: tenantForForward.phone, text: forwardDraft, landlordId });
+                await repo.appendChatMessage({
+                  id: record.id,
+                  role: "ai",
+                  content: forwardDraft,
+                  meta: { channel: "whatsapp", forwarded: true, approvedBy: sender },
+                });
+              }
             }
           }
 
@@ -786,6 +786,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           console.error("agentic landlord failed, falling back to linear", err);
           // Fall through to linear path
         }
+      }
+
+      // If no record and not agentic, just send a friendly message
+      if (!record) {
+        await whatsappService.sendWhatsAppText({
+          to: effectiveReplyTo,
+          text: "No active tenant requests right now. You can still ask me anything via the dashboard.",
+          landlordId,
+        });
+        return respond({ ok: true, routed: "landlord_no_active", llmInvoked, autoReplySent });
       }
 
       // ── LINEAR LANDLORD PATH (original) ──

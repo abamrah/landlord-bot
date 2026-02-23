@@ -148,8 +148,59 @@ export async function alertLandlord(landlordId: string, text: string, extra?: { 
   }
 }
 
+// ── Send WhatsApp Document (PDF, images, etc.) ──
+
+type SendDocumentParams = {
+  to: string;
+  document: string; // base64-encoded file content
+  fileName: string;
+  mimeType?: string;
+  caption?: string;
+  session?: string;
+  landlordId?: string;
+};
+
+export async function sendWhatsAppDocument(params: SendDocumentParams): Promise<SendResult> {
+  const cfg = getConfig();
+  if (!cfg.baseUrl || !cfg.token) {
+    console.error("sendWhatsAppDocument BLOCKED: Evolution API not configured");
+    return { ok: false, error: "evolution_api_not_configured" };
+  }
+  const instanceName = params.session || await resolveInstance(params.landlordId);
+  const url = buildSendUrl(cfg.baseUrl, "/message/sendMedia", instanceName);
+  const payload: Record<string, unknown> = {
+    number: normalizeWhatsAppNumber(params.to),
+    mediatype: "document",
+    media: `data:${params.mimeType || "application/pdf"};base64,${params.document}`,
+    fileName: params.fileName,
+    caption: params.caption || "",
+  };
+  console.info("sendWhatsAppDocument →", { url, to: payload.number, fileName: params.fileName });
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        [cfg.tokenHeader]: cfg.token,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("sendWhatsAppDocument FAILED", { status: res.status, error: data?.error || data?.message });
+      return { ok: false, error: data?.error || `send_failed_${res.status}`, response: data };
+    }
+    console.info("sendWhatsAppDocument OK", { to: payload.number, status: res.status });
+    return { ok: true, response: data };
+  } catch (err) {
+    console.error("sendWhatsAppDocument EXCEPTION", { error: (err as Error).message });
+    return { ok: false, error: (err as Error).message };
+  }
+}
+
 export default {
   sendWhatsAppText,
+  sendWhatsAppDocument,
   normalizeWhatsAppNumber,
   alertLandlord,
 };

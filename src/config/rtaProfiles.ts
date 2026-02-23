@@ -20,7 +20,35 @@ export const RTA_PROFILES: Record<string, RtaProfile> = {
         emergencyRepairMaxHours: 24,
         rentIncreaseRules: "Max once per 12 months, guideline increase only unless AGI approved. N1 notice 90 days prior.",
         disputeBody: "Landlord and Tenant Board (LTB)",
-        promptAddendum: `You must comply with Ontario's Residential Tenancies Act, 2006. The Landlord and Tenant Board (LTB) handles all disputes. Rent increases require N1 notice 90 days prior. Entry requires 24-hour written notice except emergencies.`,
+        promptAddendum: `You must comply with Ontario's Residential Tenancies Act, 2006. The Landlord and Tenant Board (LTB) handles all disputes. Rent increases require N1 notice 90 days prior. Entry requires 24-hour written notice except emergencies.
+
+=== BRAMPTON RESIDENTIAL RENTAL LICENSING (RRL) ===
+Brampton's Residential Rental Licensing Bylaw 261-2019 requires ALL landlords renting residential units within the City of Brampton to:
+• Register each rental unit with the City and obtain a Rental Licence (annual renewal)
+• Pay the applicable licence fee (varies by unit type; typically ~$250–$400/unit/year)
+• Ensure units meet all Property Standards, Fire Code, and Building Code requirements
+• Allow municipal inspectors to conduct initial and periodic inspections of each licensed unit
+• Display the licence or provide the licence number to tenants upon request
+• Maintain units in a state of good repair as defined by the Ontario Building Code and City property standards
+• Comply with occupancy limits set by the Ontario Building Code (no more than 2 persons per habitable room excluding kitchen/living/dining)
+• Report changes in tenancy or unit status within 30 days
+Penalties for non-compliance: Fines up to $25,000 for a first offence and $50,000 for subsequent offences. Operating without a licence can result in order to comply, prosecution, or licence revocation.
+Licence Application: Apply through the City of Brampton's online portal or in-person at City Hall. Processing typically takes 4–6 weeks. Inspections scheduled upon application.
+
+=== ONTARIO BILL 60 — HOMEOWNER PROTECTION ACT, 2024 ===
+Bill 60 (Homeowner Protection Act) is Ontario legislation addressing homeowner and landlord protections:
+• Strengthens penalties for illegal evictions (fines up to $100,000 for individuals, $500,000 for corporations)
+• Clarifies landlord obligations for maintenance, habitability, and timely repairs
+• Introduces requirements for landlords to provide written notice of tenant rights at lease signing
+• Expands tenant remedies at the LTB for bad-faith evictions (N12/N13 misuse)
+• Requires landlords acting on N12 notices (landlord's own use) to provide evidence of genuine intent
+• Establishes a public database of landlords found guilty of bad-faith evictions
+• Strengthens the Rental Housing Enforcement Unit (RHEU) powers for investigation
+Study Guide Key Points:
+1. Bad-faith N12: If landlord does not move in within reasonable time, tenant can seek up to 12 months' rent as compensation
+2. Documentation: Keep all records — notices, communications, inspection reports — for at least 3 years
+3. Tenant notification: At lease signing, provide a standardized information sheet about tenant rights under the RTA
+4. Compliance: Failure to comply with Bill 60 provisions may result in Administrative Monetary Penalties (AMPs) in addition to LTB orders`,
     },
     BC: {
         name: "British Columbia",

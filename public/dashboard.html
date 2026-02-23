@@ -3033,7 +3033,10 @@
       <div class="mobile-panel mobile-chat-panel" id="mobileChatPanel">
         <div class="mobile-chat-header">
           <h2>🧠 AI Agent</h2>
-          <p>Powered by Gemini — Ask me anything</p>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <p style="margin:0;">Powered by Gemini — Ask me anything</p>
+            <button onclick="clearMobileAgentHistory()" title="Clear history" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px;">🗑️</button>
+          </div>
         </div>
         <div class="mobile-chat-messages" id="mobileAgentChatLog">
           <div class="chat-msg ai">
@@ -3042,7 +3045,13 @@
             </div>
           </div>
         </div>
+        <div id="mobileAgentMediaPreview" style="display:none;padding:4px 12px;background:var(--bg-card);border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);align-items:center;gap:6px;">
+          📎 <span id="mobileMediaFileName"></span>
+          <button onclick="clearMobileAgentMedia()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">✕</button>
+        </div>
         <div class="mobile-chat-input">
+          <button onclick="document.getElementById('mobileAgentFileInput').click()" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;" title="Attach file">📎</button>
+          <input type="file" id="mobileAgentFileInput" accept="image/*,video/*,application/pdf" style="display:none">
           <textarea id="mobileAgentQuestion" placeholder="Ask anything..." rows="1"></textarea>
           <button class="mobile-chat-send" id="mobileAgentAskBtn">➤</button>
         </div>
@@ -5018,18 +5027,75 @@
       var mobileAskBtn = document.getElementById('mobileAgentAskBtn');
       var mobileInput = document.getElementById('mobileAgentQuestion');
       var mobileLog = document.getElementById('mobileAgentChatLog');
+      var mobileAgentMediaData = null; // { base64, mimeType, name }
+      var mobileAgentFileInput = document.getElementById('mobileAgentFileInput');
+
+      // Mobile media upload handler
+      mobileAgentFileInput.addEventListener('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var base64 = e.target.result.split(',')[1];
+          mobileAgentMediaData = { base64: base64, mimeType: file.type, name: file.name };
+          document.getElementById('mobileMediaFileName').textContent = file.name;
+          document.getElementById('mobileAgentMediaPreview').style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+      });
+
+      window.clearMobileAgentMedia = function () {
+        mobileAgentMediaData = null;
+        document.getElementById('mobileAgentMediaPreview').style.display = 'none';
+        mobileAgentFileInput.value = '';
+      };
+
+      window.clearMobileAgentHistory = function () {
+        if (!confirm('Clear all mobile agent chat history?')) return;
+        fetchJson('/admin/agent/history', { method: 'DELETE' }).then(function () {
+          mobileLog.innerHTML = '<div class="chat-msg ai"><div>Chat history cleared. Ask me anything!</div></div>';
+        });
+      };
+
+      function loadMobileAgentChatHistory() {
+        fetchJson('/admin/agent/history?limit=50').then(function (res) {
+          if (!res || !res.messages || !res.messages.length) return;
+          mobileLog.innerHTML = '';
+          res.messages.forEach(function (m) {
+            var div = document.createElement('div');
+            div.className = 'chat-msg ' + (m.role === 'ai' ? 'ai' : 'user');
+            var time = m.createdAt ? new Date(m.createdAt).toLocaleTimeString() : '';
+            div.innerHTML = '<div style="white-space:pre-wrap">' + (m.content || '').replace(/</g, '&lt;') + '</div><div class="meta">' + (m.role === 'ai' ? 'Agent' : 'You') + (time ? ' · ' + time : '') + '</div>';
+            mobileLog.appendChild(div);
+          });
+          mobileLog.scrollTop = mobileLog.scrollHeight;
+        }).catch(function () { });
+      }
+
+      // Load mobile chat history on init
+      loadMobileAgentChatHistory();
 
       function sendMobileAgentMessage() {
         var q = mobileInput.value.trim();
-        if (!q) return;
+        if (!q && !mobileAgentMediaData) return;
         // Append user message
         var userMsg = document.createElement('div');
         userMsg.className = 'chat-msg user';
-        userMsg.innerHTML = '<div>' + q.replace(/</g, '&lt;') + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+        var displayText = q ? q.replace(/</g, '&lt;') : '';
+        if (mobileAgentMediaData) displayText = '📎 ' + mobileAgentMediaData.name + (displayText ? '\n' + displayText : '');
+        userMsg.innerHTML = '<div>' + displayText + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
         mobileLog.appendChild(userMsg);
         mobileInput.value = '';
         mobileInput.style.height = 'auto';
         mobileLog.scrollTop = mobileLog.scrollHeight;
+
+        // Build request body
+        var body = { question: q || 'Analyze this file' };
+        if (mobileAgentMediaData) {
+          body.mediaBase64 = mobileAgentMediaData.base64;
+          body.mediaMimeType = mobileAgentMediaData.mimeType;
+        }
+        clearMobileAgentMedia();
 
         // Thinking indicator
         var thinking = document.createElement('div');
@@ -5041,11 +5107,16 @@
         fetchJson('/admin/agent/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: q })
+          body: JSON.stringify(body)
         }).then(function (res) {
           var answer = (res && (res.answer || res.finalAnswer)) || 'No response.';
           var tools = res && res.toolCallCount ? res.toolCallCount + ' tools used' : '';
-          thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + '</div><div class="meta">Agent' + (tools ? ' \u00B7 ' + tools : '') + ' \u00B7 ' + new Date().toLocaleTimeString() + '</div>';
+          // Check if response contains a PDF to download
+          var pdfLink = '';
+          if (res && res.pdfBase64) {
+            pdfLink = '<br><a href="data:application/pdf;base64,' + res.pdfBase64 + '" download="' + (res.fileName || 'notice.pdf') + '" style="color:var(--primary);text-decoration:underline;">📥 Download PDF</a>';
+          }
+          thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + pdfLink + '</div><div class="meta">Agent' + (tools ? ' · ' + tools : '') + ' · ' + new Date().toLocaleTimeString() + '</div>';
           mobileLog.scrollTop = mobileLog.scrollHeight;
         }).catch(function (err) {
           thinking.innerHTML = '<div style="color:var(--danger)">Error: ' + (err.message || 'Unknown') + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';

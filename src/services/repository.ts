@@ -1110,6 +1110,10 @@ export default {
   verifyReminderOwnership,
   // Account deletion
   deleteAllLandlordData,
+  // Financial records
+  createFinancialRecord,
+  listFinancialRecords,
+  getFinancialSummary,
 };
 
 // ── Ownership verification helpers ─────────────────────
@@ -1295,4 +1299,100 @@ export async function loadLandlordContext(landlordId: string): Promise<LandlordP
     console.warn("loadLandlordContext failed", err);
     return null;
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FINANCIAL RECORDS
+// ═══════════════════════════════════════════════════════════
+
+export async function createFinancialRecord(data: {
+  landlordId: string;
+  tenantName?: string;
+  tenantPhone?: string;
+  unitLabel?: string;
+  type: string;
+  amount: number;
+  currency?: string;
+  description?: string;
+  date?: Date;
+  receiptData?: Buffer;
+  receiptMimeType?: string;
+}): Promise<any> {
+  if (!isDbEnabled) return null;
+  return db.financialRecord.create({
+    data: {
+      landlordId: data.landlordId,
+      tenantName: data.tenantName,
+      tenantPhone: data.tenantPhone,
+      unitLabel: data.unitLabel,
+      type: data.type as any,
+      amount: data.amount,
+      currency: data.currency || "CAD",
+      description: data.description,
+      date: data.date || new Date(),
+      receiptData: data.receiptData,
+      receiptMimeType: data.receiptMimeType,
+    },
+  });
+}
+
+export async function listFinancialRecords(landlordId: string, filters?: {
+  type?: string;
+  tenantName?: string;
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}): Promise<any[]> {
+  if (!isDbEnabled) return [];
+  const where: any = { landlordId };
+  if (filters?.type) where.type = filters.type;
+  if (filters?.tenantName) where.tenantName = { contains: filters.tenantName, mode: "insensitive" };
+  if (filters?.startDate || filters?.endDate) {
+    where.date = {};
+    if (filters?.startDate) where.date.gte = filters.startDate;
+    if (filters?.endDate) where.date.lte = filters.endDate;
+  }
+  return db.financialRecord.findMany({
+    where,
+    orderBy: { date: "desc" },
+    take: filters?.limit || 50,
+    select: {
+      id: true,
+      tenantName: true,
+      tenantPhone: true,
+      unitLabel: true,
+      type: true,
+      amount: true,
+      currency: true,
+      description: true,
+      date: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function getFinancialSummary(landlordId: string): Promise<any> {
+  if (!isDbEnabled) return null;
+  const records = await db.financialRecord.findMany({
+    where: { landlordId },
+    select: { type: true, amount: true, currency: true },
+  });
+  const summary: Record<string, number> = {};
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  for (const r of records) {
+    const t = r.type as string;
+    summary[t] = (summary[t] || 0) + r.amount;
+    if (t === "RENT_PAYMENT" || t === "DEPOSIT") totalIncome += r.amount;
+    if (t === "EXPENSE") totalExpenses += r.amount;
+    if (t === "REFUND") totalExpenses += r.amount;
+  }
+  return {
+    byType: summary,
+    totalRecords: records.length,
+    totalIncome,
+    totalExpenses,
+    net: totalIncome - totalExpenses,
+    currency: records[0]?.currency || "CAD",
+  };
 }

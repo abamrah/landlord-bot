@@ -257,6 +257,10 @@ export async function landlordAssistantAgent(opts: {
     maintenanceId?: string;
     /** Optional media parts for multimodal analysis */
     mediaParts?: Array<{ base64: string; mimeType: string }>;
+    /** Channel origin — "whatsapp" or "dashboard" (default) */
+    channel?: string;
+    /** Sender phone for WhatsApp conversation history */
+    senderPhone?: string;
 }): Promise<AgentRunResult> {
     const ctx = await getAccountContext(opts.landlordId);
     const registry = buildToolRegistry(ctx.plan);
@@ -265,9 +269,10 @@ export async function landlordAssistantAgent(opts: {
     const portfolio = await loadLandlordContext(opts.landlordId);
     const portfolioSummary = portfolio ? formatPortfolioSummary(portfolio) : undefined;
 
-    // Load recent dashboard conversation history for continuity
+    // Load recent conversation history for continuity (use sender phone for WhatsApp, dashboard-agent for dashboard)
+    const historyPhone = opts.channel === "whatsapp" && opts.senderPhone ? opts.senderPhone : "dashboard-agent";
     const recentHistory = await conversationMemory.getHistory({
-        phone: "dashboard-agent",
+        phone: historyPhone,
         landlordId: opts.landlordId,
         limit: 10,
     });

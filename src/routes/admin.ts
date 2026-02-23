@@ -2092,4 +2092,154 @@ router.get("/portfolio", async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+//  FINANCIAL RECORDS ENDPOINTS
+// ═══════════════════════════════════════════════════════════
+
+/** POST /admin/financial/records — Create a financial record */
+router.post("/financial/records", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({
+    type: z.enum(["RENT_PAYMENT", "EXPENSE", "DEPOSIT", "REFUND", "OTHER"]),
+    amount: z.number().positive(),
+    tenantName: z.string().optional(),
+    tenantPhone: z.string().optional(),
+    unitLabel: z.string().optional(),
+    description: z.string().optional(),
+    date: z.string().optional(),
+    currency: z.string().optional(),
+    receiptBase64: z.string().optional(),
+    receiptMimeType: z.string().optional(),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "validation_error", details: parsed.error.issues });
+
+  try {
+    const { createFinancialRecord } = await import("../services/repository");
+    const record = await createFinancialRecord({
+      landlordId: authReq.landlordId,
+      type: parsed.data.type,
+      amount: parsed.data.amount,
+      tenantName: parsed.data.tenantName,
+      tenantPhone: parsed.data.tenantPhone,
+      unitLabel: parsed.data.unitLabel,
+      description: parsed.data.description,
+      date: parsed.data.date ? new Date(parsed.data.date) : undefined,
+      currency: parsed.data.currency,
+      receiptData: parsed.data.receiptBase64 ? Buffer.from(parsed.data.receiptBase64, "base64") : undefined,
+      receiptMimeType: parsed.data.receiptMimeType,
+    });
+    res.json({ ok: true, record });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/financial/records — List financial records */
+router.get("/financial/records", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const { listFinancialRecords } = await import("../services/repository");
+    const records = await listFinancialRecords(authReq.landlordId, {
+      type: req.query.type as string | undefined,
+      tenantName: req.query.tenantName as string | undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
+    });
+    res.json({ records, total: records.length });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/financial/summary — Financial summary */
+router.get("/financial/summary", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const { getFinancialSummary } = await import("../services/repository");
+    const summary = await getFinancialSummary(authReq.landlordId);
+    res.json(summary || { error: "no_data" });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  LEGAL NOTICE PDF GENERATION ENDPOINT
+// ═══════════════════════════════════════════════════════════
+
+/** POST /admin/notices/generate — Generate N4 or N12 notice PDF */
+router.post("/notices/generate", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({
+    noticeType: z.enum(["N4", "N12"]),
+    tenantName: z.string().min(1),
+    rentalUnitAddress: z.string().min(1),
+    landlordName: z.string().min(1),
+    landlordPhone: z.string().optional(),
+    terminationDate: z.string().min(1),
+    // N4 fields
+    rentOwingPeriod: z.string().optional(),
+    rentCharged: z.number().optional(),
+    rentPaid: z.number().optional(),
+    // N12 fields
+    reason: z.enum(["personal_use", "family_use", "purchaser_use"]).optional(),
+    occupantName: z.string().optional(),
+    relationship: z.string().optional(),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "validation_error", details: parsed.error.issues });
+
+  try {
+    const noticeService = await import("../services/noticeService");
+    const d = parsed.data;
+    let pdfBuffer: Buffer;
+    let fileName: string;
+
+    if (d.noticeType === "N4") {
+      const rentCharged = d.rentCharged || 0;
+      const rentPaid = d.rentPaid || 0;
+      pdfBuffer = await noticeService.generateN4Notice({
+        tenantName: d.tenantName,
+        rentalUnitAddress: d.rentalUnitAddress,
+        landlordName: d.landlordName,
+        landlordPhone: d.landlordPhone,
+        rentOwing: [{
+          period: d.rentOwingPeriod || "Current period",
+          rentCharged,
+          rentPaid,
+          rentOwing: rentCharged - rentPaid,
+        }],
+        totalOwing: rentCharged - rentPaid,
+        terminationDate: d.terminationDate,
+        dateGiven: new Date().toISOString().split("T")[0],
+        signedBy: d.landlordName,
+      });
+      fileName = `N4_Notice_${d.tenantName.replace(/\s+/g, "_")}.pdf`;
+    } else {
+      pdfBuffer = await noticeService.generateN12Notice({
+        tenantName: d.tenantName,
+        rentalUnitAddress: d.rentalUnitAddress,
+        landlordName: d.landlordName,
+        landlordPhone: d.landlordPhone,
+        reason: (d.reason || "personal_use") as any,
+        occupantName: d.occupantName || d.landlordName,
+        relationship: d.relationship,
+        terminationDate: d.terminationDate,
+        dateGiven: new Date().toISOString().split("T")[0],
+        signedBy: d.landlordName,
+      });
+      fileName = `N12_Notice_${d.tenantName.replace(/\s+/g, "_")}.pdf`;
+    }
+
+    res.json({
+      ok: true,
+      noticeType: d.noticeType,
+      fileName,
+      pdfBase64: pdfBuffer.toString("base64"),
+    });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 export default router;

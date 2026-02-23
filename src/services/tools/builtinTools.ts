@@ -780,6 +780,200 @@ export function maintenanceGuidanceTool(): ToolDefinition {
     };
 }
 
+// ═══════════════════════════════════════════════════════════
+//  FINANCIAL TOOLS
+// ═══════════════════════════════════════════════════════════
+
+export function recordPaymentTool(): ToolDefinition {
+    return {
+        name: "record_payment",
+        description: "Record a financial transaction — rent payment received, expense incurred, security deposit collected, or refund issued. Creates a permanent ledger entry. Use this when the landlord mentions receiving rent, paying for repairs, collecting deposits, etc.",
+        parameters: {
+            type: { type: "string", description: "Transaction type: RENT_PAYMENT, EXPENSE, DEPOSIT, REFUND, or OTHER" },
+            amount: { type: "number", description: "Dollar amount of the transaction" },
+            tenantName: { type: "string", description: "Name of the tenant involved (optional)" },
+            unitLabel: { type: "string", description: "Unit label/address (optional)" },
+            description: { type: "string", description: "Description of the transaction (e.g., 'February 2026 rent', 'Plumber repair for kitchen sink')" },
+            date: { type: "string", description: "Date of transaction in ISO format (defaults to today)" },
+        },
+        required: ["type", "amount"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId as string;
+            if (!landlordId) return { error: "Not authenticated" };
+            const validTypes = ["RENT_PAYMENT", "EXPENSE", "DEPOSIT", "REFUND", "OTHER"];
+            const type = String(args.type).toUpperCase();
+            if (!validTypes.includes(type)) return { error: `Invalid type. Must be one of: ${validTypes.join(", ")}` };
+            const amount = Number(args.amount);
+            if (isNaN(amount) || amount <= 0) return { error: "Amount must be a positive number" };
+
+            const record = await repo.createFinancialRecord({
+                landlordId,
+                tenantName: args.tenantName ? String(args.tenantName) : undefined,
+                unitLabel: args.unitLabel ? String(args.unitLabel) : undefined,
+                type,
+                amount,
+                description: args.description ? String(args.description) : undefined,
+                date: args.date ? new Date(String(args.date)) : undefined,
+            });
+            return {
+                success: true,
+                id: record?.id,
+                type,
+                amount,
+                message: `Recorded ${type} of $${amount.toFixed(2)}${args.tenantName ? ` for ${args.tenantName}` : ""}`,
+            };
+        },
+    };
+}
+
+export function listFinancialRecordsTool(): ToolDefinition {
+    return {
+        name: "list_financial_records",
+        description: "List financial records / ledger entries for the landlord. Can filter by type (RENT_PAYMENT, EXPENSE, DEPOSIT, REFUND), tenant name, or date range. Shows recent transactions.",
+        parameters: {
+            type: { type: "string", description: "Filter by type: RENT_PAYMENT, EXPENSE, DEPOSIT, REFUND, OTHER (optional)" },
+            tenantName: { type: "string", description: "Filter by tenant name (partial match, optional)" },
+            limit: { type: "number", description: "Maximum records to return (default 20)" },
+        },
+        required: [],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId as string;
+            if (!landlordId) return { error: "Not authenticated" };
+            const records = await repo.listFinancialRecords(landlordId, {
+                type: args.type ? String(args.type).toUpperCase() : undefined,
+                tenantName: args.tenantName ? String(args.tenantName) : undefined,
+                limit: args.limit ? Number(args.limit) : 20,
+            });
+            return {
+                records: records.map((r: any) => ({
+                    id: r.id,
+                    type: r.type,
+                    amount: r.amount,
+                    currency: r.currency,
+                    tenantName: r.tenantName,
+                    unitLabel: r.unitLabel,
+                    description: r.description,
+                    date: r.date,
+                })),
+                total: records.length,
+            };
+        },
+    };
+}
+
+export function financialSummaryTool(): ToolDefinition {
+    return {
+        name: "financial_summary",
+        description: "Get a financial summary for the landlord — total income (rent payments + deposits), total expenses, net amount, broken down by transaction type. Useful for quick financial overview or reporting.",
+        parameters: {},
+        required: [],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId as string;
+            if (!landlordId) return { error: "Not authenticated" };
+            const summary = await repo.getFinancialSummary(landlordId);
+            if (!summary) return { error: "Could not load financial data" };
+            return summary;
+        },
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  LEGAL NOTICE GENERATION TOOL
+// ═══════════════════════════════════════════════════════════
+
+export function generateNoticeTool(): ToolDefinition {
+    return {
+        name: "generate_notice",
+        description: "Generate an Ontario LTB eviction notice PDF (N4 for non-payment of rent, or N12 for landlord's own use). Returns the notice as a downloadable PDF. Requires tenant name, rental unit address, and specific details depending on the notice type. For N4: rent owing details. For N12: reason and occupant name.",
+        parameters: {
+            noticeType: { type: "string", description: "Type of notice: 'N4' (non-payment of rent) or 'N12' (landlord/purchaser/family use)" },
+            tenantName: { type: "string", description: "Full name(s) of the tenant(s)" },
+            rentalUnitAddress: { type: "string", description: "Full address of the rental unit" },
+            landlordName: { type: "string", description: "Full name of the landlord" },
+            landlordPhone: { type: "string", description: "Landlord's phone number (optional)" },
+            terminationDate: { type: "string", description: "Termination date (N4: at least 14 days out; N12: at least 60 days, end of rental period)" },
+            // N4-specific
+            rentOwingPeriod: { type: "string", description: "For N4: rent period (e.g., 'February 2026')" },
+            rentCharged: { type: "number", description: "For N4: rent amount charged" },
+            rentPaid: { type: "number", description: "For N4: rent amount paid" },
+            // N12-specific
+            reason: { type: "string", description: "For N12: 'personal_use', 'family_use', or 'purchaser_use'" },
+            occupantName: { type: "string", description: "For N12: name of person who will occupy the unit" },
+            relationship: { type: "string", description: "For N12: relationship to landlord (if family_use)" },
+        },
+        required: ["noticeType", "tenantName", "rentalUnitAddress", "landlordName", "terminationDate"],
+        category: "utility",
+        enabled: true,
+        async execute(args) {
+            const noticeType = String(args.noticeType).toUpperCase();
+            const noticeService = require("../noticeService");
+
+            try {
+                if (noticeType === "N4") {
+                    const rentCharged = Number(args.rentCharged) || 0;
+                    const rentPaid = Number(args.rentPaid) || 0;
+                    const rentOwing = rentCharged - rentPaid;
+                    const pdfBuffer: Buffer = await noticeService.generateN4Notice({
+                        tenantName: String(args.tenantName),
+                        rentalUnitAddress: String(args.rentalUnitAddress),
+                        landlordName: String(args.landlordName),
+                        landlordPhone: args.landlordPhone ? String(args.landlordPhone) : undefined,
+                        rentOwing: [{
+                            period: String(args.rentOwingPeriod || "Current period"),
+                            rentCharged,
+                            rentPaid,
+                            rentOwing,
+                        }],
+                        totalOwing: rentOwing,
+                        terminationDate: String(args.terminationDate),
+                        dateGiven: new Date().toISOString().split("T")[0],
+                        signedBy: String(args.landlordName),
+                    });
+                    const base64 = pdfBuffer.toString("base64");
+                    return {
+                        success: true,
+                        noticeType: "N4",
+                        fileName: `N4_Notice_${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
+                        pdfBase64: base64,
+                        message: `N4 Notice generated for ${args.tenantName}. Total rent owing: $${rentOwing.toFixed(2)}. Termination date: ${args.terminationDate}. The PDF is ready for download or can be sent via WhatsApp.`,
+                    };
+                } else if (noticeType === "N12") {
+                    const pdfBuffer: Buffer = await noticeService.generateN12Notice({
+                        tenantName: String(args.tenantName),
+                        rentalUnitAddress: String(args.rentalUnitAddress),
+                        landlordName: String(args.landlordName),
+                        landlordPhone: args.landlordPhone ? String(args.landlordPhone) : undefined,
+                        reason: (String(args.reason) || "personal_use") as any,
+                        occupantName: String(args.occupantName || args.landlordName),
+                        relationship: args.relationship ? String(args.relationship) : undefined,
+                        terminationDate: String(args.terminationDate),
+                        dateGiven: new Date().toISOString().split("T")[0],
+                        signedBy: String(args.landlordName),
+                    });
+                    const base64 = pdfBuffer.toString("base64");
+                    return {
+                        success: true,
+                        noticeType: "N12",
+                        fileName: `N12_Notice_${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
+                        pdfBase64: base64,
+                        message: `N12 Notice generated for ${args.tenantName}. Reason: ${args.reason || "personal_use"}. Termination date: ${args.terminationDate}. The PDF is ready for download or can be sent via WhatsApp.`,
+                    };
+                } else {
+                    return { error: "Invalid notice type. Must be 'N4' or 'N12'." };
+                }
+            } catch (err) {
+                return { error: `Failed to generate notice: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
 /**
  * Register all built-in tools. Call this at startup.
  */
@@ -817,6 +1011,12 @@ export function registerBuiltinTools(): ToolDefinition[] {
         expiringLeasesTool(),
         lookupLeaseTool(),
         maintenanceGuidanceTool(),
+        // Financial tools
+        recordPaymentTool(),
+        listFinancialRecordsTool(),
+        financialSummaryTool(),
+        // Legal notice tools
+        generateNoticeTool(),
     ];
 }
 
