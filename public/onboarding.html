@@ -1228,6 +1228,11 @@
                 if (!code && result && result.raw) {
                     code = result.raw.pairingCode || result.raw.code || (result.raw.data && (result.raw.data.pairingCode || result.raw.data.code));
                 }
+                // Only accept short 8-digit pairing codes, not long QR data strings
+                if (code && code.length > 20) {
+                    console.warn('Got long QR string instead of 8-digit pairing code, length:', code.length);
+                    code = null;
+                }
                 if (code) {
                     pairingEl.style.display = 'block';
                     document.getElementById('pairingCodeText').textContent = code;

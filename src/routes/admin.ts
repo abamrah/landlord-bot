@@ -1989,26 +1989,50 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
     const phoneNumber = (req.query.number as string || "").replace(/[^0-9]/g, "");
 
     if (phoneNumber) {
-      // Request pairing code: Evolution API v2 uses POST with number in body
-      // Try POST first (newer Evolution API), fall back to GET with query param
-      let result: any;
+      // Request 8-digit WhatsApp link/pairing code (not QR code data)
+      let pairingCode: string | null = null;
+      let base64: string | null = null;
+      let rawResult: any = null;
+
+      // Helper: check if a value looks like a real 8-digit pairing code (e.g. "ABCD-EFGH" or "12345678")
+      const isShortPairingCode = (v: any) => typeof v === "string" && v.length <= 20 && /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(v.trim());
+
+      // Method 1: POST to /instance/connect with number (Evolution API v2)
       try {
-        result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
+        const r1 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
           method: "POST",
           body: { number: phoneNumber },
         });
-      } catch {
-        // Fallback: GET with query param (older Evolution API)
-        result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
+        rawResult = r1;
+        // Check all possible fields for a short pairing code
+        for (const candidate of [r1?.pairingCode, r1?.code, r1?.data?.pairingCode, r1?.data?.code]) {
+          if (isShortPairingCode(candidate)) { pairingCode = candidate; break; }
+        }
+        base64 = r1?.base64 || r1?.data?.base64 || null;
+      } catch (e1) {
+        console.warn("[WhatsApp] POST connect with number failed:", (e1 as Error).message);
       }
 
-      // Extract pairing code — check multiple possible response shapes
-      const pairingCode = result?.pairingCode || result?.code || result?.data?.pairingCode || result?.data?.code;
-      const base64 = result?.base64 || result?.data?.base64;
+      // Method 2: If no short code found, try GET with query param
+      if (!pairingCode) {
+        try {
+          const r2 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
+          rawResult = rawResult || r2;
+          for (const candidate of [r2?.pairingCode, r2?.code, r2?.data?.pairingCode, r2?.data?.code]) {
+            if (isShortPairingCode(candidate)) { pairingCode = candidate; break; }
+          }
+        } catch (e2) {
+          console.warn("[WhatsApp] GET connect with number failed:", (e2 as Error).message);
+        }
+      }
 
-      console.log("[WhatsApp] Pairing code response keys:", Object.keys(result || {}), "pairingCode:", pairingCode ? "found" : "not found");
+      // Log what we found for debugging
+      const allKeys = rawResult ? Object.keys(rawResult) : [];
+      const pcVal = rawResult?.pairingCode;
+      const pcLen = typeof pcVal === "string" ? pcVal.length : 0;
+      console.log("[WhatsApp] Pairing code response:", { keys: allKeys, pairingCodeLen: pcLen, shortCodeFound: !!pairingCode, pairingCode });
 
-      return res.json({ pairingCode: pairingCode || null, base64: base64 || null, raw: result });
+      return res.json({ pairingCode, base64, raw: rawResult });
     }
 
     // No phone number — return QR code (desktop flow)
