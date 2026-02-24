@@ -5113,6 +5113,13 @@
         }
 
         thinking.innerHTML = '<div style="white-space:pre-wrap">' + formattedAnswer + '</div>' + pdfButtons + '<div class="meta">Agent' + (tools ? ' \u00B7 ' + tools : '') + ' \u00B7 ' + new Date().toLocaleTimeString() + '</div>';
+        // Auto-download: trigger click on the first PDF button after render
+        if (pdfButtons) {
+          setTimeout(function () {
+            var dlBtn = thinking.querySelector('button[id^="pdf-dl-"]');
+            if (dlBtn) dlBtn.click();
+          }, 300);
+        }
       } catch (err) {
         thinking.innerHTML = '<div style="color:var(--danger)">Error: ' + err.message + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
       }
@@ -6123,13 +6130,36 @@
         }).then(function (res) {
           var answer = (res && (res.answer || res.finalAnswer)) || 'No response.';
           var tools = res && res.toolCallCount ? res.toolCallCount + ' tools used' : '';
-          // Check if response contains a PDF to download
-          var pdfLink = '';
-          if (res && res.pdfBase64) {
-            pdfLink = '<br><a href="data:application/pdf;base64,' + res.pdfBase64 + '" download="' + (res.fileName || 'notice.pdf') + '" style="color:var(--primary);text-decoration:underline;">📥 Download PDF</a>';
+          // Check for PDF data in pdfArtifacts from agent response
+          var pdfButtons = '';
+          if (res && res.pdfArtifacts && res.pdfArtifacts.length) {
+            res.pdfArtifacts.forEach(function (art) {
+              pdfButtons += buildPdfDownloadButton(art.pdfBase64, art.fileName);
+            });
           }
-          thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + pdfLink + '</div><div class="meta">Agent' + (tools ? ' · ' + tools : '') + ' · ' + new Date().toLocaleTimeString() + '</div>';
+          // Fallback: check top-level pdfBase64
+          if (!pdfButtons && res && res.pdfBase64) {
+            pdfButtons = buildPdfDownloadButton(res.pdfBase64, res.fileName || 'notice.pdf');
+          }
+          // Also check in answer text for base64 PDF pattern
+          if (!pdfButtons && answer && answer.includes('pdfBase64')) {
+            try {
+              var pdfMatch = answer.match(/"pdfBase64"\s*:\s*"([^"]+)"/);
+              var fnMatch = answer.match(/"fileName"\s*:\s*"([^"]+)"/);
+              if (pdfMatch && fnMatch) {
+                pdfButtons += buildPdfDownloadButton(pdfMatch[1], fnMatch[1]);
+              }
+            } catch (e) { }
+          }
+          thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + '</div>' + pdfButtons + '<div class="meta">Agent' + (tools ? ' · ' + tools : '') + ' · ' + new Date().toLocaleTimeString() + '</div>';
           mobileLog.scrollTop = mobileLog.scrollHeight;
+          // Auto-download: trigger click on the first PDF button after render
+          if (pdfButtons) {
+            setTimeout(function () {
+              var dlBtn = thinking.querySelector('button[id^="pdf-dl-"]');
+              if (dlBtn) dlBtn.click();
+            }, 300);
+          }
         }).catch(function (err) {
           thinking.innerHTML = '<div style="color:var(--danger)">Error: ' + (err.message || 'Unknown') + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
           mobileLog.scrollTop = mobileLog.scrollHeight;

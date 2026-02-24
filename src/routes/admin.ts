@@ -1997,12 +1997,9 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
       // Helper: check if a value looks like a real 8-digit pairing code (e.g. "ABCD-EFGH" or "12345678")
       const isShortPairingCode = (v: any) => typeof v === "string" && v.length <= 20 && /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(v.trim());
 
-      // Method 1: POST to /instance/connect with number (Evolution API v2)
+      // Method 1: GET with query param (correct Evolution API v2 approach)
       try {
-        const r1 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
-          method: "POST",
-          body: { number: phoneNumber },
-        });
+        const r1 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
         rawResult = r1;
         // Check all possible fields for a short pairing code
         for (const candidate of [r1?.pairingCode, r1?.code, r1?.data?.pairingCode, r1?.data?.code]) {
@@ -2010,19 +2007,22 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
         }
         base64 = r1?.base64 || r1?.data?.base64 || null;
       } catch (e1) {
-        console.warn("[WhatsApp] POST connect with number failed:", (e1 as Error).message);
+        console.warn("[WhatsApp] GET connect with number failed:", (e1 as Error).message);
       }
 
-      // Method 2: If no short code found, try GET with query param
+      // Method 2: Fallback — POST with body (older API versions)
       if (!pairingCode) {
         try {
-          const r2 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
+          const r2 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
+            method: "POST",
+            body: { number: phoneNumber },
+          });
           rawResult = rawResult || r2;
           for (const candidate of [r2?.pairingCode, r2?.code, r2?.data?.pairingCode, r2?.data?.code]) {
             if (isShortPairingCode(candidate)) { pairingCode = candidate; break; }
           }
         } catch (e2) {
-          console.warn("[WhatsApp] GET connect with number failed:", (e2 as Error).message);
+          console.warn("[WhatsApp] POST connect with number fallback failed:", (e2 as Error).message);
         }
       }
 

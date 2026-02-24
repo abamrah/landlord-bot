@@ -14,6 +14,24 @@ import { db } from "../config/database";
 const AGENTIC_MODE = process.env.AGENTIC_MODE === "true";
 
 /**
+ * Resolve the tenant's primary unit ID from the UnitTenant join table.
+ * Returns the first unit's ID, or undefined if no unit assignment exists.
+ */
+async function resolveTenantUnitId(tenantId?: string): Promise<string | undefined> {
+  if (!tenantId) return undefined;
+  try {
+    const ut = await db.unitTenant.findFirst({
+      where: { tenantId },
+      select: { unitId: true },
+      orderBy: { startDate: "desc" },
+    });
+    return ut?.unitId || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Extract only the draft reply from the agent's full output.
  * The agent is instructed to use "---DRAFT_REPLY---" as a delimiter.
  * Falls back to heuristic extraction if the delimiter is missing.
@@ -110,7 +128,7 @@ router.post("/twilio", async (req, res, next) => {
     req.body = {
       tenantMessage,
       tenantId: tenantPhone, // placeholder mapping until DB mapping exists
-      unitId: undefined,
+      unitId: await resolveTenantUnitId(tenantPhone),
     };
 
     // Forward to maintenance router
@@ -583,12 +601,13 @@ async function flushTenantReply(params: { tenantId: string }) {
   const existing = await repo.findLatestMaintenanceForTenantId(tenant.id);
   const conversationLog = Array.isArray(existing?.chatLog) ? (existing?.chatLog as any[]) : [];
 
+  const resolvedUnitId = await resolveTenantUnitId(tenant.id);
   const triage = await agentService.triageMaintenance({
     tenantMessage: combinedMessage,
     tenantId: tenant.id,
-    unitId: undefined,
+    unitId: resolvedUnitId,
   });
-  const utilityCheck = await agentService.checkUtilityAnomaly({ tenantId: tenant.id, unitId: undefined });
+  const utilityCheck = await agentService.checkUtilityAnomaly({ tenantId: tenant.id, unitId: resolvedUnitId });
   const draftResponse = await agentService.draftRtaResponse({
     tenantMessage: combinedMessage,
     triage,
@@ -616,7 +635,7 @@ async function flushTenantReply(params: { tenantId: string }) {
   } else {
     record = await repo.createMaintenanceRequest({
       tenantId: tenant.id,
-      unitId: undefined,
+      unitId: resolvedUnitId,
       landlordId,
       message: combinedMessage,
       triage,
@@ -1074,10 +1093,11 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const chatContent = enrichedMessage || "[media received]";
     const tenantMessage = enrichedMessage || text || "[media received]";
     const hasMedia = Boolean(mediaResult);
+    const immediateUnitId = await resolveTenantUnitId(tenant.id);
     const triage = await agentService.triageMaintenance({
       tenantMessage,
       tenantId: tenant.id,
-      unitId: undefined,
+      unitId: immediateUnitId,
     });
     llmInvoked = true;
 
@@ -1106,7 +1126,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     } else {
       record = await repo.createMaintenanceRequest({
         tenantId: tenant.id,
-        unitId: undefined,
+        unitId: immediateUnitId,
         landlordId: tenantLandlordId,
         message: inboundContent || tenantMessage,
         triage,
@@ -1221,7 +1241,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     // ── LINEAR IMMEDIATE PATH (original) ──
-    const utilityCheck = await agentService.checkUtilityAnomaly({ tenantId: tenant.id, unitId: undefined });
+    const utilityCheck = await agentService.checkUtilityAnomaly({ tenantId: tenant.id, unitId: immediateUnitId });
 
     const draftResponse = await agentService.draftRtaResponse({
       tenantMessage,
