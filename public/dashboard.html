@@ -2567,6 +2567,8 @@
               </select></div>
             <div class="form-field" id="tenantShareField" style="display:none;"><label>Utility Share %</label><input
                 id="tenantSharePercent" type="number" min="0" max="100" placeholder="e.g. 50" /></div>
+            <div class="form-field"><label>Monthly Rent ($)</label><input
+                id="tenantRentAmount" type="number" min="0" step="0.01" placeholder="e.g. 1500" /></div>
             <button class="btn btn-primary" id="createTenantBtn" style="align-self:end;">+ Add Tenant</button>
           </div>
         </div>
@@ -3143,7 +3145,7 @@
                 <option value="rent">Rent</option>
                 <option value="utility">Utility</option>
               </select></div>
-            <div class="form-field" id="reminderUnitField" style="display:none;"><label>Unit</label><select
+            <div class="form-field" id="reminderUnitField"><label>Unit</label><select
                 id="reminderUnit">
                 <option value="">All tenants</option>
               </select></div>
@@ -3170,12 +3172,13 @@
                 <th>Day</th>
                 <th>Time</th>
                 <th>Style</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="6" style="color:var(--text-muted)">No reminders</td>
+                <td colspan="7" style="color:var(--text-muted)">No reminders</td>
               </tr>
             </tbody>
           </table>
@@ -4028,6 +4031,8 @@
           : '<span class="chip chip-accent" style="font-size:10px;margin-left:4px;">Tenant</span>';
         var shareInfo = unit.utilityType === 'SHARED' && unitTenantShare != null
           ? '<span>⚡ Utility share: ' + unitTenantShare + '%</span>' : '';
+        var rentAmt = t.units && t.units[0]?.rentAmountCents;
+        var rentInfo = rentAmt ? '<span>🏠 Rent: $' + (rentAmt / 100).toFixed(2) + '/mo</span>' : '';
         return '<div class="tenant-card">' +
           '<div class="tenant-card-header">' +
           '<div class="tenant-avatar">' + initials + '</div>' +
@@ -4041,6 +4046,7 @@
           '<span>\u2709\uFE0F ' + (t.email || '\u2014') + '</span>' +
           leaseInfo +
           shareInfo +
+          rentInfo +
           '</div>' +
           '<div class="tenant-card-footer">' +
           '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -4539,7 +4545,8 @@
       var type = document.getElementById('reminderType').value;
       var unitField = document.getElementById('reminderUnitField');
       var amtField = document.getElementById('reminderAmountField');
-      if (unitField) unitField.style.display = type === 'utility' ? '' : 'none';
+      // Show unit selector for both rent and utility reminders
+      if (unitField) unitField.style.display = '';
       if (amtField) amtField.style.display = type === 'utility' ? '' : 'none';
     }
 
@@ -4583,11 +4590,13 @@
       var shareEl = document.getElementById('tenantSharePercent');
       var role = roleEl ? roleEl.value : 'tenant';
       var utilitySharePercent = shareEl && shareEl.value ? Number(shareEl.value) : undefined;
+      var rentEl = document.getElementById('tenantRentAmount');
+      var rentAmountCents = rentEl && rentEl.value ? Math.round(Number(rentEl.value) * 100) : undefined;
       if (!name) return toast('Name required');
       try {
-        await fetchJson('/admin/tenants', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, phone: phone, email: email, unitId: unitId || undefined, role: role, utilitySharePercent: utilitySharePercent }) });
+        await fetchJson('/admin/tenants', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, phone: phone, email: email, unitId: unitId || undefined, role: role, utilitySharePercent: utilitySharePercent, rentAmountCents: rentAmountCents }) });
         toast('Tenant created');['tenantName', 'tenantPhone', 'tenantEmail'].forEach(function (id) { document.getElementById(id).value = ''; });
-        if (shareEl) shareEl.value = ''; loadTenants();
+        if (shareEl) shareEl.value = ''; if (rentEl) rentEl.value = ''; loadTenants();
       } catch (err) { toast('Failed: ' + err.message); }
     });
 
@@ -4955,10 +4964,11 @@
       var style = document.getElementById('reminderStyle').value;
       if (!dayOfMonth || !timeUtc) return toast('Day and time required');
       var body = { type: type, dayOfMonth: dayOfMonth, timeUtc: timeUtc, style: style };
+      // Include unitId for both rent and utility reminders
+      var unitSel = document.getElementById('reminderUnit');
+      if (unitSel && unitSel.value) body.unitId = unitSel.value;
       if (type === 'utility') {
-        var unitSel = document.getElementById('reminderUnit');
         var amtEl = document.getElementById('reminderAmount');
-        if (unitSel && unitSel.value) body.unitId = unitSel.value;
         if (amtEl && amtEl.value) body.amountCents = Math.round(Number(amtEl.value) * 100);
       }
       await fetchJson('/admin/reminders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });

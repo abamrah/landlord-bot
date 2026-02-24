@@ -1219,10 +1219,144 @@ export function checkMyRequestStatusTool(): ToolDefinition {
     };
 }
 
+// ═══════════════════════════════════════════════════════════
+//  TENANT PAYMENT CONFIRMATION TOOL
+// ═══════════════════════════════════════════════════════════
+
+export function confirmPaymentTool(): ToolDefinition {
+    return {
+        name: "confirm_payment",
+        description:
+            "Confirm that a tenant has paid their rent or utility bill. " +
+            "Use this when the tenant says they paid, sends a payment screenshot, or says 'paid'. " +
+            "Records the payment, updates the reminder status, and notifies the landlord.",
+        parameters: {
+            type: {
+                type: "string",
+                description: "Payment type: 'rent' or 'utility'",
+            },
+            amount: {
+                type: "number",
+                description: "Dollar amount paid (optional — will be auto-filled from records if omitted)",
+            },
+            tenantPhone: {
+                type: "string",
+                description: "The tenant's phone number (from the conversation context)",
+            },
+        },
+        required: ["type", "tenantPhone"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const landlordId = args.landlordId as string;
+            const phone = String(args.tenantPhone).trim();
+            const type = String(args.type).toLowerCase();
+            if (!["rent", "utility"].includes(type)) {
+                return { error: "Type must be 'rent' or 'utility'" };
+            }
+            if (!phone) return { error: "Tenant phone number is required" };
+
+            // 1. Look up the tenant
+            const tenant = await repo.findTenantByPhone(phone, landlordId || undefined);
+            if (!tenant) return { error: "No tenant found with this phone number." };
+
+            // 2. Find the tenant's unit + rent amount
+            const unitTenant = await db.unitTenant.findFirst({
+                where: { tenantId: tenant.id },
+                include: {
+                    unit: { select: { id: true, label: true, address: true } },
+                },
+            });
+
+            const unitLabel = unitTenant?.unit?.label || unitTenant?.unit?.address || "Unknown unit";
+            let amount = args.amount ? Number(args.amount) : 0;
+
+            // Auto-fill amount from records if not provided
+            if (!amount && type === "rent" && unitTenant?.rentAmountCents) {
+                amount = unitTenant.rentAmountCents / 100;
+            }
+            if (!amount && type === "utility" && unitTenant?.unit?.id) {
+                const latestBill = await db.utilityBill.findFirst({
+                    where: { unitId: unitTenant.unit.id },
+                    orderBy: { billingPeriodEnd: "desc" },
+                    select: { amountCents: true },
+                });
+                if (latestBill?.amountCents) {
+                    // If shared, calculate share
+                    const sharePercent = (unitTenant as any).utilitySharePercent || 100;
+                    amount = (latestBill.amountCents * sharePercent) / 10000;
+                }
+            }
+
+            // 3. Create financial record
+            const recordType = type === "rent" ? "RENT_PAYMENT" : "OTHER";
+            const description = `${type === "rent" ? "Rent" : "Utility"} payment confirmed by tenant via WhatsApp`;
+            const effectiveLandlordId = landlordId || tenant.landlordId || "";
+            const record = await repo.createFinancialRecord({
+                landlordId: effectiveLandlordId,
+                tenantName: tenant.name || undefined,
+                tenantPhone: phone,
+                unitLabel,
+                type: recordType,
+                amount: amount || 0,
+                description,
+            });
+
+            // 4. Update matching reminder's lastConfirmedAt
+            const now = new Date();
+            try {
+                const reminder = await db.reminder.findFirst({
+                    where: {
+                        landlordId: effectiveLandlordId,
+                        type,
+                        active: true,
+                        ...(unitTenant?.unit?.id ? { unitId: unitTenant.unit.id } : {}),
+                    },
+                    orderBy: { lastSentAt: "desc" },
+                });
+                if (reminder) {
+                    await db.reminder.update({
+                        where: { id: reminder.id },
+                        data: { lastConfirmedAt: now },
+                    });
+                }
+            } catch (_err) {
+                // Non-critical — continue even if reminder update fails
+            }
+
+            // 5. Alert landlord via WhatsApp + WebSocket
+            const alertMsg =
+                `Payment confirmed by *${tenant.name || phone}* (${unitLabel}):\n` +
+                `Type: ${type === "rent" ? "Rent" : "Utility"}` +
+                (amount ? `\nAmount: $${amount.toFixed(2)}` : "") +
+                `\nConfirmed at: ${now.toLocaleString()}`;
+            try {
+                await whatsappService.alertLandlord(
+                    effectiveLandlordId,
+                    alertMsg,
+                    { type: "PAYMENT_CONFIRMED", tenantPhone: phone },
+                );
+            } catch (_err) {
+                // Non-critical
+            }
+
+            return {
+                success: true,
+                id: record?.id,
+                tenantName: tenant.name,
+                unitLabel,
+                type,
+                amount: amount || null,
+                message: `Payment confirmed! ${type === "rent" ? "Rent" : "Utility"} payment${amount ? ` of $${amount.toFixed(2)}` : ""} recorded for ${tenant.name || phone} at ${unitLabel}. Your landlord has been notified.`,
+            };
+        },
+    };
+}
+
 /**
  * Register the limited set of tools available to tenants.
  * Tenants get: web_search, triage_message, draft_reply, current_time,
- * check_my_request_status, and conversation_history.
+ * check_my_request_status, conversation_history, and confirm_payment.
  * They do NOT get: lookup_tenant, lookup_unit, list_maintenance,
  * create/update maintenance, contractors, utility, send_whatsapp,
  * alert_landlord, dispatch_contractor, green_button, etc.
@@ -1234,6 +1368,8 @@ export function registerTenantTools(): ToolDefinition[] {
         draftReplyTool(),
         // Tenant can check their own requests
         checkMyRequestStatusTool(),
+        // Tenant can confirm payment
+        confirmPaymentTool(),
         // Web search for general info
         webSearchTool(),
         // Conversation context

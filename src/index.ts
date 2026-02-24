@@ -10,7 +10,7 @@ import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
 import maintenanceRouter from "./routes/maintenance";
 import maintenanceListRouter from "./routes/maintenance-list";
-import { runDueReminders } from "./services/reminderService";
+import { runDueReminders, runFollowUpNudges } from "./services/reminderService";
 import { handleWebhook as handleStripeWebhook } from "./services/stripeService";
 import { registerPlugin, initializePlugins } from "./services/verticalPlugin";
 import { propertyManagementPlugin } from "./verticals/property-management";
@@ -82,6 +82,11 @@ setInterval(() => {
   runDueReminders().catch((err) => {
     // eslint-disable-next-line no-console
     console.warn("Reminder run failed", err);
+  });
+  // Check for 48hr follow-up nudges alongside reminders
+  runFollowUpNudges().catch((err) => {
+    // eslint-disable-next-line no-console
+    console.warn("Follow-up nudge failed", err);
   });
 }, REMINDER_POLL_MS);
 

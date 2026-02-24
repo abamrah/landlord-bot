@@ -41,6 +41,7 @@ const tenantSchema = z.object({
   autoReplyEnabled: z.boolean().optional(),
   role: z.enum(["tenant", "resident"]).optional(),
   utilitySharePercent: z.number().min(0).max(100).optional(),
+  rentAmountCents: z.number().int().min(0).optional(),
 });
 
 const tenantUpdateSchema = z.object({
@@ -83,6 +84,7 @@ const propertySchema = z.object({
 const unitTenantUpdateSchema = z.object({
   role: z.enum(["tenant", "resident"]).optional(),
   utilitySharePercent: z.number().min(0).max(100).nullable().optional(),
+  rentAmountCents: z.number().int().min(0).nullable().optional(),
 });
 
 const tenantContactSchema = z.object({
@@ -157,8 +159,8 @@ router.post("/tenants", async (req, res) => {
   const tenant = await repo.createTenant({ ...parsed.data, landlordId: authReq.landlordId });
   if (!tenant) return res.status(500).json({ error: "tenant_create_failed" });
 
-  // Set role and utilitySharePercent on UnitTenant if provided
-  if (parsed.data.unitId && (parsed.data.role || parsed.data.utilitySharePercent !== undefined)) {
+  // Set role, utilitySharePercent, and rentAmountCents on UnitTenant if provided
+  if (parsed.data.unitId && (parsed.data.role || parsed.data.utilitySharePercent !== undefined || parsed.data.rentAmountCents !== undefined)) {
     try {
       const unitTenants = await db.unitTenant.findMany({ where: { tenantId: tenant.id, unitId: parsed.data.unitId } });
       if (unitTenants.length > 0) {
@@ -166,6 +168,7 @@ router.post("/tenants", async (req, res) => {
           id: unitTenants[0].id,
           role: parsed.data.role,
           utilitySharePercent: parsed.data.utilitySharePercent,
+          rentAmountCents: parsed.data.rentAmountCents,
         });
       }
     } catch (err) {
@@ -1916,7 +1919,7 @@ router.post("/whatsapp/instance/create", async (req, res) => {
         integration: "WHATSAPP-BAILEYS",
         qrcode: true,
         rejectCall: false,
-        groupsIgnore: true, // Ignore group messages — only process direct messages
+        groupsIgnore: false, // Process group messages for unit group chats
         alwaysOnline: true,
         readMessages: true,
         readStatus: true,
@@ -1985,6 +1988,13 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
       },
     }).then(() => console.log("[WhatsApp] Webhook URL updated to:", currentWebhookUrl))
       .catch((e: any) => console.warn("[WhatsApp] Webhook update failed (non-blocking):", e.message));
+
+    // Ensure groupsIgnore is OFF for existing instances so group messages are processed
+    evoFetch(`/instance/update/${encodeURIComponent(req.params.instanceName)}`, {
+      method: "PUT",
+      body: { groupsIgnore: false },
+    }).then(() => console.log("[WhatsApp] groupsIgnore set to false"))
+      .catch((e: any) => console.warn("[WhatsApp] groupsIgnore update failed (non-blocking):", e.message));
 
     const phoneNumber = (req.query.number as string || "").replace(/[^0-9]/g, "");
 

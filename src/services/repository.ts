@@ -1275,11 +1275,12 @@ export async function verifyPropertyOwnership(propertyId: string, landlordId: st
 
 // ── UnitTenant management ───────────────────────────────
 
-export async function updateUnitTenant(params: { id: string; role?: string; utilitySharePercent?: number | null }) {
+export async function updateUnitTenant(params: { id: string; role?: string; utilitySharePercent?: number | null; rentAmountCents?: number | null }) {
   if (!isDbEnabled || !params.id) return null;
   const data: Record<string, unknown> = {};
   if (typeof params.role === "string") data.role = params.role;
   if (params.utilitySharePercent !== undefined) data.utilitySharePercent = params.utilitySharePercent;
+  if (params.rentAmountCents !== undefined) data.rentAmountCents = params.rentAmountCents;
   try {
     return await db.unitTenant.update({ where: { id: params.id }, data });
   } catch (err) {

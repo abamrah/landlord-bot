@@ -55,6 +55,8 @@ export function normalizeWhatsAppNumber(raw: string) {
   if (!raw) return "";
   const trimmed = raw.trim();
   if (!trimmed) return "";
+  // Preserve group JIDs (e.g. 120363...@g.us) — they must be sent as-is
+  if (trimmed.endsWith("@g.us")) return trimmed;
   if (trimmed.includes("@")) {
     return trimmed.split("@")[0];
   }

@@ -176,6 +176,7 @@ model UnitTenant {
 	unitId              String
 	role                String   @default("tenant") // "tenant" | "resident"
 	utilitySharePercent Float?
+	rentAmountCents    Int?      // monthly rent in cents
 	startDate           DateTime @default(now())
 	endDate             DateTime?
 	leaseDocuments      LeaseDocument[]
@@ -320,6 +321,7 @@ model Reminder {
 	amountCents Int?     // optional pre-filled utility bill amount
 	active      Boolean  @default(true)
 	lastSentAt  DateTime?
+	lastConfirmedAt DateTime?  // when tenant last confirmed payment for this cycle
 	createdAt   DateTime @default(now())
 	updatedAt   DateTime @updatedAt
 

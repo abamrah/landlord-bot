@@ -21,7 +21,7 @@ async function createEvolutionInstance(instanceName: string, webhookUrl: string)
                 integration: "WHATSAPP-BAILEYS",
                 qrcode: true,
                 rejectCall: false,
-                groupsIgnore: true,
+                groupsIgnore: false,
                 alwaysOnline: true,
                 readMessages: true,
                 readStatus: true,
