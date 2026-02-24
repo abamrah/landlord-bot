@@ -839,11 +839,24 @@ export async function getUnitById(id?: string) {
 
 export async function findUnitByGroupJid(groupJid: string) {
   if (!isDbEnabled || !groupJid) return null;
+  const normalized = groupJid.trim();
+  if (!normalized) return null;
   try {
-    return await db.unit.findFirst({
-      where: { whatsappGroupJid: groupJid },
+    // Try exact match first (most common case)
+    let unit = await db.unit.findFirst({
+      where: { whatsappGroupJid: normalized },
       include: { tenants: { include: { tenant: true } }, property: true },
     });
+    if (unit) return unit;
+    // Fallback: case-insensitive / contains match for edge cases where stored JID
+    // format differs slightly from incoming webhook JID
+    unit = await db.unit.findFirst({
+      where: {
+        whatsappGroupJid: { equals: normalized, mode: "insensitive" as any },
+      },
+      include: { tenants: { include: { tenant: true } }, property: true },
+    });
+    return unit;
   } catch (err) {
     console.warn("findUnitByGroupJid failed", err);
     return null;

@@ -750,20 +750,39 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const instanceName = extractInstanceName(req.body);
     let instanceLandlord = instanceName ? await resolveLandlordByInstance(instanceName) : null;
 
-    const resolvedLandlordId = instanceLandlord?.id || "";
+    let resolvedLandlordId = instanceLandlord?.id || "";
 
     // ── Group message handling ──
     // If the message comes from a known unit WhatsApp group, route it to the
     // landlord's agent. Otherwise ignore group chatter.
+    let groupUnit: Awaited<ReturnType<typeof repo.findUnitByGroupJid>> | null = null;
     if (isGroup) {
-      const unitForGroup = await repo.findUnitByGroupJid(remoteJid);
-      if (!unitForGroup) {
+      groupUnit = await repo.findUnitByGroupJid(remoteJid);
+      // Fallback: try trimmed/lowercased JID if exact match fails
+      if (!groupUnit && remoteJid) {
+        groupUnit = await repo.findUnitByGroupJid(remoteJid.trim().toLowerCase());
+      }
+      if (!groupUnit) {
+        // eslint-disable-next-line no-console
+        console.warn("group message from UNKNOWN group — dropping", { remoteJid, sender, participant });
         return res.json({ ok: true, ignored: "group_message" });
       }
       // We have a recognized unit group — resolve landlord from unit owner and
       // treat the sender (participant) as the speaking tenant.  Fall through to
       // the normal tenant processing flow below.
-      console.info("group message from known unit", { unitId: unitForGroup.id, sender, groupJid: remoteJid });
+      // Also override landlord from the unit if the instance resolution failed
+      if (!instanceLandlord && groupUnit.landlordId) {
+        instanceLandlord = await db.landlord.findUnique({ where: { id: groupUnit.landlordId } });
+        if (instanceLandlord) resolvedLandlordId = instanceLandlord.id;
+      }
+      // eslint-disable-next-line no-console
+      console.info("group message from known unit", {
+        unitId: groupUnit.id,
+        unitLabel: groupUnit.label,
+        sender,
+        groupJid: remoteJid,
+        tenantCount: groupUnit.tenants?.length || 0,
+      });
     }
 
     // Ignore bot-echoed/own messages (except landlord self-chat)
@@ -1025,7 +1044,35 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     // Scope tenant lookup to THIS landlord's instance to prevent cross-tenant data leaks
-    const tenant = await repo.findTenantByPhone(sender, landlordId || undefined);
+    // For group messages, first try to resolve the participant from the unit's tenant list
+    // (more reliable than phone matching since we already confirmed the group JID)
+    let tenant: Awaited<ReturnType<typeof repo.findTenantByPhone>> = null;
+    if (isGroup && groupUnit?.tenants?.length) {
+      const senderDigits = sender.replace(/\D/g, "");
+      for (const ut of groupUnit.tenants) {
+        const t = (ut as any).tenant;
+        if (!t?.phone) continue;
+        const tDigits = t.phone.replace(/\D/g, "");
+        // Match if sender digits end with tenant digits or vice versa (handles country code differences)
+        if (senderDigits === tDigits || senderDigits.endsWith(tDigits) || tDigits.endsWith(senderDigits)) {
+          tenant = t;
+          // eslint-disable-next-line no-console
+          console.info("group tenant resolved via unit tenant list", { tenantId: t.id, tenantName: t.name, sender });
+          break;
+        }
+      }
+      // If participant phone didn't match any tenant in the unit, pick the first tenant
+      // (group messages from the unit group should always be routed to the unit's context)
+      if (!tenant && groupUnit.tenants.length > 0) {
+        tenant = (groupUnit.tenants[0] as any).tenant;
+        // eslint-disable-next-line no-console
+        console.info("group tenant fallback to first unit tenant", { tenantId: tenant?.id, tenantName: tenant?.name, sender });
+      }
+    }
+    // Standard phone-based lookup for 1:1 chats or if group resolution failed
+    if (!tenant) {
+      tenant = await repo.findTenantByPhone(sender, landlordId || undefined);
+    }
     if (!tenant) {
       const contractor = await repo.findContractorByPhone(sender);
       if (contractor) {
@@ -1093,7 +1140,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const chatContent = enrichedMessage || "[media received]";
     const tenantMessage = enrichedMessage || text || "[media received]";
     const hasMedia = Boolean(mediaResult);
-    const immediateUnitId = await resolveTenantUnitId(tenant.id);
+    const immediateUnitId = (isGroup && groupUnit?.id) ? groupUnit.id : await resolveTenantUnitId(tenant.id);
     const triage = await agentService.triageMaintenance({
       tenantMessage,
       tenantId: tenant.id,
