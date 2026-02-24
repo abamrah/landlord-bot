@@ -891,12 +891,13 @@ export function generateNoticeTool(): ToolDefinition {
     return {
         name: "generate_notice",
         description:
-            "Generate an Ontario LTB notice PDF. Supported forms: " +
-            "N1 (rent increase), N2 (condo conversion), N4 (non-payment of rent), " +
-            "N5 (interference/damage/overcrowding), N6 (illegal acts/misrepresentation), " +
-            "N7 (impaired safety), N8 (persistent late payment), N9 (tenant's notice to end), " +
-            "N10 (demolition/conversion/repairs), N11 (agreement to terminate), " +
-            "N12 (landlord/family/purchaser own use), N13 (above-guideline rent increase). " +
+            "Generate an Ontario LTB notice PDF matching official Tribunals Ontario format. Supported forms: " +
+            "N1 (rent increase, s.116), N2 (rent increase – unit partially exempt, s.6(2)), " +
+            "N4 (non-payment of rent, s.59), N5 (interference/damage/overcrowding, ss.62,64,67), " +
+            "N6 (illegal acts/misrepresentation, ss.60,61), N7 (impaired safety, s.66), " +
+            "N8 (end of term – persistent late payment, ss.58,144), N9 (tenant's notice to end, s.47), " +
+            "N10 (agreement to increase rent above guideline, s.121), N11 (agreement to end tenancy, s.77), " +
+            "N12 (landlord/family/purchaser own use, ss.48,49), N13 (demolition/repair/conversion, s.50). " +
             "Returns the notice as a downloadable PDF.",
         parameters: {
             noticeType: { type: "string", description: "Type of notice: N1, N2, N4, N5, N6, N7, N8, N9, N10, N11, N12, or N13" },
@@ -912,8 +913,8 @@ export function generateNoticeTool(): ToolDefinition {
             rentOwingPeriod: { type: "string", description: "For N4: rent period (e.g., 'February 2026')" },
             rentCharged: { type: "number", description: "For N4: rent amount charged" },
             rentPaid: { type: "number", description: "For N4: rent amount paid" },
-            // N5/N6/N7/N10/N13 fields
-            reason: { type: "string", description: "Reason for the notice — N5: interference|damage|overcrowding|act_impairs_safety, N6: illegal_act|misrepresentation, N10: demolition|conversion|repairs, N12: personal_use|family_use|purchaser_use, N13: capital_expenditures|operating_costs|both" },
+            // N5/N6/N7/N12/N13 fields
+            reason: { type: "string", description: "Reason for the notice — N5: interference|damage|overcrowding|act_impairs_safety, N6: illegal_act|misrepresentation, N10: capital_expenditure|new_or_additional_services|both, N12: personal_use|family_use|purchaser_use, N13: demolition|conversion|repairs" },
             details: { type: "string", description: "For N5/N6/N7/N10/N13: detailed description of the issue" },
             // N8-specific
             latePayments: { type: "string", description: "For N8: JSON array of late payments [{period, dueDate, datePaid}]" },
@@ -961,11 +962,16 @@ export function generateNoticeTool(): ToolDefinition {
                         break;
                     }
                     case "N2": {
+                        const cur2 = Number(args.currentRent) || 0;
+                        const nw2 = Number(args.newRent) || 0;
                         pdfBuffer = await noticeService.generateN2Notice({
                             ...common,
-                            terminationDate: String(args.terminationDate || ""),
+                            currentRent: cur2,
+                            newRent: nw2,
+                            effectiveDate: String(args.terminationDate || ""),
+                            exemptionReason: String(args.reason || "post_nov_2018"),
                         });
-                        description = `Condo conversion notice. Termination: ${args.terminationDate}`;
+                        description = `Rent increase (unit partially exempt) from $${cur2.toFixed(2)} to $${nw2.toFixed(2)}, effective ${args.terminationDate}`;
                         break;
                     }
                     case "N4": {
@@ -1039,13 +1045,18 @@ export function generateNoticeTool(): ToolDefinition {
                         break;
                     }
                     case "N10": {
+                        const cur10 = Number(args.currentRent) || 0;
+                        const nw10 = Number(args.newRent) || 0;
                         pdfBuffer = await noticeService.generateN10Notice({
                             ...common,
-                            reason: String(args.reason || "repairs"),
+                            currentRent: cur10,
+                            newRent: nw10,
+                            reason: String(args.reason || "capital_expenditure"),
                             details: String(args.details || ""),
-                            terminationDate: String(args.terminationDate || ""),
+                            effectiveDate: String(args.terminationDate || ""),
+                            tenantSignedBy: String(args.tenantSignedBy || args.tenantName),
                         });
-                        description = `Demolition/conversion/repairs (${args.reason || "repairs"}). Termination: ${args.terminationDate}`;
+                        description = `Agreement to increase rent above guideline from $${cur10.toFixed(2)} to $${nw10.toFixed(2)} (${args.reason || "capital_expenditure"}). Effective: ${args.terminationDate}`;
                         break;
                     }
                     case "N11": {
@@ -1069,17 +1080,13 @@ export function generateNoticeTool(): ToolDefinition {
                         break;
                     }
                     case "N13": {
-                        const cur13 = Number(args.currentRent) || 0;
-                        const nw13 = Number(args.newRent) || 0;
                         pdfBuffer = await noticeService.generateN13Notice({
                             ...common,
-                            currentRent: cur13,
-                            newRent: nw13,
-                            reason: String(args.reason || "capital_expenditures"),
+                            reason: String(args.reason || "repairs"),
                             details: String(args.details || ""),
-                            effectiveDate: String(args.terminationDate || ""),
+                            terminationDate: String(args.terminationDate || ""),
                         });
-                        description = `Above-guideline rent increase from $${cur13.toFixed(2)} to $${nw13.toFixed(2)}. Effective: ${args.terminationDate}`;
+                        description = `Demolition/repair/conversion (${args.reason || "repairs"}). Termination: ${args.terminationDate}`;
                         break;
                     }
                     default:

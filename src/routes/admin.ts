@@ -2564,7 +2564,10 @@ router.post("/notices/generate", async (req, res) => {
       case "N2":
         pdfBuffer = await noticeService.generateN2Notice({
           ...common,
-          terminationDate: d.terminationDate || "",
+          currentRent: d.currentRent || 0,
+          newRent: d.newRent || 0,
+          effectiveDate: d.terminationDate || "",
+          exemptionReason: d.reason || "post_nov_2018",
         });
         break;
       case "N4": {
@@ -2622,9 +2625,12 @@ router.post("/notices/generate", async (req, res) => {
       case "N10":
         pdfBuffer = await noticeService.generateN10Notice({
           ...common,
-          reason: d.reason || "repairs",
+          currentRent: d.currentRent || 0,
+          newRent: d.newRent || 0,
+          reason: d.reason || "capital_expenditure",
           details: d.details || "",
-          terminationDate: d.terminationDate || "",
+          effectiveDate: d.terminationDate || "",
+          tenantSignedBy: d.tenantSignedBy || d.tenantName,
         });
         break;
       case "N11":
@@ -2646,11 +2652,9 @@ router.post("/notices/generate", async (req, res) => {
       case "N13":
         pdfBuffer = await noticeService.generateN13Notice({
           ...common,
-          currentRent: d.currentRent || 0,
-          newRent: d.newRent || 0,
-          reason: d.reason || "capital_expenditures",
+          reason: d.reason || "repairs",
           details: d.details || "",
-          effectiveDate: d.terminationDate || "",
+          terminationDate: d.terminationDate || "",
         });
         break;
       default:
