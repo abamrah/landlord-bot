@@ -1906,12 +1906,9 @@ router.post("/whatsapp/instance/create", async (req, res) => {
         return res.status(403).json({ error: "plan_limit_reached", message: `Your ${landlord.plan || "FREE"} plan allows ${plan.maxWhatsAppNumbers} WhatsApp instance(s). Upgrade to add more.`, max: plan.maxWhatsAppNumbers });
       }
     }
-    let appUrl = process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
-    // Force HTTPS for production (Railway proxies strip https, causing POST→GET redirect)
-    if (!appUrl.includes('localhost') && appUrl.startsWith('http://')) {
-        appUrl = appUrl.replace('http://', 'https://');
-    }
-    const webhookUrl = `${appUrl}/webhooks/whatsapp/evolution`;
+    // Use WEBHOOK_URL (Railway internal) to avoid egress costs & HTTPS redirect issues
+    const webhookBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
+    const webhookUrl = `${webhookBase}/webhooks/whatsapp/evolution`;
     const result = await evoFetch("/instance/create", {
       method: "POST",
       body: {
@@ -1975,12 +1972,9 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
   const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
   if (landlord?.evolutionInstanceName !== req.params.instanceName) return res.status(403).json({ error: "forbidden" });
   try {
-    // Ensure webhook URL is up-to-date (force HTTPS in production)
-    let wbAppUrl = process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
-    if (!wbAppUrl.includes('localhost') && wbAppUrl.startsWith('http://')) {
-        wbAppUrl = wbAppUrl.replace('http://', 'https://');
-    }
-    const currentWebhookUrl = `${wbAppUrl}/webhooks/whatsapp/evolution`;
+    // Ensure webhook URL is up-to-date — use internal Railway URL if set
+    const wbBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
+    const currentWebhookUrl = `${wbBase}/webhooks/whatsapp/evolution`;
     evoFetch(`/webhook/set/${encodeURIComponent(req.params.instanceName)}`, {
       method: "POST",
       body: {

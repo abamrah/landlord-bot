@@ -96,12 +96,9 @@ router.post("/signup", async (req, res) => {
 
         // Auto-create Evolution API instance for WhatsApp (non-blocking)
         const instanceName = `nestmind-${landlord.id}`;
-        let appUrl = process.env.APP_PUBLIC_URL || process.env.APP_URL || `${req.protocol}://${req.get("host")}`;
-        // Force HTTPS for production (Railway proxies strip https, causing POST→GET redirect)
-        if (!appUrl.includes('localhost') && appUrl.startsWith('http://')) {
-            appUrl = appUrl.replace('http://', 'https://');
-        }
-        const webhookUrl = `${appUrl}/webhooks/whatsapp/evolution`;
+        // Use WEBHOOK_URL (Railway internal) to avoid egress costs & HTTPS redirect issues
+        const webhookBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || `${req.protocol}://${req.get("host")}`;
+        const webhookUrl = `${webhookBase}/webhooks/whatsapp/evolution`;
         const evoResult = await createEvolutionInstance(instanceName, webhookUrl);
         if (evoResult?.instance?.instanceName) {
             await db.landlord.update({
