@@ -1968,6 +1968,22 @@ router.get("/whatsapp/instance/mine", async (req, res) => {
   }
 });
 
+/** Sync Evolution API instance settings (groupsIgnore=false, readMessages=true, webhook URL).
+ *  Call this if group messages aren't being received. */
+router.post("/whatsapp/instance/sync", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
+    if (!landlord?.evolutionInstanceName) return res.status(404).json({ error: "no_instance", message: "No Evolution API instance configured." });
+    const webhookBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
+    const webhookUrl = `${webhookBase.replace(/\/+$/, "")}/webhooks/whatsapp/evolution`;
+    const result = await whatsappService.syncEvolutionInstanceSettings(landlord.evolutionInstanceName, webhookUrl);
+    res.json({ ok: result.ok, instanceName: landlord.evolutionInstanceName, details: result.error });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 /** Get QR code / pairing code to connect an existing instance.
  *  Pass ?number=+1234567890 to request a pairing code (useful on mobile). */
 router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
@@ -1989,12 +2005,10 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
     }).then(() => console.log("[WhatsApp] Webhook URL updated to:", currentWebhookUrl))
       .catch((e: any) => console.warn("[WhatsApp] Webhook update failed (non-blocking):", e.message));
 
-    // Ensure groupsIgnore is OFF for existing instances so group messages are processed
-    evoFetch(`/instance/update/${encodeURIComponent(req.params.instanceName)}`, {
-      method: "PUT",
-      body: { groupsIgnore: false },
-    }).then(() => console.log("[WhatsApp] groupsIgnore set to false"))
-      .catch((e: any) => console.warn("[WhatsApp] groupsIgnore update failed (non-blocking):", e.message));
+    // Ensure groupsIgnore is OFF and readMessages is ON for existing instances
+    whatsappService.syncEvolutionInstanceSettings(req.params.instanceName, currentWebhookUrl)
+      .then((r) => console.log("[WhatsApp] Instance settings synced on connect:", r))
+      .catch((e: any) => console.warn("[WhatsApp] Instance settings sync failed (non-blocking):", e.message));
 
     const phoneNumber = (req.query.number as string || "").replace(/[^0-9]/g, "");
 

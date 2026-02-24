@@ -75,6 +75,17 @@ server.listen(port, async () => {
   await initializePlugins();
   // eslint-disable-next-line no-console
   console.log(`AI Agent listening on port ${port}`);
+
+  // Sync Evolution API instance settings (groupsIgnore=false, readMessages=true)
+  // Run after a short delay to let DB connections settle
+  setTimeout(async () => {
+    try {
+      const { syncAllInstanceSettings } = require("./services/whatsappService");
+      await syncAllInstanceSettings();
+    } catch (err) {
+      console.warn("Evolution instance sync failed (non-blocking):", (err as Error).message);
+    }
+  }, 5000);
 });
 
 const REMINDER_POLL_MS = 30 * 1000;

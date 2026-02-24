@@ -316,6 +316,119 @@ export async function sendWhatsAppDocument(params: SendDocumentParams): Promise<
   }
 }
 
+/**
+ * Sync Evolution API instance settings to ensure group messages are
+ * forwarded to the webhook. This sets:
+ *   groupsIgnore: false   — process group messages
+ *   readMessages: true    — mark messages as read (required for groups)
+ *   readStatus: true      — receive status updates
+ *   alwaysOnline: true    — keep connection alive
+ * Also updates the webhook URL and subscribed events.
+ */
+export async function syncEvolutionInstanceSettings(instanceName: string, webhookUrl?: string): Promise<{ ok: boolean; error?: string }> {
+  const cfg = getConfig();
+  if (!cfg.baseUrl || !cfg.token) {
+    return { ok: false, error: "evolution_api_not_configured" };
+  }
+
+  const base = cfg.baseUrl.replace(/\/+$/, "");
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    [cfg.tokenHeader]: cfg.token,
+  };
+
+  const results: string[] = [];
+
+  // 1. Update instance settings (groupsIgnore, readMessages, etc.)
+  try {
+    const res = await fetch(`${base}/instance/update/${encodeURIComponent(instanceName)}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({
+        groupsIgnore: false,
+        readMessages: true,
+        readStatus: true,
+        alwaysOnline: true,
+        rejectCall: false,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      results.push("instance_settings_updated");
+      console.log(`[EvoSync] Instance ${instanceName}: settings updated (groupsIgnore=false, readMessages=true)`);
+    } else {
+      results.push(`instance_settings_failed: ${(data as any)?.message || res.status}`);
+      console.warn(`[EvoSync] Instance ${instanceName}: settings update failed`, data);
+    }
+  } catch (err) {
+    results.push(`instance_settings_error: ${(err as Error).message}`);
+    console.warn(`[EvoSync] Instance ${instanceName}: settings update error`, (err as Error).message);
+  }
+
+  // 2. Update webhook URL and events
+  if (webhookUrl) {
+    try {
+      const res = await fetch(`${base}/webhook/set/${encodeURIComponent(instanceName)}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          url: webhookUrl,
+          byEvents: false,
+          base64: true,
+          events: [
+            "MESSAGES_UPSERT",
+            "MESSAGES_UPDATE",
+            "CONNECTION_UPDATE",
+            "QRCODE_UPDATED",
+          ],
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        results.push("webhook_updated");
+        console.log(`[EvoSync] Instance ${instanceName}: webhook updated → ${webhookUrl}`);
+      } else {
+        results.push(`webhook_failed: ${(data as any)?.message || res.status}`);
+        console.warn(`[EvoSync] Instance ${instanceName}: webhook update failed`, data);
+      }
+    } catch (err) {
+      results.push(`webhook_error: ${(err as Error).message}`);
+      console.warn(`[EvoSync] Instance ${instanceName}: webhook update error`, (err as Error).message);
+    }
+  }
+
+  return { ok: results.some(r => r.includes("updated")), error: results.join("; ") };
+}
+
+/**
+ * Sync settings for ALL landlord Evolution API instances.
+ * Called on server startup to ensure group messages work.
+ */
+export async function syncAllInstanceSettings(): Promise<void> {
+  const { db: database } = require("../config/database");
+  const webhookBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || "";
+  const webhookUrl = webhookBase ? `${webhookBase.replace(/\/+$/, "")}/webhooks/whatsapp/evolution` : undefined;
+
+  try {
+    const landlords = await database.landlord.findMany({
+      where: { evolutionInstanceName: { not: null } },
+      select: { id: true, evolutionInstanceName: true, name: true },
+    });
+    if (!landlords.length) {
+      console.log("[EvoSync] No landlords with Evolution instances found — skipping");
+      return;
+    }
+    console.log(`[EvoSync] Syncing settings for ${landlords.length} Evolution instance(s)...`);
+    for (const ll of landlords) {
+      if (!ll.evolutionInstanceName) continue;
+      await syncEvolutionInstanceSettings(ll.evolutionInstanceName, webhookUrl);
+    }
+    console.log("[EvoSync] All instance settings synced.");
+  } catch (err) {
+    console.warn("[EvoSync] Failed to sync instance settings on startup:", (err as Error).message);
+  }
+}
+
 export default {
   sendWhatsAppText,
   sendWhatsAppDocument,
@@ -324,4 +437,6 @@ export default {
   formatWhatsAppText,
   createWhatsAppGroup,
   sendWhatsAppGroupText,
+  syncEvolutionInstanceSettings,
+  syncAllInstanceSettings,
 };

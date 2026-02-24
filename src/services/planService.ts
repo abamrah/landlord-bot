@@ -14,7 +14,7 @@ export type PlanLimits = {
 export const PLANS: Record<string, PlanLimits> = {
     FREE: {
         maxUnits: 3,
-        maxMessagesPerMonth: 50,
+        maxMessagesPerMonth: 30,
         autopilot: false,
         utilityTracking: false,
         contractorDispatch: false,

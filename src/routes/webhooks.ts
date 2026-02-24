@@ -9,6 +9,7 @@ import orchestrator from "../services/agentOrchestrator";
 import { processMedia, buildMediaEnrichedMessage, ExtractedMedia } from "../services/mediaService";
 import conversationMemory from "../services/conversationMemory";
 import { webhookRateLimit } from "../services/rateLimiter";
+import { checkPlanLimit, incrementMessageCount } from "../services/planService";
 import { db } from "../config/database";
 
 const AGENTIC_MODE = process.env.AGENTIC_MODE === "true";
@@ -653,33 +654,33 @@ async function flushTenantReply(params: { tenantId: string }) {
     }
   }
 
-let draftText = (draftResponse?.draft || "").trim();
-      // If linear batch returned LLM-unavailable or empty draft, use fallback
-      if (!draftText || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
-        draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
-        console.warn("LLM unavailable for tenant reply (linear batch), using fallback", { tenantId: tenant.id });
+  let draftText = (draftResponse?.draft || "").trim();
+  // If linear batch returned LLM-unavailable or empty draft, use fallback
+  if (!draftText || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
+    draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
+    console.warn("LLM unavailable for tenant reply (linear batch), using fallback", { tenantId: tenant.id });
+  }
+  if (draftText && canAutoReply) {
+    const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
+    if (!sendResult.ok) {
+      // eslint-disable-next-line no-console
+      console.error("auto-reply send FAILED (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo, error: sendResult.error, response: sendResult.response });
+    } else {
+      if (record?.id) {
+        await repo.appendChatMessage({
+          id: record.id,
+          role: "ai",
+          content: draftText,
+          meta: { channel: bucket.isGroup ? "whatsapp_group" : "whatsapp", batched: true },
+        });
       }
-      if (draftText && canAutoReply) {
-        const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
-        if (!sendResult.ok) {
-          // eslint-disable-next-line no-console
-          console.error("auto-reply send FAILED (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo, error: sendResult.error, response: sendResult.response });
-        } else {
-          if (record?.id) {
-            await repo.appendChatMessage({
-              id: record.id,
-              role: "ai",
-              content: draftText,
-              meta: { channel: bucket.isGroup ? "whatsapp_group" : "whatsapp", batched: true },
-            });
-          }
-          lastReplySentAt.set(tenant.id, Date.now());
-          // eslint-disable-next-line no-console
-          console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
-        }
-      } else if (draftText && !canAutoReply) {
-        // eslint-disable-next-line no-console
-        console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
+      lastReplySentAt.set(tenant.id, Date.now());
+      // eslint-disable-next-line no-console
+      console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
+    }
+  } else if (draftText && !canAutoReply) {
+    // eslint-disable-next-line no-console
+    console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
   }
 
   const triageJson: any = record?.triageJson || triage || {};
@@ -787,6 +788,10 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
     // Ignore bot-echoed/own messages (except landlord self-chat)
     if (fromMe) {
+      // In groups, fromMe means the connected device (bot) sent it — always skip
+      if (isGroup) {
+        return res.json({ ok: true, ignored: "from_me_group_echo" });
+      }
       if (!instanceLandlord && !isLandlordNumber(sender)) return res.json({ ok: true, ignored: "from_me" });
       if (text?.startsWith("AI Assistance:")) return res.json({ ok: true, ignored: "from_me_ai_echo" });
       // landlord self-test allowed to proceed
@@ -814,6 +819,10 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const effectiveReplyTo = replyTo;
 
     const respond = (payload: Record<string, unknown>) => {
+      // Track AI usage for plan limits (increment counter when LLM was invoked)
+      if (llmInvoked && landlordId) {
+        incrementMessageCount(landlordId).catch(() => {});
+      }
       setWebhookStatus({
         receivedAt: new Date().toISOString(),
         routed: typeof payload.routed === "string" ? payload.routed : undefined,
@@ -827,6 +836,19 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       });
       return res.json(payload);
     };
+
+    // ── Plan usage limit (Gemini API calls) ──
+    // FREE plan: 30 AI calls/month. Checked before any LLM invocation.
+    let planLimitExceeded = false;
+    if (landlordId) {
+      const limit = await checkPlanLimit(landlordId, "messages");
+      if (!limit.allowed) {
+        planLimitExceeded = true;
+        // eslint-disable-next-line no-console
+        console.warn("plan limit exceeded — skipping AI", { landlordId, current: limit.current, max: limit.max, plan: limit.plan });
+      }
+    }
+
     if (isLandlord) {
       const record = await repo.findLatestOpenMaintenance(landlordId || undefined);
       // If there IS an active maintenance record, attach landlord message to it
@@ -842,6 +864,15 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
       // ── AGENTIC LANDLORD PATH (works with or without active maintenance) ──
       if (AGENTIC_MODE && landlordId) {
+        // Enforce plan limit before LLM call
+        if (planLimitExceeded) {
+          await whatsappService.sendWhatsAppText({
+            to: effectiveReplyTo,
+            text: "You\u2019ve reached your free plan\u2019s monthly AI limit (30 messages). Upgrade to Pro for unlimited AI-powered responses.",
+            landlordId,
+          });
+          return respond({ ok: true, routed: "landlord_plan_limit", llmInvoked: false, autoReplySent: false });
+        }
         try {
           // Save landlord message to conversation memory
           await conversationMemory.saveMessage({
@@ -1113,6 +1144,34 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const baseConversationLog = Array.isArray(record?.chatLog) ? (record?.chatLog as any[]) : [];
     // Instance-resolved landlordId takes priority to prevent cross-tenant routing
     const tenantLandlordId = landlordId || tenant.landlordId || "";
+
+    // ── Plan limit check for tenant messages ──
+    // Re-check against the tenant's landlord (may differ from initially resolved landlordId)
+    if (!planLimitExceeded && tenantLandlordId) {
+      const tLimit = await checkPlanLimit(tenantLandlordId, "messages");
+      if (!tLimit.allowed) planLimitExceeded = true;
+    }
+    if (planLimitExceeded) {
+      // Still log the message but skip all AI processing
+      if (record?.id) {
+        await repo.appendChatMessage({
+          id: record.id,
+          role: "tenant",
+          content: inboundContent || "[media received]",
+          meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", sender, planLimited: true },
+        });
+      }
+      await whatsappService.sendWhatsAppText({
+        to: replyTo,
+        text: "Your landlord\u2019s free plan AI limit has been reached for this month. Your message has been recorded and your landlord will be notified directly.",
+        landlordId: tenantLandlordId,
+      });
+      // Alert landlord about the message even though AI is limited
+      if (tenantLandlordId) {
+        await whatsappService.alertLandlord(tenantLandlordId, `\u26a0\ufe0f Message from ${tenant.name} (${tenant.phone || sender}): "${(inboundContent || "").substring(0, 300)}"\n\nAI limit reached \u2014 upgrade to Pro for unlimited AI responses.`);
+      }
+      return respond({ ok: true, routed: "tenant_plan_limit", llmInvoked: false, autoReplySent: false });
+    }
 
     // ── UNIFIED MEDIA PROCESSING ──
     // processMedia handles image vision, audio transcription, video analysis,
