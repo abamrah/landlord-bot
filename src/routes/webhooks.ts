@@ -1306,4 +1306,8 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 router.post("/whatsapp", evolutionWebhookHandler);
 router.post("/whatsapp/evolution", evolutionWebhookHandler);
 
+// GET handler for Evolution API webhook verification / health checks
+router.get("/whatsapp", (_req, res) => res.json({ status: "ok" }));
+router.get("/whatsapp/evolution", (_req, res) => res.json({ status: "ok" }));
+
 export default router;
