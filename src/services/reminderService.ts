@@ -432,6 +432,10 @@ export async function runFollowUpNudges(now = new Date()): Promise<ReminderResul
       let failed = 0;
       const typeLabel = reminder.type === "rent" ? "rent" : "utility";
 
+      // Determine the appropriate notice type for the warning
+      const noticeType = reminder.type === "rent" ? "N4 (Non-Payment of Rent)" : "N4 (Non-Payment of Rent)";
+      const noticeWarning = `\n\nPlease note: if payment is not received, a formal Ontario LTB *${noticeType}* notice is being prepared and may be served within *12 hours*.`;
+
       if (reminder.unitId) {
         const unit = await db.unit.findUnique({
           where: { id: reminder.unitId },
@@ -444,7 +448,7 @@ export async function runFollowUpNudges(now = new Date()): Promise<ReminderResul
 
         if (!unit || unit.tenants.length === 0) continue;
 
-        const nudgeMsg = `Friendly reminder: your ${typeLabel} payment for *${unit.label}* hasn't been confirmed yet. If you've already paid, just reply *paid* and we'll update the records. Thanks!`;
+        const nudgeMsg = `Friendly reminder: your ${typeLabel} payment for *${unit.label}* hasn't been confirmed yet. If you've already paid, just reply *paid* and we'll update the records.${noticeWarning}`;
 
         if (unit.whatsappGroupJid) {
           const result = await whatsappService.sendWhatsAppGroupText({
@@ -470,7 +474,7 @@ export async function runFollowUpNudges(now = new Date()): Promise<ReminderResul
       } else {
         // No unit — broadcast nudge
         const tenants = await repo.listTenants(reminder.landlordId || undefined);
-        const nudgeMsg = `Friendly reminder: your ${typeLabel} payment hasn't been confirmed yet. If you've already paid, just reply *paid* and we'll update the records. Thanks!`;
+        const nudgeMsg = `Friendly reminder: your ${typeLabel} payment hasn't been confirmed yet. If you've already paid, just reply *paid* and we'll update the records.${noticeWarning}`;
         for (const tenant of tenants) {
           if (!tenant.phone) continue;
           const result = await whatsappService.sendWhatsAppText({

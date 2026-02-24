@@ -890,83 +890,210 @@ export function financialSummaryTool(): ToolDefinition {
 export function generateNoticeTool(): ToolDefinition {
     return {
         name: "generate_notice",
-        description: "Generate an Ontario LTB eviction notice PDF (N4 for non-payment of rent, or N12 for landlord's own use). Returns the notice as a downloadable PDF. Requires tenant name, rental unit address, and specific details depending on the notice type. For N4: rent owing details. For N12: reason and occupant name.",
+        description:
+            "Generate an Ontario LTB notice PDF. Supported forms: " +
+            "N1 (rent increase), N2 (condo conversion), N4 (non-payment of rent), " +
+            "N5 (interference/damage/overcrowding), N6 (illegal acts/misrepresentation), " +
+            "N7 (impaired safety), N8 (persistent late payment), N9 (tenant's notice to end), " +
+            "N10 (demolition/conversion/repairs), N11 (agreement to terminate), " +
+            "N12 (landlord/family/purchaser own use), N13 (above-guideline rent increase). " +
+            "Returns the notice as a downloadable PDF.",
         parameters: {
-            noticeType: { type: "string", description: "Type of notice: 'N4' (non-payment of rent) or 'N12' (landlord/purchaser/family use)" },
+            noticeType: { type: "string", description: "Type of notice: N1, N2, N4, N5, N6, N7, N8, N9, N10, N11, N12, or N13" },
             tenantName: { type: "string", description: "Full name(s) of the tenant(s)" },
             rentalUnitAddress: { type: "string", description: "Full address of the rental unit" },
             landlordName: { type: "string", description: "Full name of the landlord" },
             landlordPhone: { type: "string", description: "Landlord's phone number (optional)" },
-            terminationDate: { type: "string", description: "Termination date (N4: at least 14 days out; N12: at least 60 days, end of rental period)" },
+            terminationDate: { type: "string", description: "Termination/effective date (required for most forms)" },
+            // N1/N13 fields
+            currentRent: { type: "number", description: "For N1/N13: current monthly rent amount" },
+            newRent: { type: "number", description: "For N1/N13: new monthly rent amount" },
             // N4-specific
             rentOwingPeriod: { type: "string", description: "For N4: rent period (e.g., 'February 2026')" },
             rentCharged: { type: "number", description: "For N4: rent amount charged" },
             rentPaid: { type: "number", description: "For N4: rent amount paid" },
+            // N5/N6/N7/N10/N13 fields
+            reason: { type: "string", description: "Reason for the notice — N5: interference|damage|overcrowding|act_impairs_safety, N6: illegal_act|misrepresentation, N10: demolition|conversion|repairs, N12: personal_use|family_use|purchaser_use, N13: capital_expenditures|operating_costs|both" },
+            details: { type: "string", description: "For N5/N6/N7/N10/N13: detailed description of the issue" },
+            // N8-specific
+            latePayments: { type: "string", description: "For N8: JSON array of late payments [{period, dueDate, datePaid}]" },
+            // N11-specific
+            tenantSignedBy: { type: "string", description: "For N11: tenant's printed name for signature" },
             // N12-specific
-            reason: { type: "string", description: "For N12: 'personal_use', 'family_use', or 'purchaser_use'" },
             occupantName: { type: "string", description: "For N12: name of person who will occupy the unit" },
             relationship: { type: "string", description: "For N12: relationship to landlord (if family_use)" },
         },
-        required: ["noticeType", "tenantName", "rentalUnitAddress", "landlordName", "terminationDate"],
+        required: ["noticeType", "tenantName", "rentalUnitAddress", "landlordName"],
         category: "utility",
         enabled: true,
         async execute(args) {
             const noticeType = String(args.noticeType).toUpperCase();
             const noticeService = require("../noticeService");
+            const validTypes = noticeService.VALID_NOTICE_TYPES as readonly string[];
+            if (!validTypes.includes(noticeType)) {
+                return { error: `Invalid notice type '${noticeType}'. Valid types: ${validTypes.join(", ")}` };
+            }
+
+            const common = {
+                tenantName: String(args.tenantName),
+                rentalUnitAddress: String(args.rentalUnitAddress),
+                landlordName: String(args.landlordName),
+                landlordPhone: args.landlordPhone ? String(args.landlordPhone) : undefined,
+                dateGiven: new Date().toISOString().split("T")[0],
+                signedBy: String(args.landlordName),
+            };
 
             try {
-                if (noticeType === "N4") {
-                    const rentCharged = Number(args.rentCharged) || 0;
-                    const rentPaid = Number(args.rentPaid) || 0;
-                    const rentOwing = rentCharged - rentPaid;
-                    const pdfBuffer: Buffer = await noticeService.generateN4Notice({
-                        tenantName: String(args.tenantName),
-                        rentalUnitAddress: String(args.rentalUnitAddress),
-                        landlordName: String(args.landlordName),
-                        landlordPhone: args.landlordPhone ? String(args.landlordPhone) : undefined,
-                        rentOwing: [{
-                            period: String(args.rentOwingPeriod || "Current period"),
-                            rentCharged,
-                            rentPaid,
-                            rentOwing,
-                        }],
-                        totalOwing: rentOwing,
-                        terminationDate: String(args.terminationDate),
-                        dateGiven: new Date().toISOString().split("T")[0],
-                        signedBy: String(args.landlordName),
-                    });
-                    const base64 = pdfBuffer.toString("base64");
-                    return {
-                        success: true,
-                        noticeType: "N4",
-                        fileName: `N4_Notice_${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
-                        pdfBase64: base64,
-                        message: `N4 Notice generated for ${args.tenantName}. Total rent owing: $${rentOwing.toFixed(2)}. Termination date: ${args.terminationDate}. The PDF is ready for download or can be sent via WhatsApp.`,
-                    };
-                } else if (noticeType === "N12") {
-                    const pdfBuffer: Buffer = await noticeService.generateN12Notice({
-                        tenantName: String(args.tenantName),
-                        rentalUnitAddress: String(args.rentalUnitAddress),
-                        landlordName: String(args.landlordName),
-                        landlordPhone: args.landlordPhone ? String(args.landlordPhone) : undefined,
-                        reason: (String(args.reason) || "personal_use") as any,
-                        occupantName: String(args.occupantName || args.landlordName),
-                        relationship: args.relationship ? String(args.relationship) : undefined,
-                        terminationDate: String(args.terminationDate),
-                        dateGiven: new Date().toISOString().split("T")[0],
-                        signedBy: String(args.landlordName),
-                    });
-                    const base64 = pdfBuffer.toString("base64");
-                    return {
-                        success: true,
-                        noticeType: "N12",
-                        fileName: `N12_Notice_${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
-                        pdfBase64: base64,
-                        message: `N12 Notice generated for ${args.tenantName}. Reason: ${args.reason || "personal_use"}. Termination date: ${args.terminationDate}. The PDF is ready for download or can be sent via WhatsApp.`,
-                    };
-                } else {
-                    return { error: "Invalid notice type. Must be 'N4' or 'N12'." };
+                let pdfBuffer: Buffer;
+                let description = "";
+
+                switch (noticeType) {
+                    case "N1": {
+                        const cur = Number(args.currentRent) || 0;
+                        const nw = Number(args.newRent) || 0;
+                        pdfBuffer = await noticeService.generateN1Notice({
+                            ...common,
+                            currentRent: cur,
+                            newRent: nw,
+                            effectiveDate: String(args.terminationDate || ""),
+                        });
+                        description = `Rent increase from $${cur.toFixed(2)} to $${nw.toFixed(2)}, effective ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N2": {
+                        pdfBuffer = await noticeService.generateN2Notice({
+                            ...common,
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Condo conversion notice. Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N4": {
+                        const rentCharged = Number(args.rentCharged) || 0;
+                        const rentPaid = Number(args.rentPaid) || 0;
+                        const rentOwing = rentCharged - rentPaid;
+                        pdfBuffer = await noticeService.generateN4Notice({
+                            ...common,
+                            rentOwing: [{
+                                period: String(args.rentOwingPeriod || "Current period"),
+                                rentCharged,
+                                rentPaid,
+                                rentOwing,
+                            }],
+                            totalOwing: rentOwing,
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Non-payment of rent. Owing: $${rentOwing.toFixed(2)}. Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N5": {
+                        pdfBuffer = await noticeService.generateN5Notice({
+                            ...common,
+                            reason: String(args.reason || "interference"),
+                            details: String(args.details || ""),
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Interference/damage/overcrowding (${args.reason || "interference"}). Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N6": {
+                        pdfBuffer = await noticeService.generateN6Notice({
+                            ...common,
+                            reason: String(args.reason || "illegal_act"),
+                            details: String(args.details || ""),
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Illegal act/misrepresentation (${args.reason || "illegal_act"}). Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N7": {
+                        pdfBuffer = await noticeService.generateN7Notice({
+                            ...common,
+                            details: String(args.details || ""),
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Impaired safety. Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N8": {
+                        let latePayments: Array<{ period: string; dueDate: string; datePaid: string }> = [];
+                        try {
+                            latePayments = JSON.parse(String(args.latePayments || "[]"));
+                        } catch {
+                            latePayments = [{ period: "Current period", dueDate: "See pattern", datePaid: "Late" }];
+                        }
+                        pdfBuffer = await noticeService.generateN8Notice({
+                            ...common,
+                            latePayments,
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Persistent late payment (${latePayments.length} instances). Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N9": {
+                        pdfBuffer = await noticeService.generateN9Notice({
+                            ...common,
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Tenant's notice to end tenancy. Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N10": {
+                        pdfBuffer = await noticeService.generateN10Notice({
+                            ...common,
+                            reason: String(args.reason || "repairs"),
+                            details: String(args.details || ""),
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Demolition/conversion/repairs (${args.reason || "repairs"}). Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N11": {
+                        pdfBuffer = await noticeService.generateN11Notice({
+                            ...common,
+                            tenantSignedBy: String(args.tenantSignedBy || args.tenantName),
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Mutual agreement to end tenancy. Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N12": {
+                        pdfBuffer = await noticeService.generateN12Notice({
+                            ...common,
+                            reason: (String(args.reason) || "personal_use") as any,
+                            occupantName: String(args.occupantName || args.landlordName),
+                            relationship: args.relationship ? String(args.relationship) : undefined,
+                            terminationDate: String(args.terminationDate || ""),
+                        });
+                        description = `Landlord/family/purchaser own use (${args.reason || "personal_use"}). Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N13": {
+                        const cur13 = Number(args.currentRent) || 0;
+                        const nw13 = Number(args.newRent) || 0;
+                        pdfBuffer = await noticeService.generateN13Notice({
+                            ...common,
+                            currentRent: cur13,
+                            newRent: nw13,
+                            reason: String(args.reason || "capital_expenditures"),
+                            details: String(args.details || ""),
+                            effectiveDate: String(args.terminationDate || ""),
+                        });
+                        description = `Above-guideline rent increase from $${cur13.toFixed(2)} to $${nw13.toFixed(2)}. Effective: ${args.terminationDate}`;
+                        break;
+                    }
+                    default:
+                        return { error: `Unsupported notice type: ${noticeType}` };
                 }
+
+                const base64 = pdfBuffer.toString("base64");
+                return {
+                    success: true,
+                    noticeType,
+                    fileName: `${noticeType}_Notice_${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
+                    pdfBase64: base64,
+                    message: `${noticeType} Notice generated for ${args.tenantName}. ${description}. The PDF is ready for download or can be sent via WhatsApp.`,
+                };
             } catch (err) {
                 return { error: `Failed to generate notice: ${(err as Error).message}` };
             }

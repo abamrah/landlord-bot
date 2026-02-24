@@ -2502,22 +2502,35 @@ router.get("/financial/summary", async (req, res) => {
 //  LEGAL NOTICE PDF GENERATION ENDPOINT
 // ═══════════════════════════════════════════════════════════
 
-/** POST /admin/notices/generate — Generate N4 or N12 notice PDF */
+/** POST /admin/notices/generate — Generate Ontario LTB notice PDF (N1–N13) */
 router.post("/notices/generate", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   const schema = z.object({
-    noticeType: z.enum(["N4", "N12"]),
+    noticeType: z.enum(["N1", "N2", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12", "N13"]),
     tenantName: z.string().min(1),
     rentalUnitAddress: z.string().min(1),
     landlordName: z.string().min(1),
     landlordPhone: z.string().optional(),
-    terminationDate: z.string().min(1),
+    terminationDate: z.string().optional(),
+    // N1/N13 fields
+    currentRent: z.number().optional(),
+    newRent: z.number().optional(),
     // N4 fields
     rentOwingPeriod: z.string().optional(),
     rentCharged: z.number().optional(),
     rentPaid: z.number().optional(),
+    // N5/N6/N10/N12/N13 fields
+    reason: z.string().optional(),
+    details: z.string().optional(),
+    // N8 fields
+    latePayments: z.array(z.object({
+      period: z.string(),
+      dueDate: z.string(),
+      datePaid: z.string(),
+    })).optional(),
+    // N11 fields
+    tenantSignedBy: z.string().optional(),
     // N12 fields
-    reason: z.enum(["personal_use", "family_use", "purchaser_use"]).optional(),
     occupantName: z.string().optional(),
     relationship: z.string().optional(),
   });
@@ -2527,44 +2540,124 @@ router.post("/notices/generate", async (req, res) => {
   try {
     const noticeService = await import("../services/noticeService");
     const d = parsed.data;
-    let pdfBuffer: Buffer;
-    let fileName: string;
+    const dateGiven = new Date().toISOString().split("T")[0];
+    const common = {
+      tenantName: d.tenantName,
+      rentalUnitAddress: d.rentalUnitAddress,
+      landlordName: d.landlordName,
+      landlordPhone: d.landlordPhone,
+      dateGiven,
+      signedBy: d.landlordName,
+    };
 
-    if (d.noticeType === "N4") {
-      const rentCharged = d.rentCharged || 0;
-      const rentPaid = d.rentPaid || 0;
-      pdfBuffer = await noticeService.generateN4Notice({
-        tenantName: d.tenantName,
-        rentalUnitAddress: d.rentalUnitAddress,
-        landlordName: d.landlordName,
-        landlordPhone: d.landlordPhone,
-        rentOwing: [{
-          period: d.rentOwingPeriod || "Current period",
-          rentCharged,
-          rentPaid,
-          rentOwing: rentCharged - rentPaid,
-        }],
-        totalOwing: rentCharged - rentPaid,
-        terminationDate: d.terminationDate,
-        dateGiven: new Date().toISOString().split("T")[0],
-        signedBy: d.landlordName,
-      });
-      fileName = `N4_Notice_${d.tenantName.replace(/\s+/g, "_")}.pdf`;
-    } else {
-      pdfBuffer = await noticeService.generateN12Notice({
-        tenantName: d.tenantName,
-        rentalUnitAddress: d.rentalUnitAddress,
-        landlordName: d.landlordName,
-        landlordPhone: d.landlordPhone,
-        reason: (d.reason || "personal_use") as any,
-        occupantName: d.occupantName || d.landlordName,
-        relationship: d.relationship,
-        terminationDate: d.terminationDate,
-        dateGiven: new Date().toISOString().split("T")[0],
-        signedBy: d.landlordName,
-      });
-      fileName = `N12_Notice_${d.tenantName.replace(/\s+/g, "_")}.pdf`;
+    let pdfBuffer: Buffer;
+
+    switch (d.noticeType) {
+      case "N1":
+        pdfBuffer = await noticeService.generateN1Notice({
+          ...common,
+          currentRent: d.currentRent || 0,
+          newRent: d.newRent || 0,
+          effectiveDate: d.terminationDate || "",
+        });
+        break;
+      case "N2":
+        pdfBuffer = await noticeService.generateN2Notice({
+          ...common,
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N4": {
+        const rentCharged = d.rentCharged || 0;
+        const rentPaid = d.rentPaid || 0;
+        pdfBuffer = await noticeService.generateN4Notice({
+          ...common,
+          rentOwing: [{
+            period: d.rentOwingPeriod || "Current period",
+            rentCharged,
+            rentPaid,
+            rentOwing: rentCharged - rentPaid,
+          }],
+          totalOwing: rentCharged - rentPaid,
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      }
+      case "N5":
+        pdfBuffer = await noticeService.generateN5Notice({
+          ...common,
+          reason: d.reason || "interference",
+          details: d.details || "",
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N6":
+        pdfBuffer = await noticeService.generateN6Notice({
+          ...common,
+          reason: d.reason || "illegal_act",
+          details: d.details || "",
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N7":
+        pdfBuffer = await noticeService.generateN7Notice({
+          ...common,
+          details: d.details || "",
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N8":
+        pdfBuffer = await noticeService.generateN8Notice({
+          ...common,
+          latePayments: d.latePayments || [{ period: "Current period", dueDate: "See pattern", datePaid: "Late" }],
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N9":
+        pdfBuffer = await noticeService.generateN9Notice({
+          ...common,
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N10":
+        pdfBuffer = await noticeService.generateN10Notice({
+          ...common,
+          reason: d.reason || "repairs",
+          details: d.details || "",
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N11":
+        pdfBuffer = await noticeService.generateN11Notice({
+          ...common,
+          tenantSignedBy: d.tenantSignedBy || d.tenantName,
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N12":
+        pdfBuffer = await noticeService.generateN12Notice({
+          ...common,
+          reason: (d.reason || "personal_use") as any,
+          occupantName: d.occupantName || d.landlordName,
+          relationship: d.relationship,
+          terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N13":
+        pdfBuffer = await noticeService.generateN13Notice({
+          ...common,
+          currentRent: d.currentRent || 0,
+          newRent: d.newRent || 0,
+          reason: d.reason || "capital_expenditures",
+          details: d.details || "",
+          effectiveDate: d.terminationDate || "",
+        });
+        break;
+      default:
+        return res.status(400).json({ error: `Unsupported notice type: ${d.noticeType}` });
     }
+
+    const fileName = `${d.noticeType}_Notice_${d.tenantName.replace(/\s+/g, "_")}.pdf`;
 
     res.json({
       ok: true,
