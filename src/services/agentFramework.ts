@@ -184,7 +184,7 @@ export async function runAgent(opts: {
             // Persist usage to DB
             logAgentUsage(opts.context?.landlordId as string, modelName, totalPromptTokens, totalResponseTokens, toolCallCount, durationMs, opts.taskType);
             return {
-                finalAnswer: textParts || "(No response from agent)",
+                finalAnswer: textParts || "",
                 steps,
                 toolCallCount,
                 totalTokensEstimate: totalTokens,

@@ -2567,8 +2567,8 @@
               </select></div>
             <div class="form-field" id="tenantShareField" style="display:none;"><label>Utility Share %</label><input
                 id="tenantSharePercent" type="number" min="0" max="100" placeholder="e.g. 50" /></div>
-            <div class="form-field"><label>Monthly Rent ($)</label><input
-                id="tenantRentAmount" type="number" min="0" step="0.01" placeholder="e.g. 1500" /></div>
+            <div class="form-field"><label>Monthly Rent ($)</label><input id="tenantRentAmount" type="number" min="0"
+                step="0.01" placeholder="e.g. 1500" /></div>
             <button class="btn btn-primary" id="createTenantBtn" style="align-self:end;">+ Add Tenant</button>
           </div>
         </div>
@@ -3032,7 +3032,8 @@
               <button class="btn btn-primary btn-sm" onclick="dashRequestPairingCode()" id="dashPairingRequestBtn"
                 style="white-space:nowrap;padding:10px 16px;">Get Code</button>
             </div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Include country code (e.g. +1 for US/Canada)</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Include country code (e.g. +1 for
+              US/Canada)</div>
           </div>
 
           <div id="waQrArea" style="text-align:center;margin:16px 0;">
@@ -3045,10 +3046,12 @@
               <div style="font-size:12px;color:var(--text-muted);">Open WhatsApp → Linked Devices → Scan QR</div>
             </div>
             <div id="waPairingCode" style="display:none;margin-top:10px;">
-              <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">Enter this code in WhatsApp:</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">Enter this code
+                in WhatsApp:</div>
               <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:var(--accent);" id="waPairingText">
               </div>
-              <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">WhatsApp → Settings → Linked Devices →
+                Link a Device → Link with Phone Number</div>
             </div>
             <div id="waConnected" style="display:none;padding:20px 0;">
               <div style="font-size:36px;margin-bottom:8px;">✅</div>
@@ -3145,8 +3148,7 @@
                 <option value="rent">Rent</option>
                 <option value="utility">Utility</option>
               </select></div>
-            <div class="form-field" id="reminderUnitField"><label>Unit</label><select
-                id="reminderUnit">
+            <div class="form-field" id="reminderUnitField"><label>Unit</label><select id="reminderUnit">
                 <option value="">All tenants</option>
               </select></div>
             <div class="form-field" id="reminderAmountField" style="display:none;"><label>Amount ($)</label><input
@@ -3337,10 +3339,12 @@
               <div class="guide-step"><span class="guide-num">4</span> Choose their <strong>Role</strong>: Tenant (lease
                 holder) or Resident (co-occupant like a roommate).</div>
               <div class="guide-step"><span class="guide-num">5</span> For Shared utility units, enter the tenant's
-                <strong>Utility Share %</strong>.</div>
+                <strong>Utility Share %</strong>.
+              </div>
               <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add Tenant</strong>.</div>
               <div class="guide-tip">💡 <strong>Tenant</strong> = primary lease signer who receives notices.
-                <strong>Resident</strong> = co-occupant who can message the AI for maintenance.</div>
+                <strong>Resident</strong> = co-occupant who can message the AI for maintenance.
+              </div>
             </div>
           </div>
 
@@ -3354,7 +3358,8 @@
               <div class="guide-step"><span class="guide-num">1</span> Tenants send a WhatsApp message describing their
                 issue (e.g. "My kitchen faucet is dripping").</div>
               <div class="guide-step"><span class="guide-num">2</span> The AI automatically classifies the severity:
-                <strong>Emergency</strong>, <strong>Normal</strong>, or <strong>Cosmetic</strong>.</div>
+                <strong>Emergency</strong>, <strong>Normal</strong>, or <strong>Cosmetic</strong>.
+              </div>
               <div class="guide-step"><span class="guide-num">3</span> A maintenance ticket is created in your dashboard
                 with the AI's triage assessment.</div>
               <div class="guide-step"><span class="guide-num">4</span> For low-severity issues, autopilot sends a reply
@@ -3382,7 +3387,8 @@
               <div class="guide-step"><span class="guide-num">3</span> Set the <strong>Cooldown</strong> — minimum time
                 between auto-replies to the same tenant.</div>
               <div class="guide-step"><span class="guide-num">4</span> The AI automatically holds replies for
-                <strong>High</strong> and <strong>Critical</strong> severity issues for your approval.</div>
+                <strong>High</strong> and <strong>Critical</strong> severity issues for your approval.
+              </div>
               <div class="guide-tip">💡 A 2-minute delay is recommended. This gives tenants time to send follow-up
                 details before the AI responds.</div>
             </div>
@@ -3396,7 +3402,8 @@
             </div>
             <div class="guide-body" id="guideUtility" style="display:none;">
               <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Utilities</strong> and click
-                <strong>Log Bill</strong>.</div>
+                <strong>Log Bill</strong>.
+              </div>
               <div class="guide-step"><span class="guide-num">2</span> Select the unit, utility type (electricity, gas,
                 water, etc.), and enter the bill amount.</div>
               <div class="guide-step"><span class="guide-num">3</span> For <strong>SHARED</strong> units, go to
@@ -3444,11 +3451,13 @@
               <div class="guide-step"><span class="guide-num">1</span> Go to <strong>Reminders</strong> from the
                 sidebar.</div>
               <div class="guide-step"><span class="guide-num">2</span> Choose the reminder type: <strong>Rent</strong>,
-                <strong>Utility</strong>, <strong>Lease</strong>, or <strong>Custom</strong>.</div>
+                <strong>Utility</strong>, <strong>Lease</strong>, or <strong>Custom</strong>.
+              </div>
               <div class="guide-step"><span class="guide-num">3</span> For <strong>Utility</strong> reminders, select
                 the target unit and optionally enter the bill amount.</div>
               <div class="guide-step"><span class="guide-num">4</span> Set the <strong>Day of Month</strong> (1–28) and
-                <strong>Time</strong> (in your local timezone).</div>
+                <strong>Time</strong> (in your local timezone).
+              </div>
               <div class="guide-step"><span class="guide-num">5</span> Choose message <strong>Style</strong>: Friendly,
                 Formal, or Urgent.</div>
               <div class="guide-step"><span class="guide-num">6</span> Click <strong>+ Add</strong>. The reminder will
@@ -3531,7 +3540,8 @@
             <div class="guide-tip" style="margin-bottom:12px;">📱 <strong>Enable push notifications</strong> (bell icon
               in the header) to get browser alerts for new tickets.</div>
             <div class="guide-tip" style="margin-bottom:12px;">🤖 Reply <strong>"approve"</strong> or
-              <strong>"deny"</strong> to WhatsApp escalation alerts to control AI responses.</div>
+              <strong>"deny"</strong> to WhatsApp escalation alerts to control AI responses.
+            </div>
             <div class="guide-tip" style="margin-bottom:12px;">📸 Tenants can send <strong>photos and voice
                 notes</strong> — the AI analyzes images for damage and transcribes audio.</div>
             <div class="guide-tip" style="margin-bottom:12px;">💬 Use <strong>WhatsApp groups</strong> for shared units

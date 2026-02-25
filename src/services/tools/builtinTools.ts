@@ -96,7 +96,7 @@ export function listMaintenanceTool(): ToolDefinition {
 export function createMaintenanceRequestTool(): ToolDefinition {
     return {
         name: "create_maintenance_request",
-        description: "Create a new maintenance request in the database. Used when a tenant reports an issue.",
+        description: "Create a new maintenance request in the database. Used when a tenant reports an issue. The priority is automatically set from the triage severity.",
         parameters: {
             message: { type: "string", description: "The tenant's maintenance message" },
             tenantId: { type: "string", description: "Tenant ID" },
@@ -107,12 +107,19 @@ export function createMaintenanceRequestTool(): ToolDefinition {
         category: "data",
         enabled: true,
         async execute(args) {
+            // Map triage severity to Priority enum
+            const severityToPriority: Record<string, string> = { critical: "CRITICAL", high: "HIGH", normal: "NORMAL", low: "LOW" };
+            const triageSeverity = ((args.triageJson as any)?.classification?.severity || "").toLowerCase();
+            const priority = severityToPriority[triageSeverity] || undefined;
+            const category = (args.triageJson as any)?.classification?.category || undefined;
             const request = await repo.createMaintenanceRequest({
                 message: String(args.message),
                 tenantId: args.tenantId ? String(args.tenantId) : undefined,
                 unitId: args.unitId ? String(args.unitId) : undefined,
                 landlordId: args.landlordId ? String(args.landlordId) : undefined,
                 triage: (args.triageJson || undefined) as Record<string, unknown> | undefined,
+                priority: priority as any,
+                category,
             });
             return request;
         },
@@ -139,6 +146,43 @@ export function updateMaintenanceStatusTool(): ToolDefinition {
                 },
             });
             return { id: updated.id, status: updated.status };
+        },
+    };
+}
+
+export function updateMaintenanceSeverityTool(): ToolDefinition {
+    return {
+        name: "update_maintenance_severity",
+        description: "Change the severity/priority of a maintenance ticket. Use this when the landlord wants to escalate or de-escalate an issue. Valid severities: CRITICAL, HIGH, NORMAL, LOW.",
+        parameters: {
+            requestId: { type: "string", description: "Maintenance request ID" },
+            severity: { type: "string", description: "New severity: CRITICAL, HIGH, NORMAL, or LOW" },
+        },
+        required: ["requestId", "severity"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            const id = String(args.requestId);
+            const rawSeverity = String(args.severity).toUpperCase();
+            const validSeverities = ["CRITICAL", "HIGH", "NORMAL", "LOW"];
+            if (!validSeverities.includes(rawSeverity)) {
+                return { error: `Invalid severity '${args.severity}'. Must be one of: ${validSeverities.join(", ")}` };
+            }
+            // Update the priority enum field
+            const updated = await db.maintenanceRequest.update({
+                where: { id },
+                data: { priority: rawSeverity as any },
+            });
+            // Also update triageJson.classification.severity to keep them in sync
+            const existing = await db.maintenanceRequest.findUnique({ where: { id }, select: { triageJson: true } });
+            const triage = (existing?.triageJson || {}) as Record<string, any>;
+            if (!triage.classification) triage.classification = {};
+            triage.classification.severity = rawSeverity.toLowerCase();
+            await db.maintenanceRequest.update({
+                where: { id },
+                data: { triageJson: triage as any },
+            });
+            return { id: updated.id, priority: rawSeverity, severity: rawSeverity.toLowerCase(), message: `Severity updated to ${rawSeverity}` };
         },
     };
 }
@@ -309,6 +353,60 @@ export function dispatchContractorTool(): ToolDefinition {
                 landlordId: args.landlordId ? String(args.landlordId) : undefined,
             });
             return { sent: result.ok, contractor: contractor.name, error: result.error };
+        },
+    };
+}
+
+export function createContractorTool(): ToolDefinition {
+    return {
+        name: "create_contractor",
+        description: "Save a new contractor to the database. Use this after finding a contractor via web_search. Provide their name, phone, email, and specialty/role (e.g., plumber, electrician, HVAC, general).",
+        parameters: {
+            name: { type: "string", description: "Contractor's full name or business name" },
+            phone: { type: "string", description: "Contractor's phone number (e.g., +14165551234)" },
+            email: { type: "string", description: "Contractor's email address (optional)" },
+            role: { type: "string", description: "Specialty/role: plumber, electrician, HVAC, general, roofing, locksmith, pest control, etc." },
+        },
+        required: ["name", "phone"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            if (!args.name || !args.phone) return { error: "Name and phone are required" };
+            const contractor = await repo.createContractor({
+                name: String(args.name),
+                phone: String(args.phone),
+                email: args.email ? String(args.email) : undefined,
+                role: args.role ? String(args.role) : undefined,
+                landlordId: args.landlordId ? String(args.landlordId) : undefined,
+            });
+            if (!contractor) return { error: "Failed to create contractor" };
+            return { success: true, id: contractor.id, name: contractor.name, phone: contractor.phone, role: contractor.role };
+        },
+    };
+}
+
+export function messageContractorTool(): ToolDefinition {
+    return {
+        name: "message_contractor",
+        description: "Send a WhatsApp message to a contractor. Use this for general communication — questions, follow-ups, scheduling. For formal maintenance dispatches, use dispatch_contractor instead.",
+        parameters: {
+            contractorId: { type: "string", description: "Contractor ID from list_contractors or create_contractor" },
+            message: { type: "string", description: "Message text to send to the contractor" },
+        },
+        required: ["contractorId", "message"],
+        category: "communication",
+        enabled: true,
+        async execute(args) {
+            const contractor = await db.contractor.findUnique({ where: { id: String(args.contractorId) } });
+            if (!contractor) return { error: "Contractor not found" };
+            if (!contractor.phone) return { error: `Contractor '${contractor.name}' has no phone number on file` };
+            const result = await whatsappService.sendWhatsAppText({
+                to: contractor.phone,
+                text: String(args.message),
+                landlordId: args.landlordId ? String(args.landlordId) : undefined,
+            });
+            if (!result.ok) return { error: `Failed to send message to ${contractor.name}: ${result.error}` };
+            return { sent: true, contractor: contractor.name, phone: contractor.phone };
         },
     };
 }
@@ -1119,7 +1217,10 @@ export function registerBuiltinTools(): ToolDefinition[] {
         listMaintenanceTool(),
         createMaintenanceRequestTool(),
         updateMaintenanceStatusTool(),
+        updateMaintenanceSeverityTool(),
         listContractorsTool(),
+        createContractorTool(),
+        messageContractorTool(),
         lookupUtilityBillsTool(),
         getUtilityCredentialsTool(),
         conversationHistoryTool(),
@@ -1303,7 +1404,7 @@ export function greenButtonTool(): ToolDefinition {
 export function checkMyRequestStatusTool(): ToolDefinition {
     return {
         name: "check_my_request_status",
-        description: "Check the status of the tenant's maintenance requests. Returns a list of their recent requests with current status, severity, and any AI-drafted responses. Use the tenant's phone number from context.",
+        description: "Check ALL maintenance tickets for a tenant. Returns active tickets (OPEN, PENDING, IN_TRIAGE, SCHEDULED, IN_PROGRESS) and completed tickets (RESOLVED, CANCELLED) separately, with timestamps. Use the tenant's phone number from context. ALWAYS call this BEFORE creating a new ticket to avoid duplicates.",
         parameters: {
             tenantPhone: { type: "string", description: "The tenant's phone number (from conversation context)" },
         },
@@ -1320,34 +1421,45 @@ export function checkMyRequestStatusTool(): ToolDefinition {
             const requests = await db.maintenanceRequest.findMany({
                 where: { tenantId: tenant.id },
                 orderBy: { createdAt: "desc" },
-                take: 10,
+                take: 20,
                 select: {
                     id: true,
                     message: true,
                     status: true,
                     createdAt: true,
                     updatedAt: true,
+                    statusChangedAt: true,
                     triageJson: true,
                     aiDraft: true,
                 },
             });
 
             if (!requests.length) {
-                return { requests: [], message: "You have no maintenance requests on file." };
+                return { activeTickets: [], completedTickets: [], message: "You have no maintenance requests on file." };
             }
 
+            const formatDate = (d: Date | null | undefined) => d ? new Date(d).toLocaleString("en-CA", { timeZone: "America/Toronto", dateStyle: "medium", timeStyle: "short" }) : null;
+
+            const activeStatuses = ["OPEN", "PENDING", "IN_TRIAGE", "SCHEDULED", "IN_PROGRESS"];
+            const mapRequest = (r: any) => ({
+                id: r.id,
+                issue: (r.message || "").substring(0, 300),
+                status: (r.status || "OPEN").toUpperCase(),
+                severity: r.triageJson?.classification?.severity || "unknown",
+                category: r.triageJson?.classification?.category || "unknown",
+                createdAt: formatDate(r.createdAt),
+                lastUpdated: formatDate(r.updatedAt),
+                statusChangedAt: formatDate(r.statusChangedAt),
+            });
+
+            const active = requests.filter((r: any) => activeStatuses.includes((r.status || "OPEN").toUpperCase()));
+            const completed = requests.filter((r: any) => !activeStatuses.includes((r.status || "OPEN").toUpperCase()));
+
             return {
-                requests: requests.map((r: any) => ({
-                    id: r.id,
-                    message: (r.message || "").substring(0, 200),
-                    status: r.status || "open",
-                    severity: r.triageJson?.classification?.severity || "unknown",
-                    category: r.triageJson?.classification?.category || "unknown",
-                    createdAt: r.createdAt,
-                    updatedAt: r.updatedAt,
-                    latestDraft: (r.aiDraft?.draft || "").substring(0, 200),
-                })),
-                total: requests.length,
+                activeTickets: active.map(mapRequest),
+                completedTickets: completed.map(mapRequest),
+                totalActive: active.length,
+                totalCompleted: completed.length,
             };
         },
     };
@@ -1490,18 +1602,26 @@ export function confirmPaymentTool(): ToolDefinition {
 /**
  * Register the limited set of tools available to tenants.
  * Tenants get: web_search, triage_message, draft_reply, current_time,
- * check_my_request_status, conversation_history, and confirm_payment.
- * They do NOT get: lookup_tenant, lookup_unit, list_maintenance,
- * create/update maintenance, contractors, utility, send_whatsapp,
- * alert_landlord, dispatch_contractor, green_button, etc.
+ * check_my_request_status, conversation_history, confirm_payment,
+ * lookup_tenant (to identify the tenant), create_maintenance_request
+ * (to create tickets), alert_landlord (for urgent issues),
+ * and list_contractors (read-only, to check availability).
  */
 export function registerTenantTools(): ToolDefinition[] {
     return [
+        // Tenant lookup — so agent can identify the tenant by phone
+        lookupTenantTool(),
         // Let the agent triage and draft internally
         triageMessageTool(),
         draftReplyTool(),
         // Tenant can check their own requests
         checkMyRequestStatusTool(),
+        // Create maintenance requests for new issues
+        createMaintenanceRequestTool(),
+        // Alert landlord for urgent issues
+        alertLandlordTool(),
+        // List contractors (read-only)
+        listContractorsTool(),
         // Tenant can confirm payment
         confirmPaymentTool(),
         // Web search for general info

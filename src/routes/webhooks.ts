@@ -91,6 +91,26 @@ function extractDraftReply(raw: string): string {
   return trimmed;
 }
 
+/**
+ * Check whether a draft reply is valid to send to a tenant.
+ * Rejects empty strings, internal error messages, placeholder text, and agent artifacts.
+ */
+function isValidTenantDraft(draft: string): boolean {
+  if (!draft || draft.trim().length < 5) return false;
+  const lower = draft.trim().toLowerCase();
+  const invalidPatterns = [
+    /^\(no\s*(response|reply|draft)/i,
+    /^no\s*(response|reply|draft)\s*(from|available)/i,
+    /^agent\s*error/i,
+    /llm_unavailable|vertex_not_configured/i,
+    /^\[?(internal|system|error|debug)\]?/i,
+    /^undefined$/i,
+    /^null$/i,
+    /^todo:/i,
+  ];
+  return !invalidPatterns.some((p) => p.test(lower));
+}
+
 const router = express.Router();
 
 // Twilio signature verification middleware.
@@ -541,13 +561,43 @@ async function flushTenantReply(params: { tenantId: string }) {
         console.warn("LLM unavailable for tenant reply (agentic batch), using fallback", { tenantId: tenant.id, raw: draftText.substring(0, 100) });
         draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
       }
+
+      // Retry once if the draft is empty or invalid (e.g. agent returned internal artifacts)
+      if (!isValidTenantDraft(draftText)) {
+        console.warn("invalid draft from agent (agentic batch), retrying once", { tenantId: tenant.id, raw: (draftText || "").substring(0, 80) });
+        try {
+          const retryResult = await orchestrator.handleTenantMessage({
+            tenantPhone: tenant.phone || "",
+            message: enrichedMessage,
+            landlordId,
+            mediaDescription: mediaDescriptions.length ? mediaDescriptions.join("\n") : undefined,
+            mediaParts: mediaParts.length ? mediaParts : undefined,
+          });
+          const retryDraft = extractDraftReply(retryResult.finalAnswer || "");
+          if (isValidTenantDraft(retryDraft)) {
+            draftText = retryDraft;
+            console.info("retry succeeded (agentic batch)", { tenantId: tenant.id, draftLength: draftText.length });
+          } else {
+            console.warn("retry also produced invalid draft (agentic batch) — suppressing reply", { tenantId: tenant.id });
+            draftText = ""; // Suppress — don't send garbage to tenant
+          }
+        } catch (retryErr) {
+          console.warn("retry failed (agentic batch)", { error: (retryErr as Error).message });
+          draftText = ""; // Suppress
+        }
+      }
       // eslint-disable-next-line no-console
       console.info("draft reply extracted", {
         tenantId: tenant.id,
         fullLength: (agentResult.finalAnswer || "").length,
         draftLength: draftText.length,
       });
-      if (draftText && canAutoReply) {
+      // Try to get severity from the latest maintenance record
+      const latestRecord = await repo.findLatestMaintenanceForTenantId(tenant.id);
+      const batchSeverity = ((latestRecord?.triageJson as any)?.classification?.severity || "normal").toString().toLowerCase();
+      const isHighCriticalBatch = batchSeverity === "high" || batchSeverity === "critical";
+
+      if (draftText && canAutoReply && !isHighCriticalBatch) {
         const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
         if (!sendResult.ok) {
           // eslint-disable-next-line no-console
@@ -564,15 +614,20 @@ async function flushTenantReply(params: { tenantId: string }) {
           // eslint-disable-next-line no-console
           console.info("auto-reply sent (agentic batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
         }
+      } else if (isHighCriticalBatch && draftText) {
+        // HIGH/CRITICAL: Hold the auto-reply for landlord approval
+        // eslint-disable-next-line no-console
+        console.info("auto-reply HELD for landlord approval (agentic batch)", { tenantId: tenant.id, severity: batchSeverity });
+        // Store the draft in the maintenance record so approve/deny can forward it
+        if (latestRecord?.id) {
+          await repo.updateMaintenanceAnalysis({ id: latestRecord.id, aiDraft: { draft: draftText } as any });
+        }
       } else {
         // eslint-disable-next-line no-console
         console.info("auto-reply skipped (agentic batch)", { tenantId: tenant.id, hasDraft: Boolean(draftText), canAutoReply });
       }
 
       // Notify landlord about tenant message (batched agentic path)
-      // Try to get severity from the latest maintenance record
-      const latestRecord = await repo.findLatestMaintenanceForTenantId(tenant.id);
-      const batchSeverity = ((latestRecord?.triageJson as any)?.classification?.severity || "normal").toString().toLowerCase();
       const agentAlert = buildLandlordAlert({
         tenantName: tenant.name,
         tenantPhone: tenant.phone || bucket.replyTo,
@@ -655,12 +710,18 @@ async function flushTenantReply(params: { tenantId: string }) {
   }
 
   let draftText = (draftResponse?.draft || "").trim();
-  // If linear batch returned LLM-unavailable or empty draft, use fallback
-  if (!draftText || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
-    draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
-    console.warn("LLM unavailable for tenant reply (linear batch), using fallback", { tenantId: tenant.id });
+  // Validate draft with the same rules as agentic paths
+  if (!isValidTenantDraft(draftText)) {
+    draftText = "";
+    console.warn("Invalid/empty draft from linear batch — suppressing reply", { tenantId: tenant.id });
   }
-  if (draftText && canAutoReply) {
+
+  const triageJson: any = record?.triageJson || triage || {};
+  const aiDraft: any = record?.aiDraft || draftResponse || {};
+  const linearBatchSeverity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
+  const isHighCriticalLinearBatch = linearBatchSeverity === "high" || linearBatchSeverity === "critical";
+
+  if (draftText && canAutoReply && !isHighCriticalLinearBatch) {
     const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
     if (!sendResult.ok) {
       // eslint-disable-next-line no-console
@@ -678,13 +739,16 @@ async function flushTenantReply(params: { tenantId: string }) {
       // eslint-disable-next-line no-console
       console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
     }
+  } else if (isHighCriticalLinearBatch && draftText) {
+    // HIGH/CRITICAL: Hold the auto-reply for landlord approval
+    console.info("auto-reply HELD for landlord approval (linear batch)", { tenantId: tenant.id, severity: linearBatchSeverity });
+    if (record?.id) {
+      await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: draftText } as any });
+    }
   } else if (draftText && !canAutoReply) {
     // eslint-disable-next-line no-console
     console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
   }
-
-  const triageJson: any = record?.triageJson || triage || {};
-  const aiDraft: any = record?.aiDraft || draftResponse || {};
   const severity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
   const draft = aiDraft?.draft || "(no draft yet)";
   const alert = buildLandlordAlert({
@@ -765,8 +829,13 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       }
       if (!groupUnit) {
         // eslint-disable-next-line no-console
-        console.warn("group message from UNKNOWN group — dropping", { remoteJid, sender, participant });
-        return res.json({ ok: true, ignored: "group_message" });
+        console.warn("group message from UNKNOWN group — dropping. To enable, set whatsappGroupJid on the unit record.", {
+          remoteJid,
+          sender,
+          participant,
+          hint: "Add this group JID to a unit's whatsappGroupJid field in the database to start receiving messages from this group.",
+        });
+        return res.json({ ok: true, ignored: "group_message", groupJid: remoteJid });
       }
       // We have a recognized unit group — resolve landlord from unit owner and
       // treat the sender (participant) as the speaking tenant.  Fall through to
@@ -1291,10 +1360,38 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           console.warn("LLM unavailable for tenant reply, using fallback", { tenantId: tenant.id, raw: agentDraft.substring(0, 100) });
           agentDraft = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
         }
+
+        // Retry once if the draft is empty or invalid
+        if (!isValidTenantDraft(agentDraft)) {
+          console.warn("invalid draft from agent (agentic immediate), retrying once", { tenantId: tenant.id, raw: (agentDraft || "").substring(0, 80) });
+          try {
+            const retryResult = await orchestrator.handleTenantMessage({
+              tenantPhone: sender,
+              message: tenantMessage,
+              landlordId: tenantLandlordId,
+              mediaDescription,
+              mediaParts,
+            });
+            const retryDraft = extractDraftReply(retryResult.finalAnswer || "");
+            if (isValidTenantDraft(retryDraft)) {
+              agentDraft = retryDraft;
+              console.info("retry succeeded (agentic immediate)", { tenantId: tenant.id });
+            } else {
+              console.warn("retry also produced invalid draft — suppressing reply", { tenantId: tenant.id });
+              agentDraft = "";
+            }
+          } catch (retryErr) {
+            console.warn("retry failed (agentic immediate)", { error: (retryErr as Error).message });
+            agentDraft = "";
+          }
+        }
+
         const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
         const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
+        const agentSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
+        const isHighCriticalImm = agentSeverity === "high" || agentSeverity === "critical";
 
-        if (agentDraft && canAutoReply) {
+        if (agentDraft && canAutoReply && !isHighCriticalImm) {
           const sendResult = await whatsappService.sendWhatsAppText({ to: replyTo, text: agentDraft, landlordId: tenantLandlordId });
           if (!sendResult.ok) {
             // eslint-disable-next-line no-console
@@ -1305,6 +1402,15 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             autoReplySent = true;
             autoReplyReason = "agentic_draft_sent";
           }
+        } else if (isHighCriticalImm && agentDraft) {
+          // HIGH/CRITICAL: Hold the auto-reply for landlord approval
+          // eslint-disable-next-line no-console
+          console.info("auto-reply HELD for landlord approval (agentic immediate)", { tenantId: tenant.id, severity: agentSeverity });
+          // Store the draft so approve/deny can forward it
+          if (record?.id) {
+            await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: agentDraft } as any });
+          }
+          autoReplyReason = "held_for_approval";
         } else if (!canAutoReply) {
           autoReplyReason = "auto_reply_disabled";
         } else {
@@ -1317,10 +1423,11 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           toolCalls: agentResult.toolCallCount,
           steps: agentResult.steps.length,
           autoReplySent,
+          severity: agentSeverity,
+          heldForApproval: isHighCriticalImm,
         });
 
         // Notify landlord about tenant message (agentic path)
-        const agentSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
         const agentAlert = buildLandlordAlert({
           tenantName: tenant.name,
           tenantPhone: tenant.phone || sender,
@@ -1366,12 +1473,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
     const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
     let draftText = (draftResponse?.draft || "").trim();
-    // If the linear path returned an LLM-unavailable or empty draft, use fallback
-    if (!draftText || /llm_unavailable|vertex_not_configured/i.test(draftText)) {
-      draftText = "Thanks for your message! Our AI assistant is temporarily experiencing high demand. Your message has been logged and your landlord has been notified. We'll get back to you shortly.";
-      console.warn("LLM unavailable for tenant reply (linear), using fallback", { tenantId: tenant.id });
+    // Validate draft with the same rules as agentic paths
+    if (!isValidTenantDraft(draftText)) {
+      draftText = "";
+      console.warn("Invalid/empty draft from linear immediate — suppressing reply", { tenantId: tenant.id });
     }
-    if (draftText && canAutoReply) {
+
+    const linearImmSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
+    const isHighCriticalLinearImm = linearImmSeverity === "high" || linearImmSeverity === "critical";
+
+    if (draftText && canAutoReply && !isHighCriticalLinearImm) {
       const sendResult = await whatsappService.sendWhatsAppText({
         to: replyTo,
         text: draftText,
@@ -1386,6 +1497,13 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         autoReplySent = true;
         autoReplyReason = "draft_sent";
       }
+    } else if (isHighCriticalLinearImm && draftText) {
+      // HIGH/CRITICAL: Hold the auto-reply for landlord approval
+      console.info("auto-reply HELD for landlord approval (linear immediate)", { tenantId: tenant.id, severity: linearImmSeverity });
+      if (record?.id) {
+        await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: draftText } as any });
+      }
+      autoReplyReason = "held_for_approval";
     } else if (draftText && !canAutoReply) {
       // eslint-disable-next-line no-console
       console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
