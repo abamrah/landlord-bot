@@ -7,7 +7,7 @@ import agentService from "../services/agentService";
 import { getWebhookStatus } from "../services/webhookStatus";
 import { addReminder, deleteReminder, listReminders, toggleReminder } from "../services/reminderService";
 import { requireAuth, AuthRequest } from "../middleware/auth";
-import { checkPlanLimit } from "../services/planService";
+import { checkPlanLimit, incrementMessageCount } from "../services/planService";
 import { createCheckoutSession } from "../services/stripeService";
 import { listProvinces } from "../config/rtaProfiles";
 import orchestrator from "../services/agentOrchestrator";
@@ -1289,12 +1289,25 @@ router.post("/agent/ask", async (req, res) => {
       mediaParts.push({ base64: parsed.data.mediaBase64, mimeType: parsed.data.mediaMimeType });
     }
 
+    // Check message limit before proceeding
+    const msgLimit = await checkPlanLimit(authReq.landlordId, "messages");
+    if (!msgLimit.allowed) {
+      return res.status(429).json({
+        error: "message_limit_reached",
+        message: `You've reached your monthly message limit (${msgLimit.current}/${msgLimit.max}). Upgrade your plan for more messages.`,
+        usage: { current: msgLimit.current, max: msgLimit.max, plan: msgLimit.plan },
+      });
+    }
+
     const result = await orchestrator.landlordAssistantAgent({
       landlordId: authReq.landlordId,
       question: parsed.data.question,
       maintenanceId: parsed.data.maintenanceId,
       mediaParts: mediaParts.length ? mediaParts : undefined,
     });
+
+    // Increment message count after successful agent response
+    incrementMessageCount(authReq.landlordId).catch(() => {});
 
     // Save the AI response to conversation memory
     await conversationMemory.saveMessage({

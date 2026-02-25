@@ -4014,9 +4014,21 @@
             for (var i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
             var blob = new Blob([byteArr], { type: 'application/pdf' });
             var url = URL.createObjectURL(blob);
+            // Mobile-friendly download: append anchor to DOM and handle iOS Safari
             var a = document.createElement('a');
-            a.href = url; a.download = fileName; a.click();
-            setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+            a.href = url;
+            a.download = fileName;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            // Detect iOS — it blocks programmatic clicks on download links
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isIOS) {
+              // iOS: open PDF in new tab so user can save/share from there
+              window.open(url, '_blank');
+            } else {
+              a.click();
+            }
+            setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 10000);
           } catch (e) { toast('Download failed: ' + e.message); }
         });
       }, 100);
@@ -4040,7 +4052,13 @@
       options.headers = { ...options.headers, 'Authorization': 'Bearer ' + __token };
       const res = await fetch(url, options);
       if (res.status === 401 || res.status === 403) { localStorage.removeItem('token'); localStorage.removeItem('landlord'); window.location.href = '/login'; throw new Error('Session expired'); }
-      if (!res.ok) throw new Error('Request failed ' + res.status);
+      if (!res.ok) {
+        var errBody = {};
+        try { errBody = await res.json(); } catch(e) {}
+        var err = new Error(errBody.message || errBody.error || 'Request failed ' + res.status);
+        err.status = res.status;
+        throw err;
+      }
       return res.json();
     }
     function logout() { localStorage.removeItem('token'); localStorage.removeItem('landlord'); window.location.href = '/login'; }
@@ -5254,7 +5272,12 @@
           }, 300);
         }
       } catch (err) {
-        thinking.innerHTML = '<div style="color:var(--danger)">Error: ' + err.message + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+        var errMsg = err.message || 'Unknown error';
+        // Check for plan limit reached (429)
+        if (err.status === 429 || errMsg.includes('message_limit') || errMsg.includes('monthly message limit')) {
+          errMsg = '\u26A0\uFE0F You\'ve reached your monthly message limit. Upgrade your plan for more messages.';
+        }
+        thinking.innerHTML = '<div style="color:var(--danger)">' + errMsg + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
       }
       log.scrollTop = log.scrollHeight;
     }
@@ -6406,7 +6429,11 @@
             }, 300);
           }
         }).catch(function (err) {
-          thinking.innerHTML = '<div style="color:var(--danger)">Error: ' + (err.message || 'Unknown') + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+          var errMsg = err.message || 'Unknown error';
+          if (err.status === 429 || errMsg.includes('message_limit') || errMsg.includes('monthly message limit')) {
+            errMsg = '\u26A0\uFE0F You\'ve reached your monthly message limit. Upgrade your plan for more messages.';
+          }
+          thinking.innerHTML = '<div style="color:var(--danger)">' + errMsg + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
           mobileLog.scrollTop = mobileLog.scrollHeight;
         });
       }
