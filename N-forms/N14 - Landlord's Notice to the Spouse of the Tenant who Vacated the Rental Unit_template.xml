@@ -1,0 +1,3601 @@
+
+<template xmlns="http://www.xfa.org/schema/xfa-template/3.0/"
+><?formServer defaultPDFRenderFormat acrobat9.1static?><?formServer allowRenderCaching 0?><?formServer formModel both?><subform layout="tb" locale="en_CA" name="form1"
+><pageSet
+><pageArea id="Page1" name="Page1"
+><contentArea h="266.7mm" w="198.12mm" x="8.89mm" y="6.35mm"
+/><medium long="279.4mm" short="215.9mm" stock="letter"
+/><?templateDesigner expand 1?></pageArea
+><?templateDesigner expand 1?></pageSet
+><subform w="198.12mm" h="266.7mm" locale="en_CA"
+><draw name="Text1" w="196.85mm" h="16.51mm" locale="en_CA" x="1.27mm"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="text-decoration:none;letter-spacing:0in"
+>Landlord’s Notice to the Spouse of the Tenant</p
+><p style="text-decoration:none;letter-spacing:0in"
+>who Vacated the Rental Unit</p
+><p style="font-size:12pt;text-decoration:none;letter-spacing:0in"
+>N14</p
+><p style="font-size:10pt;font-weight:normal;text-decoration:none;letter-spacing:0in"
+>(Disponible en français)</p
+></body
+></exData
+></value
+><font size="11pt" typeface="Arial" weight="bold" baselineShift="0pt"
+/><margin topInset="0mm" bottomInset="0mm" leftInset="0mm" rightInset="0mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="12pt"
+/></draw
+><draw name="Text2" y="20.796mm" w="29.286mm" h="48.979mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>What is the
+N14 notice?</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="9pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="15pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 136004 0 0 1417 1417 0 0?><?renderCache.textRun 12 What is the  0 17448 18352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 N14 notice? 0 14840 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text3" y="20.796mm" x="34.925mm" w="163.195mm" h="48.978mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:9pt;text-decoration:none;letter-spacing:0in"
+>The N14 notice is a Board approved form that landlords can give to the spouse of a tenant, if the tenant moved out of a rental unit without giving notice. The N14 notice informs the spouse of what they must do if they want to stay in the rental unit and become the tenant.</p
+><p style="margin-top:6pt;margin-bottom:6pt;font-weight:bold;text-decoration:none;letter-spacing:0in"
+>Exception:<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>If the rental unit is located in a building that contains three or fewer units and the landlord resides in the building, the spouse does not have the option to become the tenant, unless the spouse and the landlord agree. In this case, the landlord does not use the N14 notice.</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><corner
+/></border
+></draw
+><draw name="Text4" y="71.519mm" w="29.286mm" h="94.486mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>When can
+you use the
+N14 notice?</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="9pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="15pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 265000 0 0 1417 1417 0 0?><?renderCache.textRun 9 When can  0 26320 18352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 you use the  0 16246 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 N14 notice? 0 14840 48352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text5" y="71.519mm" x="34.925mm" w="163.195mm" h="94.486mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:9pt;text-decoration:none;letter-spacing:0in"
+>Unless the exception set out above applies to you and your tenant(s), you can use the N14 notice in the following situation:</p
+><p style="margin-top:3pt;text-indent:-19.584pt;text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the tenant moved out of the unit without giving you a notice of termination, without getting a notice of termination from you, and without agreeing with you to move out,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the spouse of the tenant is still residing in the rental unit,<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>and</span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the tenant owes you rent.</p
+><p style="margin-top:6pt;text-decoration:none;letter-spacing:0in"
+>If the above conditions are met, you can serve the N14 notice to the spouse, and the spouse can either choose to become the tenant of the rental unit, or choose to move out.</p
+><p style="margin-top:6pt;text-decoration:none;letter-spacing:0in"
+>You must give the spouse the N14 notice within 45 days from the day you believe the tenant<span style="xfa-spacerun:yes"
+> </span
+><span style="text-decoration:underline"
+>moved out</span
+> of the rental unit.</p
+><p style="margin-top:6pt;text-decoration:none;letter-spacing:0in"
+>You<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>do not<span style="xfa-spacerun:yes"
+> </span
+></span
+>have to give the spouse the N14 notice if:</p
+><p style="margin-top:3pt;text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>it has been more than 45 days since the day you believe the tenant moved out, or</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the tenant that moved out was not in arrears of rent.</p
+><p style="margin-top:6pt;margin-bottom:6pt;text-decoration:none;letter-spacing:0in"
+>In these situations you may apply to the Landlord and Tenant Board to<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>evict an unauthorized occupant<span style="xfa-spacerun:yes"
+> </span
+></span
+>(form A2). A hearing will be held before an order is issued.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><corner
+/></border
+></draw
+><draw name="Text6" y="167.751mm" w="29.286mm" h="72.261mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>What information must be included in the N14 notice?</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="9pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="15pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 202000 0 0 1417 1417 0 0?><?renderCache.textRun 5 What  0 51954 18352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 information  0 15773 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 8 must be  0 36354 48352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 included in  0 20045 63352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 8 the N14  0 37174 78352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7 notice? 0 40944 93352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text7" y="167.751mm" x="34.925mm" w="6.425in" h="72.261mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:9pt;text-decoration:none;letter-spacing:0in"
+>You must include the following information in the space provided on the N14 notice:</p
+><p style="margin-top:3pt;text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the landlord’s name,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the name of the spouse (if you do not know it, you can write "Unknown"),</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the address of the rental unit,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the name of the tenant who moved out,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the date you believe the tenant moved out,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>how much rent the tenant owes,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the current rent for the rental unit,</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the date the next rent payment is due, and</p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the landlord’s address and phone number.</p
+><p style="margin-top:6pt;margin-bottom:9pt;text-decoration:none;letter-spacing:0in"
+>Sign and date the form. If you are the representative of the landlord, include your contact information in the space provided.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><corner
+/></border
+></draw
+><draw name="Text8" y="261.62mm" x="150.495mm" w="47.625mm" h="5.08mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Continued on next page</text
+></value
+><font typeface="Verdana" posture="italic" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="bottom"
+/><?renderCache.bounds 132166 11566 0 0 1417 1417 0 0?><?renderCache.textRun 22 Continued on next page 0 1417 10918 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?></draw
+><?templateDesigner expand 0?></subform
+><subform w="198.12mm" h="266.7mm" locale="en_CA"
+><draw name="Text9" y="8.413mm" w="29.286mm" h="70.145mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>How does the spouse become the tenant?</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="9pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="15pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 196002 0 0 1417 1417 0 0?><?renderCache.textRun 13 How does the  0 4977 18352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7 spouse  0 42111 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 become the  0 16256 48352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7 tenant? 0 38751 63352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text10" y="8.413mm" x="34.925mm" w="163.195mm" h="70.144mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:9pt;text-decoration:none;letter-spacing:0in"
+>To become the tenant, there are two things the spouse must do:</p
+><p style="margin-top:3pt;text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>inform you that he or she wants to stay in the unit,<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>and</span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>agree in writing to pay the rent that is owing for the rental unit.</p
+><p style="margin-top:6pt;text-decoration:none;letter-spacing:0in"
+>Attached to the N14 notice is the form called<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>Notice to Landlord and Agreement to Pay the Rent Owing</span
+>. If the spouse wants to become the tenant of the rental unit, the spouse must sign this form and return it to you within<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>15<span style="xfa-spacerun:yes"
+> </span
+></span
+>days from the day they were given the N14 notice.</p
+><p style="margin-top:6pt;text-decoration:none;letter-spacing:0in"
+>If the spouse signs the<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>Notice to Landlord and Agreement to Pay the Rent Owing<span style="xfa-spacerun:yes"
+> </span
+></span
+>form and returns it to you, the spouse becomes the new tenant of the rental unit.</p
+><p style="margin-top:6pt;margin-bottom:6pt;text-decoration:none;letter-spacing:0in"
+>This means that the tenancy agreement for the new tenant (the spouse) is the same one that existed for the tenant that moved out, and the rent for the unit does not change.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><corner
+/></border
+></draw
+><draw name="Text11" y="80.303mm" w="29.286mm" h="39.454mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>What if the spouse does not return the signed form within 15 days?</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="9pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="15pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 109004 0 0 1417 1417 0 0?><?renderCache.textRun 12 What if the  0 19157 18352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 spouse does  0 12262 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 15 not return the  0 2511 48352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 signed form  0 14440 63352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 10 within 15  0 28527 78352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 5 days? 0 49318 93352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text12" y="80.303mm" x="34.925mm" w="6.425in" h="39.453mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:9pt;letter-spacing:0in"
+>You may apply to the Landlord and Tenant Board for an order to evict the spouse as an unauthorized occupant of the rental unit (application form A2) if:</p
+><p style="margin-top:3pt;text-indent:-19.584pt;letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the spouse does not return the signed<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>Notice to Landlord and Agreement to Pay the Rent Owing<span style="xfa-spacerun:yes"
+> </span
+></span
+>form to you within 15 days after the notice was given to them, and</p
+><p style="letter-spacing:0in"
+>•<span style="xfa-spacerun:yes"
+>    </span
+>the spouse does not move out of the rental unit.</p
+><p style="margin-top:6pt;margin-bottom:6pt;letter-spacing:0in"
+>A hearing will be held before an order is issued.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><corner
+/></border
+></draw
+><draw name="Text13" y="121.502mm" w="29.286mm" h="43.686mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>What if you don’t know if the person still living in the unit is the spouse?</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="9pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right" lineHeight="15pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 121000 0 0 1417 1417 0 0?><?renderCache.textRun 12 What if you  0 16979 18352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 16 don’t know if  0 7770 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 the person  0 21334 48352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 16 still living in  0 12609 63352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 16 the unit is the  0 3131 78352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7 spouse? 0 35944 93352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text14" y="121.502mm" x="34.925mm" w="163.195mm" h="43.686mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:9pt;letter-spacing:0in"
+>In some situations, you might not know if the person still living in the rental unit is the spouse of the tenant who moved out. If you do not know who the person is, you do not have to serve the N14 notice. Instead, you can file an application to<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>evict an unauthorized occupant<span style="xfa-spacerun:yes"
+> </span
+></span
+>(form A2) with the Board, and the Board will hold a hearing.</p
+><p style="margin-top:6pt;margin-bottom:6pt;letter-spacing:0in"
+>If you file an application to get an eviction order, and the person living in the rental unit is the spouse of the tenant who moved out, they can still become the tenant by doing the following:</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><edge presence="hidden"
+/><corner
+/></border
+></draw
+><subform name="Table1" layout="table" columnWidths="31.1271mm 130.8017mm" x="34.921mm" y="168.68mm" locale="en_CA"
+><border
+><edge
+/></border
+><subform layout="row" name="HeaderRow" id="HeaderRow_ID" locale="en_CA"
+><assist role="TH"
+/><draw h="7.986mm" name="Cell1" locale="en_CA"
+><border
+><edge
+/><corner thickness="0.1778mm"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If…</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><draw h="7.986mm" name="Cell2" locale="en_CA"
+><border
+><edge
+/><corner thickness="0.1778mm"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Then…</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><border
+><edge presence="hidden"
+/></border
+><occur max="-1"
+/><?templateDesigner expand 1?></subform
+><subform layout="row" name="Row1" locale="en_CA"
+><assist role="TR"
+/><draw h="23.679mm" name="Cell1" locale="en_CA"
+><border
+><edge
+/><corner thickness="0.1778mm"
+/></border
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>there is rent</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>owing for the</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>unit</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><draw h="23.679mm" name="Cell2" locale="en_CA"
+><border
+><edge
+/><corner thickness="0.1778mm"
+/></border
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>the spouse can become the tenant if they:</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>•<span style="xfa-spacerun:yes"
+>    </span
+>inform you that they want to stay,<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>and</span
+></p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>•<span style="xfa-spacerun:yes"
+>    </span
+>agree in writing to pay the rent owing for the unit,<span style="xfa-spacerun:yes"
+> </span
+><span style="text-decoration:underline"
+>before</span
+> the<span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="tab-interval:0.5in;tab-stops:left 0.32in"
+><span style="xfa-tab-count:1"
+>         </span
+>Board issues an order.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><border
+><edge presence="hidden"
+/></border
+><?templateDesigner expand 1?></subform
+><subform layout="row" name="Row2" locale="en_CA"
+><assist role="TR"
+/><draw h="20.1086mm" name="Cell1" locale="en_CA"
+><border
+><edge
+/><corner thickness="0.1778mm"
+/></border
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>there is no</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>rent owing for</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>the unit</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><draw h="20.1086mm" name="Cell2" locale="en_CA"
+><border
+><edge
+/><corner thickness="0.1778mm"
+/></border
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>the spouse can become the tenant if they:</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>•<span style="xfa-spacerun:yes"
+>    </span
+>inform you that they want to stay in the rental unit before the</p
+><p style="tab-interval:0.5in;tab-stops:left 0.32in"
+><span style="xfa-tab-count:1"
+>         </span
+>Board issues an order.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><border
+><edge presence="hidden"
+/></border
+><?templateDesigner expand 1?></subform
+><keep intact="contentArea"
+/><?templateDesigner rowpattern first:1, next:1, firstcolor:f0f0f0, nextcolor:ffffff, apply:0?><overflow leader="HeaderRow"
+/><?templateDesigner expand 0?></subform
+><breakBefore targetType="pageArea" startNew="1"
+/><?templateDesigner expand 0?></subform
+><subform w="198.12mm" h="266.7mm" locale="en_CA"
+><draw h="16.51mm" name="HeadText" w="4.675in" x="78.867mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="text-decoration:none;letter-spacing:0in"
+>Landlord's Notice to the Spouse of the Tenant</p
+><p style="text-decoration:none;letter-spacing:0in"
+>who Vacated the Rental Unit</p
+><p style="font-size:12pt;text-decoration:none;letter-spacing:0in"
+>N14</p
+><p style="font-size:10pt;font-weight:normal;text-decoration:none;letter-spacing:0in"
+>(Disponible en français)</p
+></body
+></exData
+></value
+><font baselineShift="0pt" typeface="Arial" weight="bold" size="11pt"
+/><margin bottomInset="0mm" leftInset="0mm" rightInset="0mm" topInset="0mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" hAlign="right" lineHeight="12pt"
+/><assist role="H1"
+/></draw
+><subform x="0in" y="21.748mm" locale="en_CA" name="Notice_Name_And_Address_1"
+><?templateDesigner expand 0?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XE5vdGljZSBOYW1lIEFuZCBBZGRyZXNzIDEu
+eGRwI3NvbSgkdGVtcGxhdGUuZm9ybTEuTm90aWNlX05hbWVfQW5kX0FkZHJlc3NfMSkiIHg9IjBp
+biIgeT0iMjEuNzQ4bW0iIHhtbG5zPSJodHRwOi8vd3d3LnhmYS5vcmcvc2NoZW1hL3hmYS10ZW1w
+bGF0ZS8zLjAvIgo+PD90ZW1wbGF0ZURlc2lnbmVyIGV4cGFuZCAwPz48L3N1YmZvcm0KPg==?><bind match="none"
+/><draw locale="en_CA" h="5.08mm" name="Text1" w="98.806mm"
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+>To:<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>(Tenant's name and address)</span
+></p
+></body
+></exData
+></value
+></draw
+><draw locale="en_CA" h="5.08mm" name="Text1" w="98.806mm" x="98.806mm"
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="tab-interval:0.5in;tab-stops:left 5.094in;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+>From:<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>(Landlord's name and address)<span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+></draw
+><field locale="en_CA" h="13.97mm" name="To_TenantName" w="98.806mm" y="5.08mm"
+><assist
+><toolTip
+>Tenant's name and address</toolTip
+></assist
+><border
+><corner presence="hidden"
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="13.97mm" name="From_LandlordName" w="98.806mm" x="98.806mm" y="5.08mm"
+><assist
+><toolTip
+>Landlord's name and address</toolTip
+></assist
+><border
+><corner presence="hidden"
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><draw locale="en_CA" h="5.08mm" name="Text2" w="197.612mm" y="19.05mm"
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+>Address of the Rental Unit:<span style="xfa-spacerun:yes"
+>  </span
+><span style="font-weight:normal"
+><span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+></draw
+><field locale="en_CA" h="13.97mm" name="RentUnitAddress" w="197.612mm" y="24.13mm"
+><assist
+><toolTip
+> Address of the Rental Unit</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+></subform
+><draw name="Rectangle17" y="59.848mm" w="197.612mm" h="69.291mm"
+><value
+><rectangle
+><edge
+/><corner radius="5.08mm"
+/></rectangle
+></value
+></draw
+><draw name="Text18" y="62.388mm" w="60.96mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> The tenant of the unit above,</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 169966 18766 0 0 1417 1417 0 0?><?renderCache.textRun 30  The tenant of the unit above, 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="TenantName" y="62.388mm" x="61.12mm" w="126.338mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></textEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><assist
+><toolTip
+>Tenant's Name.</toolTip
+></assist
+><traversal
+><traverse ref="Text19[0]"
+/></traversal
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><draw name="Text19" y="70.008mm" w="47.625mm" h="5.08mm" x="104.044mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>(insert name)</text
+></value
+><font typeface="Verdana" baselineShift="0pt" size="9pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center"
+/><traversal
+><traverse ref="Text20[0]"
+/></traversal
+><?renderCache.bounds 132166 11566 0 0 1417 1417 0 0?><?renderCache.textRun 13 (insert name) 0 32421 8558 0 0 0 "Verdana" 1 0 9000 ISO-8859-1?></draw
+><draw name="Text20" y="62.388mm" w="3.175mm" h="7.62mm" x="187.458mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>, </text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="bottom"
+/><traversal
+><traverse ref="OewMeAmount[0]"
+/></traversal
+><?renderCache.bounds 6166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 2 ,  0 1417 18118 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field name="OewMeAmount" w="82.55mm" h="7.62mm" locale="en_CA" y="78.339mm"
+><ui
+><numericEdit hScrollPolicy="off"
+><border
+><?templateDesigner StyleID aped2?><edge
+/></border
+><margin
+/></numericEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="0.5004mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" marginRight="0pt" hAlign="right"
+/><caption reserve="31.6323mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="line-height:15pt"
+><span style="xfa-spacerun:yes"
+> </span
+>•<span style="xfa-spacerun:yes"
+>    </span
+>owes me $</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/></caption
+><format
+><picture
+>num{zzz,zzz,zz9.99}</picture
+></format
+><validate scriptTest="warning"
+/><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+	this.rawValue="";
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	//app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+}
+</script
+></event
+><traversal
+><traverse ref="Text21[0]"
+/></traversal
+><assist
+><toolTip
+>Amount the tenant owes in rent</toolTip
+></assist
+></field
+><draw name="Text21" y="78.339mm" x="82.55mm" w="59.53mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>in rent, to the period ending</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="1.0008mm" bottomInset="1.0008mm" leftInset="1.0008mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><traversal
+><traverse ref="PeriodEndDate[0]"
+/></traversal
+><?renderCache.bounds 164492 15926 0 0 2837 2837 0 0?><?renderCache.textRun 29 in rent, to the period ending 0 2837 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="PeriodEndDate" y="78.339mm" x="143.008mm" w="44.45mm" h="11.43mm" locale="en_CA"
+><ui
+><dateTimeEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></dateTimeEdit
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+></ui
+><font size="12pt" typeface="Arial"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="center"
+/><value
+><date
+/></value
+><caption placement="bottom" reserve="3.556mm"
+><value
+><text
+>dd/mm/yyyy</text
+></value
+><para hAlign="center"
+/><font size="9pt" typeface="Verdana"
+/></caption
+><assist
+><toolTip
+>The last day of the rent period that rent is owing</toolTip
+></assist
+><traversal
+><traverse ref="Text22[0]"
+/></traversal
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+></field
+><draw name="Text22" y="78.263mm" x="187.458mm" w="3.175mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>,</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 6166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 1 , 0 1417 13735 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text23" y="89.769mm" w="142.88mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> •    and I believe that he/she moved out of the rental unit on or about</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="1.0008mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle" lineHeight="15pt"
+/><?renderCache.bounds 400760 18766 0 0 2837 1417 0 0?><?renderCache.textRun 74  •    and I believe that he/she moved out of the rental unit on or about 0 2837 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="MoveOutDate" y="89.769mm" x="143.008mm" w="44.45mm" h="11.43mm" locale="en_CA"
+><ui
+><dateTimeEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></dateTimeEdit
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+></ui
+><font size="12pt" typeface="Arial"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="center"
+/><value
+><date
+/></value
+><caption placement="bottom" reserve="3.556mm"
+><value
+><text
+>dd/mm/yyyy</text
+></value
+><para hAlign="center"
+/><font size="9pt" typeface="Verdana"
+/></caption
+><assist
+><toolTip
+>move out date.</toolTip
+></assist
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+></field
+><draw name="Text24" y="89.769mm" x="187.458mm" w="3.175mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>.</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 6166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 1 . 0 1417 13735 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field name="CurrentRentAmount" w="132.08mm" h="7.62mm" locale="en_CA" y="101.199mm"
+><ui
+><numericEdit hScrollPolicy="off"
+><border
+><?templateDesigner StyleID aped2?><edge
+/></border
+><margin
+/></numericEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="0.5004mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" marginRight="0pt" hAlign="right"
+/><caption reserve="86.9221mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="line-height:15pt"
+><span style="xfa-spacerun:yes"
+> </span
+>•<span style="xfa-spacerun:yes"
+>    </span
+>The current rent for the rental unit is $</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/></caption
+><format
+><picture
+>num{zzz,zzz,zz9.99}</picture
+></format
+><validate scriptTest="warning"
+/><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+	this.rawValue="";
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	//app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+}
+</script
+></event
+><assist
+><toolTip
+>Current Rent Amount.</toolTip
+></assist
+></field
+><draw name="Text25" y="101.199mm" x="132.08mm" w="7.62mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>per</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="1.0008mm" bottomInset="1.0008mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 18766 15926 0 0 1417 2837 0 0?><?renderCache.textRun 3 per 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="PayPeriod" y="101.199mm" x="143.008mm" w="44.45mm" h="11.43mm" locale="en_CA"
+><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></textEdit
+></ui
+><font size="12pt" typeface="Arial"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="center"
+/><caption placement="bottom" reserve="3.556mm"
+><value
+><text
+>(day/week/month)</text
+></value
+><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center" vAlign="middle"
+/><font size="9pt" typeface="Verdana" baselineShift="0pt"
+/></caption
+><assist
+><toolTip
+>Period (month, week, etc.)</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><draw name="Text26" y="101.199mm" x="187.458mm" w="3.175mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>.</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 6166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 1 . 0 1417 13735 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text27" y="113.264mm" w="79.375mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> •    The next rental payment is due on</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="1.0008mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle" lineHeight="15pt"
+/><?renderCache.bounds 220746 18766 0 0 2837 1417 0 0?><?renderCache.textRun 41  •    The next rental payment is due on 0 2837 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="PaymentDueDate" y="113.264mm" x="79.375mm" w="44.45mm" h="11.43mm" locale="en_CA"
+><ui
+><dateTimeEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></dateTimeEdit
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+></ui
+><font size="12pt" typeface="Arial"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="center"
+/><value
+><date
+/></value
+><caption placement="bottom" reserve="3.556mm"
+><value
+><text
+>dd/mm/yyyy</text
+></value
+><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center" vAlign="middle"
+/><font size="9pt" typeface="Verdana" baselineShift="0pt"
+/></caption
+><assist
+><toolTip
+>The next period where rent is owing is:</toolTip
+></assist
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+></field
+><draw name="Text28" y="113.264mm" x="123.825mm" w="3.175mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>.</text
+></value
+><font typeface="Verdana"
+/><margin topInset="1.0008mm" bottomInset="1.0008mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 6166 15926 0 0 1417 2837 0 0?><?renderCache.textRun 1 . 0 1417 13735 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text29" y="136.168mm" w="197.612mm" h="47.625mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="text-align:center;font-size:12pt;font-weight:bold"
+>IF YOU WANT TO STAY IN THE RENTAL UNIT</p
+><p style="font-weight:bold"
+><span style="xfa-tab-count:1"
+>         </span
+>If you want to stay in the rental unit and become the tenant, you have 15 days from the</p
+><p style="font-weight:bold"
+><span style="xfa-tab-count:1"
+>         </span
+>date I give you this notice to do the following:</p
+><p style="font-weight:bold"
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p
+><span style="xfa-tab-count:1"
+>         </span
+><span style="font-weight:bold"
+>•<span style="xfa-tab-count:1"
+>         </span
+></span
+>let me know that you want to stay in the rental unit, and</p
+><p
+><span style="xfa-tab-count:1"
+>         </span
+><span style="font-weight:bold"
+>•<span style="xfa-tab-count:1"
+>         </span
+></span
+>agree, in writing, to pay any rent that is owing</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p
+><span style="xfa-tab-count:1"
+>         </span
+>You can do this by signing the attached notice called: "<span style="font-weight:bold"
+>Notice to Landlord and Agreement to Pay</span
+></p
+><p style="font-weight:bold"
+><span style="xfa-tab-count:1"
+>         </span
+>the Rent Owing<span style="font-weight:normal"
+>"</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><border
+><edge
+/><corner
+/></border
+><?renderCache.bounds 557326 132166 0 0 1417 1417 0 0?><?renderCache.textRun 39 IF YOU WANT TO STAY IN THE RENTAL UNIT  0 129553 22821 0 0 0 "Verdana" 1 0 12000 ISO-8859-1?><?renderCache.textRun 1   0 1417 35635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 88 If you want to stay in the rental unit and become the tenant, you have 15 days from the  0 37417 35635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 1417 47635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 49 date I give you this notice to do the following:  0 37417 47635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 2    0 1417 59635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 1417 71635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 3 • 0 37417 71635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 44526 71635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 58 let me know that you want to stay in the rental unit, and  0 73417 71635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 1417 83635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 3 • 0 37417 83635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 44526 83635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 49 agree, in writing, to pay any rent that is owing  0 73417 83635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 2    0 1417 95635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 1417 107635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 56 You can do this by signing the attached notice called: " 0 37417 107635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 39 Notice to Landlord and Agreement to Pay 0 315269 107635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 547085 107635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 1417 119635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 14 the Rent Owing 0 37417 119635 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1 " 0 124546 119635 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text30" y="190.122mm" w="29.286mm" h="26.754mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you want
+to stay in
+the unit …</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="6pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="15pt" hAlign="right"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 73004 0 0 1417 1417 0 0?><?renderCache.textRun 12 If you want  0 16427 15352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 to stay in  0 29122 30352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 the unit … 0 23732 45352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text31" y="190.122mm" x="34.925mm" w="6.425in" h="26.754mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:6pt;letter-spacing:0in"
+>If you give me a signed copy of the Notice to Landlord and Agreement to Pay the Rent Owing, I will consider that you are the tenant of the rental unit identified above. (Make a copy of the signed agreement for yourself.)</p
+><p style="margin-top:6pt;margin-bottom:6pt;letter-spacing:0in"
+>If you become the tenant, you will be responsible for paying me the amount of rent owing.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><draw name="Text32" y="220.367mm" w="29.286mm" h="29.929mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you do not pay the rent owing…</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="15pt" spaceAbove="6pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 82004 0 0 1417 1417 0 0?><?renderCache.textRun 14 If you do not  0 8761 15352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 13 pay the rent  0 12970 30352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 8 owing… 0 36915 45352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text33" y="220.367mm" w="163.195mm" h="29.929mm" locale="en_CA" x="34.925mm"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you sign the agreement and you do not pay me the amount of rent owing, I can give you an N4 Notice to End Your Tenancy for Non-payment of Rent. I can then apply to the Landlord and Tenant Board for an order evicting you for not paying the rent, and to collect the rent owing. If you dispute the amount I claim is owing, you may attend the hearing and tell the adjudicator.</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="6pt" spaceBelow="6pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="15pt"
+/><traversal
+><traverse ref="PageFoot1[0]"
+/></traversal
+><?renderCache.bounds 459766 82004 0 0 1417 1417 0 0?><?renderCache.textRun 85 If you sign the agreement and you do not pay me the amount of rent owing, I can give  0 1417 15352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 86 you an N4 Notice to End Your Tenancy for Non-payment of Rent. I can then apply to the  0 1417 30352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 92 Landlord and Tenant Board for an order evicting you for not paying the rent, and to collect  0 1417 45352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 87 the rent owing. If you dispute the amount I claim is owing, you may attend the hearing  0 1417 60352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 25 and tell the adjudicator. 0 1417 75352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><subform x="0mm" y="263.398mm" locale="en_CA" name="version_date"
+><?templateDesigner expand 0?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XHZlcnNpb25fZGF0ZV8yMDIyMDQwMS54ZHAj
+c29tKCR0ZW1wbGF0ZS5mb3JtMS52ZXJzaW9uX2RhdGUpIiB4PSIwbW0iIHk9IjI2My4zOThtbSIg
+bG9jYWxlPSJlbl9DQSIgeG1sbnM9Imh0dHA6Ly93d3cueGZhLm9yZy9zY2hlbWEveGZhLXRlbXBs
+YXRlLzMuMC8iCj48P3RlbXBsYXRlRGVzaWduZXIgZXhwYW5kIDA/Pjwvc3ViZm9ybQo+?><traversal
+><traverse operation="first" ref="Text2[0]"
+/></traversal
+><bind match="none"
+/><draw locale="en_CA" h="3.302mm" name="Text2" w="15.163mm"
+><assist
+><speak
+>version date</speak
+><toolTip
+>version date</toolTip
+></assist
+><font typeface="Arial" baselineShift="0pt" size="6pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="bottom"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>v. 01/04/2022</text
+></value
+></draw
+></subform
+><draw h="5.08mm" name="PageFoot1" w="31.75mm" y="261.62mm" x="166.37mm" locale="en_CA"
+><ui
+><textEdit
+><margin
+/></textEdit
+></ui
+><value
+><text
+>Page 1 of 2</text
+></value
+><font baselineShift="0pt" size="9pt" typeface="Arial"
+/><margin bottomInset="0mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" lineHeight="16.8pt" hAlign="right" vAlign="bottom"
+/><?renderCache.bounds 87166 12983 0 0 1417 1417 0 0?><?renderCache.textRun 11 Page 1 of 2 0 42546 12506 0 0 0 "Arial" 0 0 9000 ISO-8859-1?></draw
+><breakBefore targetType="pageArea" startNew="1"
+/><?templateDesigner expand 0?></subform
+><subform w="198.12mm" h="266.7mm" locale="en_CA"
+><draw name="Text35" y="3.175mm" w="29.286mm" h="24.636mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you do not respond to me within 15 days…</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="6pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="15pt" hAlign="right"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80181 67000 0 0 1417 1417 0 0?><?renderCache.textRun 14 If you do not  0 8761 15352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 respond to  0 21242 30352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 13 me within 15  0 7887 45352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7 days… 0 44996 60352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text36" y="3.175mm" w="163.195mm" h="24.636mm" x="34.925mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you do not give me a signed copy of the agreement within 15 days after I give you this notice, I will assume you do not want to stay in the rental unit. In this case, I can apply to the Landlord and Tenant Board to have you evicted as an unauthorized occupant of the rental unit.</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="6pt" spaceBelow="6pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="15pt"
+/><?renderCache.bounds 459766 67000 0 0 1417 1417 0 0?><?renderCache.textRun 90 If you do not give me a signed copy of the agreement within 15 days after I give you this  0 1417 15352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 95 notice, I will assume you do not want to stay in the rental unit. In this case, I can apply to  0 1417 30352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 85 the Landlord and Tenant Board to have you evicted as an unauthorized occupant of the  0 1417 45352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 12 rental unit. 0 1417 60352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text37" y="31.303mm" w="29.286mm" h="47.92mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you want to move out of the rental unit…</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="6pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="15pt" hAlign="right"
+/><caption
+><para vAlign="bottom"
+/></caption
+><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+></draw
+><draw name="Text38" y="31.303mm" x="34.925mm" w="163.195mm" h="47.92mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="margin-top:6pt;font-weight:normal;text-decoration:none;letter-spacing:0in"
+>If you do<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>not<span style="xfa-spacerun:yes"
+> </span
+></span
+>want to stay in the rental unit, you do not have to sign the Notice to Landlord and Agreement to Pay the Rent Owing. If you do not inform me of what you intend to do within 15 days after I give you this notice, and, if you do not move out of the rental unit, I can apply to the Landlord and Tenant Board to have you evicted as an unauthorized occupant of the rental unit.</p
+><p style="margin-top:6pt;margin-bottom:6pt;font-weight:normal;text-decoration:none;letter-spacing:0in"
+>If you have any questions about this form and the law, you can contact the Landlord and Tenant Board at<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>416-645-8080</span
+>, or toll-free at<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>1-888-332-3234</span
+>. You may also visit the Board's website at<span style="xfa-spacerun:yes"
+> </span
+><a href="https://tribunalsontario.ca/ltb/" style="line-height:15pt;font-family:Verdana;font-size:10pt"
+>tribunalsontario.ca/ltb</a
+><span style="font-weight:bold"
+><span style="xfa-spacerun:yes"
+> </span
+></span
+>for further information.<span style="xfa-spacerun:yes"
+> </span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="15pt"
+/></draw
+><draw name="Text39" y="95.25mm" w="28.494mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> Signature</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 77936 18766 0 0 1417 1417 0 0?><?renderCache.textRun 10  Signature 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><exclGroup name="SignSelect" x="43.038mm" y="95.25mm"
+><?templateDesigner itemValuesSpecified 1?><field x="0mm" w="28mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="22mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt"
+/><value
+><text
+> Landlord</text
+></value
+></caption
+><items
+><integer
+>1</integer
+></items
+><assist
+><toolTip
+>Who is signing this notice? Landlord</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field x="39.512mm" w="45.497mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="39.497mm"
+><para vAlign="middle"
+/><font typeface="Verdana"
+/><value
+><text
+> Representative</text
+></value
+></caption
+><items
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Who is signing this notice? Representative</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><?templateDesigner expand 1?></exclGroup
+><subform x="0in" y="102.87mm" locale="en_CA" name="SignatureN1ToN3"
+><bind match="none"
+/><?templateDesigner expand 1?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XFNpZ25hdHVyZU4xVG9OMy54ZHAjc29tKCR0
+ZW1wbGF0ZS5mb3JtMS5TaWduYXR1cmVOMVRvTjMpIiB4PSIwaW4iIHk9IjEwMi44N21tIiBsb2Nh
+bGU9ImVuX0NBIiB4bWxucz0iaHR0cDovL3d3dy54ZmEub3JnL3NjaGVtYS94ZmEtdGVtcGxhdGUv
+My4wLyIKPjxiaW5kCi8+PD90ZW1wbGF0ZURlc2lnbmVyIGV4cGFuZCAxPz48L3N1YmZvcm0KPg==?><field locale="en_CA" h="17.272mm" name="SignName" w="98.806mm"
+><assist
+><toolTip
+>name of the person who is signing this form</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Name of Person Signing</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="17.272mm" name="SignPhoneNum" w="98.806mm" x="98.806mm"
+><assist
+><toolTip
+>Phone number of the person who is signing this form</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Phone Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')'999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Le champ No de téléphone n'a pu être validé. Veuillez utiliser le format 111-111-1111.");
+    app.alert("Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Le champ No de téléphone (jour) n’a pu être validé. Veuillez utiliser le format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><field locale="en_CA" h="17.272mm" name="Signature" w="98.806mm" y="17.348mm"
+><assist
+><toolTip
+>Sign your name</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Signature</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="17.272mm" name="SignDate" w="98.806mm" x="98.806mm" y="17.348mm"
+><assist
+><toolTip
+>The date you sign this form</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Date (dd/mm/yyyy)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+><dateTimeEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></dateTimeEdit
+></ui
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><value
+><date
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+></field
+></subform
+><draw name="Text40" y="142.875mm" w="95.25mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> Representative Information (if applicable)</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 267166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 43  Representative Information (if applicable) 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><subform x="0in" y="150.495mm" locale="en_CA" name="Agent_Information_for_Notice"
+><bind match="none"
+/><?templateDesigner expand 1?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XEFnZW50IEluZm9ybWF0aW9uIC0gTm90aWNl
+cy54ZHAjc29tKCR0ZW1wbGF0ZS5mb3JtMS5BZ2VudF9JbmZvcm1hdGlvbl9mb3JfTm90aWNlKSIg
+eD0iMGluIiB5PSIxNTAuNDk1bW0iIHhtbG5zPSJodHRwOi8vd3d3LnhmYS5vcmcvc2NoZW1hL3hm
+YS10ZW1wbGF0ZS8zLjAvIgo+PGJpbmQKLz48P3RlbXBsYXRlRGVzaWduZXIgZXhwYW5kIDE/Pjwv
+c3ViZm9ybQo+?><field locale="en_CA" h="12.7mm" name="AgentName" w="86.36mm" x="0.001mm"
+><assist
+><toolTip
+>Representative’s Name</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Name</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentLSUC" w="25.4mm" x="86.361mm" y="0mm"
+><assist
+><toolTip
+>Representative’s Law Society of Upper Canada (LSUC) Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>LSUC #</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><value
+><text maxChars="6"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentCompany" w="85.852mm" x="111.761mm"
+><assist
+><toolTip
+>Representative’s Company Name (if applicable)</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Company Name (if applicable)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentAddress" w="134.112mm" x="0.001mm" y="12.7mm"
+><assist
+><toolTip
+>Representative’s Mailing Address</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Mailing Address</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentPhoneNum" w="63.5mm" x="134.112mm" y="12.7mm"
+><assist
+><toolTip
+>Representative’s Phone Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Phone Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')' 999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><field locale="en_CA" h="12.7mm" name="AgentMunicipality" w="71.882mm" x="0.001mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Municipality (City, Town, etc.)</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Municipality (City, Town, etc.)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentProvince" w="27.94mm" x="71.883mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Province</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Province</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><value
+><text maxChars="2"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentPostCode" w="34.29mm" x="99.823mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Postal Code</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Postal Code</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{A9A 9A9}|text{A9A9A9}</picture
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{A9A 9A9}</picture
+></bind
+><format
+><picture
+>text{A9A 9A9}</picture
+></format
+><value
+><text maxChars="7"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");  ///Le champ Code postal n'a pu être validé. Veuillez utiliser le format L1L 1N1.
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+else
+{
+	this.rawValue = this.rawValue.toUpperCase();
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    //app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");
+    xfa.host.setFocus(this);
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentFaxNum" w="63.5mm" x="134.112mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Fax Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Fax Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')' 999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Fax Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+></subform
+><draw h="5.08mm" name="PageFoot2" w="31.75mm" y="261.62mm" x="166.37mm" locale="en_CA"
+><ui
+><textEdit
+><margin
+/></textEdit
+></ui
+><value
+><text
+>Page 2 of 2</text
+></value
+><font baselineShift="0pt" size="9pt" typeface="Arial"
+/><margin bottomInset="0mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" lineHeight="16.8pt" hAlign="right" vAlign="bottom"
+/><?renderCache.bounds 87166 12983 0 0 1417 1417 0 0?><?renderCache.textRun 11 Page 2 of 2 0 42546 12506 0 0 0 "Arial" 0 0 9000 ISO-8859-1?></draw
+><breakBefore targetType="pageArea" startNew="1"
+/><?templateDesigner expand 0?></subform
+><subform w="198.12mm" h="266.7mm" locale="en_CA"
+><draw name="Text41" y="3.175mm" w="197.612mm" h="9.537mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Notice to Landlord and Agreement to Pay the Rent Owing</text
+></value
+><font size="11pt" typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 557326 24200 0 0 1417 1417 0 0?><?renderCache.textRun 54 Notice to Landlord and Agreement to Pay the Rent Owing 0 102780 16745 0 0 0 "Verdana" 1 0 11000 ISO-8859-1?></draw
+><field name="ToLandlordName" y="19.05mm" w="197.612mm" h="19.05mm" locale="en_CA"
+><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><?templateDesigner StyleID aped0?></border
+><margin
+/></textEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><border
+><edge
+/><corner
+/></border
+><assist
+><toolTip
+>Name of the landlord</toolTip
+></assist
+><caption placement="top" reserve="4.4018mm"
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold"
+>To:<span style="font-weight:normal"
+> (Landlord's Name)</span
+></p
+></body
+></exData
+></value
+><para vAlign="middle"
+/><font typeface="Verdana" size="9pt"
+/></caption
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>this.rawValue = this.rawValue.toUpperCase();
+
+
+</script
+></event
+></field
+><draw name="Text43" y="44.455mm" w="62.061mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> Re: Address of the Rental Unit</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 173087 18766 0 0 1417 1417 0 0?><?renderCache.textRun 31  Re: Address of the Rental Unit 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><subform x="0.195mm" y="52.075mm" layout="table" locale="en_CA" columnWidths="65.4415mm 65.4415mm 66.675mm" name="OtherForm"
+><?templateDesigner expand 0?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XEFkZHJlc3Mgb2YgUmVudGFsIFVuaXQgZm9y
+IG90aGVyIGZvcm0ueGRwI3NvbSgkdGVtcGxhdGUuZm9ybTEuT3RoZXJGb3JtKSIgeD0iMC4xOTVt
+bSIgeT0iNTIuMDc1bW0iIHhtbG5zPSJodHRwOi8vd3d3LnhmYS5vcmcvc2NoZW1hL3hmYS10ZW1w
+bGF0ZS8zLjAvIgo+PD90ZW1wbGF0ZURlc2lnbmVyIGV4cGFuZCAwPz48L3N1YmZvcm0KPg==?><border
+><edge
+><color
+/></edge
+><margin
+/></border
+><keep intact="contentArea"
+/><traversal
+><traverse operation="first" ref="HeaderRow[0]"
+/></traversal
+><overflow leader="HeaderRow"
+/><subform layout="row" locale="en_CA" id="f235d8e2-d601-11ec-9a39-8c1645557f59:HeaderRow_ID" name="HeaderRow"
+><assist role="TH"
+/><border
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><occur max="-1"
+/><traversal
+><traverse operation="first" ref="Cell1[0]"
+/></traversal
+><draw locale="en_CA" h="6.35mm" name="Cell1" w="2.250014in"
+><border
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+> Unit /Apt. /Suite:</text
+></value
+></draw
+><draw locale="en_CA" colSpan="2" minH="6.35mm" name="Cell2" w="130.883mm"
+><border
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+> Street Address:</text
+></value
+></draw
+></subform
+><subform layout="row" locale="en_CA" name="Row1"
+><assist role="TR"
+/><border
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><traversal
+><traverse operation="first" ref="UnitNum[0]"
+/></traversal
+><field locale="en_CA" h="6.35mm" name="UnitNum" w="65.442mm"
+><assist
+><toolTip
+>Rental Unit Unit/ Apt. / Suite number</toolTip
+></assist
+><border
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><traversal
+><traverse ref="StreetAddress[0]"
+/></traversal
+><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" colSpan="2" h="6.35mm" name="StreetAddress" w="130.883mm"
+><assist
+><toolTip
+>Rental Unit Street Address</toolTip
+></assist
+><border
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><traversal
+><traverse ref="Row2[0]"
+/></traversal
+><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+></subform
+><subform layout="row" locale="en_CA" name="Row2"
+><assist role="TR"
+/><border
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><traversal
+><traverse operation="first" ref="Cell1[0]"
+/></traversal
+><draw locale="en_CA" colSpan="2" h="6.35mm" name="Cell1" w="130.883mm"
+><border
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><traversal
+><traverse ref="Cell3[0]"
+/></traversal
+><ui
+><textEdit
+/></ui
+><value
+><text
+> Municipality (City, Town, etc):  </text
+></value
+></draw
+><draw locale="en_CA" h="6.35mm" name="Cell3"
+><border
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><traversal
+><traverse ref="Row3[0]"
+/></traversal
+><ui
+><textEdit
+/></ui
+><value
+><text
+> Postal Code:</text
+></value
+></draw
+></subform
+><subform layout="row" locale="en_CA" name="Row3"
+><assist role="TR"
+/><border
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><traversal
+><traverse operation="first" ref="City[0]"
+/></traversal
+><field locale="en_CA" colSpan="2" h="6.35mm" name="City" w="130.883mm"
+><assist
+><toolTip
+>Rental Unit Municipality (City, Town, etc.)</toolTip
+></assist
+><border
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="6.35mm" name="PostCode" w="65.442mm"
+><assist
+><toolTip
+>Rental Unit Postal Code</toolTip
+></assist
+><border
+><corner presence="hidden" thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><corner thickness="0.1778mm"
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{A9A 9A9}|text{A9A9A9}</picture
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{A9A 9A9}</picture
+></bind
+><format
+><picture
+>text{A9A 9A9}</picture
+></format
+><value
+><text maxChars="7"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");
+    //app.alert("Le champ Code postal n'a pu être validé. Veuillez utiliser le format L1L 1N1.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+else
+{
+	this.rawValue = this.rawValue.toUpperCase();
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    //app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");
+    xfa.host.setFocus(this);
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+></field
+></subform
+></subform
+><draw name="Text44" y="87.788mm" w="197.612mm" h="28.575mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>I am the spouse of the tenant who vacated the rental unit identified above. I want to stay in</p
+><p
+>the rental unit and become the tenant, and I agree to pay the amount of rent that is lawfully</p
+><p
+>owing for the rental unit.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt" size="11pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="30pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 557326 78166 0 0 1417 1417 0 0?><?renderCache.textRun 94 I am the spouse of the tenant who vacated the rental unit identified above. I want to stay in  0 1417 10145 0 0 0 "Verdana" 0 0 11000 ISO-8859-1?><?renderCache.textRun 94 the rental unit and become the tenant, and I agree to pay the amount of rent that is lawfully  0 1417 40145 0 0 0 "Verdana" 0 0 11000 ISO-8859-1?><?renderCache.textRun 26 owing for the rental unit. 0 1417 70145 0 0 0 "Verdana" 0 0 11000 ISO-8859-1?></draw
+><field name="SpouseName" y="132.238mm" w="71.12mm" h="13.707mm" locale="en_CA"
+><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></textEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption reserve="0.185306in" placement="bottom"
+><font typeface="Verdana" baselineShift="0pt"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><text
+> Name of Spouse</text
+></value
+></caption
+><assist
+><toolTip
+>Your name</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field name="Signature" y="132.238mm" x="73.406mm" w="71.12mm" h="13.707mm" locale="en_CA"
+><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></textEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption reserve="0.185306in" placement="bottom"
+><font typeface="Verdana" baselineShift="0pt"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><text
+> Signature</text
+></value
+></caption
+><assist
+><toolTip
+>Sign your name</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field name="SignDate" y="132.238mm" x="146.812mm" w="50.8mm" h="13.707mm" locale="en_CA"
+><ui
+><dateTimeEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></dateTimeEdit
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><date
+/></value
+><caption reserve="5.29mm" placement="bottom"
+><font typeface="Verdana" baselineShift="0pt"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><text
+> Date (dd/mm/yyyy)</text
+></value
+></caption
+><assist
+><toolTip
+>The date you sign this form</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+></field
+><draw name="Text45" y="156.209mm" w="197.612mm" h="10.902mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>You must return this signed notice to the landlord no later than 15 days after the landlord gives it to you. Remember to make a copy of the notice for yourself.</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 557326 28069 0 0 1417 1417 0 0?><?renderCache.textRun 101 You must return this signed notice to the landlord no later than 15 days after the landlord gives it  0 1417 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 59 to you. Remember to make a copy of the notice for yourself. 0 1417 21352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><breakBefore targetType="pageArea" startNew="1"
+/><?templateDesigner expand 1?></subform
+><proto
+/><desc
+><text name="title"
+>Landlord’s Notice to the Spouse of the Tenant who Vacated the Rental Unit Form N14</text
+></desc
+><?templateDesigner Hyphenation excludeInitialCap:1, excludeAllCaps:1, wordCharCnt:7, remainCharCnt:3, pushCharCnt:3?><?templateDesigner expand 1?><?renderCache.subset "Adobe Pi Std" 0 0 UTF-16 2 4 004F?><?renderCache.subset "Arial" 0 0 ISO-8859-1 4 180 46 00030006000B000C000F0011001200130014001500170024002600270029002F003000310033003600370038004400450046004700480049004A004B004C004F005000510052005300550056005700580059005A005B005C006F #(),./0124ACDFLMNPSTUabcdefghilmnoprstuvwxyç?><?renderCache.subset "Arial" 1 0 ISO-8859-1 4 112 30 0003000A00140017002F00310035003600370038003900440046004700480049004B004C004F0051005200530055005600570058005A00B6 '14LNRSTUVacdefhilnoprstuw’?><?renderCache.subset "Verdana" 0 0 ISO-8859-1 4 232 62 00030005000A000B000C000F0010001100120014001500170018001D00240025002600270028002C002F00300031003200330035003600370038003C004400450046004700480049004A004B004C004D004E004F0050005100520053005400550056005700580059005A005B005C005D008700B6 "'(),-./1245:ABCDEILMNOPRSTUYabcdefghijklmnopqrstuvwxyz•’?><?renderCache.subset "Verdana" 1 0 ISO-8859-1 4 240 66 00030007000B000C000F0010001100120013001400150016001700180019001B001D0022002400280029002B002C002F0031003200330035003600370038003A003C004400450046004700480049004A004B004C004E004F005000510052005300550056005700580059005A005B005C005D008700AB00B6 $(),-./01234568:?AEFHILNOPRSTUWYabcdefghiklmnoprstuvwxyz•…’?><?renderCache.subset "Verdana" 0 1 ISO-8859-1 4 52 13 00030026004400470048004A004C00510052005300570058005B Cadeginoptux?></subform
+><?originalXFAVersion http://www.xfa.org/schema/xfa-template/2.1/ LegacyPositioning:0 LegacyEventModel:0?><?templateDesigner Grid show:0, snap:0, units:0, color:ff8080, origin:(0,0), interval:(125000,125000), objsnap:1, guidesnap:0, pagecentersnap:-1960945235?><?templateDesigner DefaultLanguage JavaScript?><?templateDesigner DefaultRunAt client?><?acrobat JavaScript strictScoping?><?PDFPrintOptions embedViewerPrefs 0?><?PDFPrintOptions embedPrintOnFormOpen 0?><?PDFPrintOptions scalingPrefs 0?><?PDFPrintOptions enforceScalingPrefs 0?><?PDFPrintOptions paperSource 0?><?PDFPrintOptions duplexMode 0?><?templateDesigner DefaultPreviewType interactive?><?templateDesigner DefaultPreviewPagination simplex?><?templateDesigner XDPPreviewFormat 19?><?templateDesigner DefaultCaptionFontSettings face:Myriad Pro;size:10;weight:normal;style:normal?><?templateDesigner DefaultValueFontSettings face:Myriad Pro;size:10;weight:normal;style:normal?><?templateDesigner SaveTaggedPDF 1?><?templateDesigner SavePDFWithEmbeddedFonts 1?><?templateDesigner FormTargetVersion 30?><?templateDesigner Rulers horizontal:1, vertical:1, guidelines:0, crosshairs:0?><?templateDesigner Guidelines v:1625039;h:7302047?><?templateDesigner Zoom 133?></template
+>

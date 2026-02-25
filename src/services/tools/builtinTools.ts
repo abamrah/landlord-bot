@@ -989,38 +989,99 @@ export function generateNoticeTool(): ToolDefinition {
     return {
         name: "generate_notice",
         description:
-            "Generate an Ontario LTB notice PDF matching official Tribunals Ontario format. Supported forms: " +
-            "N1 (rent increase, s.116), N2 (rent increase – unit partially exempt, s.6(2)), " +
-            "N4 (non-payment of rent, s.59), N5 (interference/damage/overcrowding, ss.62,64,67), " +
-            "N6 (illegal acts/misrepresentation, ss.60,61), N7 (impaired safety, s.66), " +
-            "N8 (end of term – persistent late payment, ss.58,144), N9 (tenant's notice to end, s.47), " +
-            "N10 (agreement to increase rent above guideline, s.121), N11 (agreement to end tenancy, s.77), " +
-            "N12 (landlord/family/purchaser own use, ss.48,49), N13 (demolition/repair/conversion, s.50). " +
-            "Returns the notice as a downloadable PDF.",
+            "Generate an official Ontario LTB notice PDF by autofilling government templates. Supported forms: " +
+            "N1 (rent increase), N2 (rent increase – partially exempt unit), N3 (rent increase – care home), " +
+            "N4 (non-payment of rent), N5 (interference/damage/overcrowding), " +
+            "N6 (illegal acts/misrepresentation), N7 (impaired safety/serious problems), " +
+            "N8 (end of term), N9 (tenant's notice to end), " +
+            "N10 (agreement to increase rent above guideline), N11 (agreement to end tenancy), " +
+            "N12 (landlord/family/purchaser own use), N13 (demolition/repair/conversion), " +
+            "N14 (notice to spouse of tenant who vacated). " +
+            "IMPORTANT: Before calling this tool, you MUST ask the landlord ALL required questions for the specific form. " +
+            "Each form has different required fields — review the parameter descriptions carefully.\n\n" +
+            "═══ QUESTIONS TO ASK PER FORM ═══\n" +
+            "N1: tenant name, unit address, new rent amount, current rent, effective date, " +
+            "is increase at/below guideline or above guideline? If above: have you applied to LTB or intend to? " +
+            "Payment period (monthly/weekly/other)?\n" +
+            "N2: tenant name, unit address, new rent amount, current rent, effective date, payment period\n" +
+            "N3: tenant name, unit address, new rent amount, effective date, will rent increase? " +
+            "Does it need LTB approval? Will care/meals charges increase? If so, new care charge amount? Payment period?\n" +
+            "N4: tenant name, unit address, for EACH unpaid period: period start date, period end date, " +
+            "rent charged, rent paid. Termination date.\n" +
+            "N5: tenant name, unit address, reason (interference/damage/overcrowding), " +
+            "detailed description of incidents with dates and times (up to 3 events), " +
+            "if damage: amount owed for damage; if overcrowding: explanation. Termination date.\n" +
+            "N6: tenant name, unit address, reason (illegal act at unit/complex, or income misrepresentation), " +
+            "description of incidents with dates/times (up to 3 events). Termination date.\n" +
+            "N7: tenant name, unit address, reason (impaired safety/illegal drugs at unit or complex), " +
+            "description of incidents with dates/times (up to 3 events). Termination date.\n" +
+            "N8: tenant name, unit address, reason (persistent late payment/no longer qualifies for subsidized/" +
+            "employment ended/no longer needs rehab/gave notice but didn't move), " +
+            "for late payment: list of periods with due date and actual date paid, any additional details. Termination date.\n" +
+            "N9: tenant name, unit address, termination date\n" +
+            "N10: tenant name, unit address, current rent, new rent, reason (capital expenditure/new services/both), " +
+            "description of work/services, effective date\n" +
+            "N11: tenant name, unit address, agreed termination date\n" +
+            "N12: tenant name, unit address, reason (personal use/family use/purchaser use/care provider), " +
+            "who will occupy the unit (me/spouse/child/parent/spouse's child/spouse's parent), " +
+            "name of person who will occupy, if care provider: who is care being provided for? Termination date.\n" +
+            "N13: tenant name, unit address, reason (demolition/conversion/repairs), " +
+            "work plan description, detailed work description, permits status (obtained/will obtain/not needed). Termination date.\n" +
+            "N14: spouse name, unit address, original tenant name who vacated, rental period end date, " +
+            "move-out date, payment due date, amount owed, current rent, pay period (daily/weekly/monthly).",
         parameters: {
-            noticeType: { type: "string", description: "Type of notice: N1, N2, N4, N5, N6, N7, N8, N9, N10, N11, N12, or N13" },
-            tenantName: { type: "string", description: "Full name(s) of the tenant(s)" },
+            noticeType: { type: "string", description: "Type of notice: N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, or N14" },
+            tenantName: { type: "string", description: "Full name(s) of the tenant(s). For N14, this is the spouse's name." },
             rentalUnitAddress: { type: "string", description: "Full address of the rental unit" },
             landlordName: { type: "string", description: "Full name of the landlord" },
-            landlordPhone: { type: "string", description: "Landlord's phone number (optional)" },
-            terminationDate: { type: "string", description: "Termination/effective date (required for most forms)" },
-            // N1/N13 fields
-            currentRent: { type: "number", description: "For N1/N13: current monthly rent amount" },
-            newRent: { type: "number", description: "For N1/N13: new monthly rent amount" },
-            // N4-specific
-            rentOwingPeriod: { type: "string", description: "For N4: rent period (e.g., 'February 2026')" },
-            rentCharged: { type: "number", description: "For N4: rent amount charged" },
-            rentPaid: { type: "number", description: "For N4: rent amount paid" },
-            // N5/N6/N7/N12/N13 fields
-            reason: { type: "string", description: "Reason for the notice — N5: interference|damage|overcrowding|act_impairs_safety, N6: illegal_act|misrepresentation, N10: capital_expenditure|new_or_additional_services|both, N12: personal_use|family_use|purchaser_use, N13: demolition|conversion|repairs" },
-            details: { type: "string", description: "For N5/N6/N7/N10/N13: detailed description of the issue" },
+            landlordPhone: { type: "string", description: "Landlord's phone number" },
+            terminationDate: { type: "string", description: "Termination/effective date (dd/mm/yyyy). Required for most forms." },
+            // Rent increase fields (N1/N2/N3/N10)
+            currentRent: { type: "number", description: "Current monthly rent amount (N1/N2/N3/N10/N14)" },
+            newRent: { type: "number", description: "New monthly rent amount (N1/N2/N3/N10)" },
+            paymentPeriod: { type: "string", description: "Payment period: monthly|weekly|other (N1/N2/N3)" },
+            // N1-specific
+            increaseType: { type: "string", description: "N1: at_or_below_guideline|above_guideline" },
+            aboveGuidelineReason: { type: "string", description: "N1 (if above guideline): applied_to_ltb|intends_to_apply" },
+            aboveGuidelineAmount: { type: "number", description: "N1: above-guideline increase amount" },
+            // N3-specific
+            rentWillIncrease: { type: "boolean", description: "N3: will rent increase?" },
+            rentIncreaseApproval: { type: "string", description: "N3: no_approval_needed|needs_ltb_approval" },
+            careChargesIncrease: { type: "boolean", description: "N3: will care/meals charges increase?" },
+            newCareCharge: { type: "number", description: "N3: new care/meals charge amount" },
+            totalNewAmount: { type: "number", description: "N3: total new rent + care/meals" },
+            // N4-specific — supports multiple arrears periods
+            rentOwingPeriods: { type: "string", description: "N4: JSON array of arrears [{periodFrom, periodTo, rentCharged, rentPaid}]. Up to 3 periods." },
+            // N5/N6/N7/N8/N12/N13 reason fields
+            reason: { type: "string", description: "Reason code. N5: interference|damage|overcrowding. N6: illegal_act_unit|illegal_act_complex|misrepresentation. N7: impaired_safety|illegal_drugs_unit|illegal_drugs_complex|serious_impairment_complex. N8: persistent_late_payment|no_longer_qualifies_subsidized|employment_ended|no_longer_needs_rehab|gave_notice_didnt_move. N10: capital_expenditure|new_or_additional_services|both. N12: personal_use|family_use|purchaser_use|care_provider. N13: demolition|conversion|repairs." },
+            details: { type: "string", description: "Detailed description (N5/N6/N7/N10/N13)" },
+            // N5-specific
+            damageAmount: { type: "number", description: "N5: amount owed for damage ($)" },
+            otherAmount: { type: "number", description: "N5: other amount owed ($)" },
+            overcrowdingExplanation: { type: "string", description: "N5: explanation of overcrowding details" },
+            // N5/N6/N7 events
+            events: { type: "string", description: "N5/N6/N7: JSON array of incidents [{dateTime, description}]. Up to 3 events with date/time and what happened." },
             // N8-specific
-            latePayments: { type: "string", description: "For N8: JSON array of late payments [{period, dueDate, datePaid}]" },
-            // N11-specific
-            tenantSignedBy: { type: "string", description: "For N11: tenant's printed name for signature" },
+            latePayments: { type: "string", description: "N8: JSON array of late payments [{period, dueDate, datePaid}]" },
+            noticeDetail: { type: "string", description: "N8: additional free-text details about the reason" },
+            // N10/N11
+            tenantSignedBy: { type: "string", description: "N10/N11: tenant's printed name for signature" },
             // N12-specific
-            occupantName: { type: "string", description: "For N12: name of person who will occupy the unit" },
-            relationship: { type: "string", description: "For N12: relationship to landlord (if family_use)" },
+            occupantName: { type: "string", description: "N12: name of person who will occupy the unit" },
+            relationship: { type: "string", description: "N12: relationship to landlord" },
+            whoWillOccupy: { type: "string", description: "N12: who will move in — me|spouse|child|parent|spouses_child|spouses_parent" },
+            isCareProvider: { type: "boolean", description: "N12: is this a care provider scenario?" },
+            careRecipient: { type: "string", description: "N12: who care is being provided for" },
+            // N13-specific
+            workPlan: { type: "string", description: "N13: work plan description" },
+            permitsStatus: { type: "string", description: "N13: obtained|will_obtain|not_needed" },
+            // N14-specific
+            originalTenantName: { type: "string", description: "N14: name of the original tenant who vacated" },
+            periodEndDate: { type: "string", description: "N14: rental period end date" },
+            moveOutDate: { type: "string", description: "N14: date the tenant moved out" },
+            paymentDueDate: { type: "string", description: "N14: date payment is due from spouse" },
+            amountOwed: { type: "number", description: "N14: amount the tenant owes" },
+            payPeriod: { type: "string", description: "N14: daily|weekly|monthly" },
         },
         required: ["noticeType", "tenantName", "rentalUnitAddress", "landlordName"],
         category: "utility",
@@ -1042,6 +1103,12 @@ export function generateNoticeTool(): ToolDefinition {
                 signedBy: String(args.landlordName),
             };
 
+            // Parse events JSON if provided
+            let parsedEvents: Array<{ dateTime: string; description: string }> | undefined;
+            if (args.events) {
+                try { parsedEvents = JSON.parse(String(args.events)); } catch { parsedEvents = undefined; }
+            }
+
             try {
                 let pdfBuffer: Buffer;
                 let description = "";
@@ -1055,6 +1122,10 @@ export function generateNoticeTool(): ToolDefinition {
                             currentRent: cur,
                             newRent: nw,
                             effectiveDate: String(args.terminationDate || ""),
+                            increaseType: args.increaseType ? String(args.increaseType) : undefined,
+                            aboveGuidelineReason: args.aboveGuidelineReason ? String(args.aboveGuidelineReason) : undefined,
+                            aboveGuidelineAmount: args.aboveGuidelineAmount ? Number(args.aboveGuidelineAmount) : undefined,
+                            paymentPeriod: args.paymentPeriod ? String(args.paymentPeriod) : undefined,
                         });
                         description = `Rent increase from $${cur.toFixed(2)} to $${nw.toFixed(2)}, effective ${args.terminationDate}`;
                         break;
@@ -1067,27 +1138,64 @@ export function generateNoticeTool(): ToolDefinition {
                             currentRent: cur2,
                             newRent: nw2,
                             effectiveDate: String(args.terminationDate || ""),
-                            exemptionReason: String(args.reason || "post_nov_2018"),
+                            paymentPeriod: args.paymentPeriod ? String(args.paymentPeriod) : undefined,
+                            exemptionReason: args.reason ? String(args.reason) : undefined,
                         });
-                        description = `Rent increase (unit partially exempt) from $${cur2.toFixed(2)} to $${nw2.toFixed(2)}, effective ${args.terminationDate}`;
+                        description = `Rent increase (partially exempt unit) from $${cur2.toFixed(2)} to $${nw2.toFixed(2)}, effective ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N3": {
+                        const cur3 = Number(args.currentRent) || 0;
+                        const nw3 = Number(args.newRent) || 0;
+                        pdfBuffer = await noticeService.generateN3Notice({
+                            ...common,
+                            currentRent: cur3,
+                            newRent: nw3,
+                            effectiveDate: String(args.terminationDate || ""),
+                            rentWillIncrease: args.rentWillIncrease !== false && args.rentWillIncrease !== "false",
+                            rentIncreaseApproval: args.rentIncreaseApproval ? String(args.rentIncreaseApproval) : undefined,
+                            careChargesIncrease: args.careChargesIncrease === true || args.careChargesIncrease === "true",
+                            newCareCharge: args.newCareCharge ? Number(args.newCareCharge) : undefined,
+                            totalNewAmount: args.totalNewAmount ? Number(args.totalNewAmount) : undefined,
+                            paymentPeriod: args.paymentPeriod ? String(args.paymentPeriod) : undefined,
+                        });
+                        description = `Care home rent increase to $${nw3.toFixed(2)}, effective ${args.terminationDate}`;
                         break;
                     }
                     case "N4": {
-                        const rentCharged = Number(args.rentCharged) || 0;
-                        const rentPaid = Number(args.rentPaid) || 0;
-                        const rentOwing = rentCharged - rentPaid;
-                        pdfBuffer = await noticeService.generateN4Notice({
-                            ...common,
-                            rentOwing: [{
-                                period: String(args.rentOwingPeriod || "Current period"),
+                        let rentOwingArr: Array<{ periodFrom: string; periodTo: string; rentCharged: number; rentPaid: number; rentOwing: number }> = [];
+                        if (args.rentOwingPeriods) {
+                            try {
+                                const parsed = JSON.parse(String(args.rentOwingPeriods));
+                                rentOwingArr = parsed.map((p: any) => ({
+                                    periodFrom: String(p.periodFrom || p.period || ""),
+                                    periodTo: String(p.periodTo || p.period || ""),
+                                    rentCharged: Number(p.rentCharged) || 0,
+                                    rentPaid: Number(p.rentPaid) || 0,
+                                    rentOwing: (Number(p.rentCharged) || 0) - (Number(p.rentPaid) || 0),
+                                }));
+                            } catch { /* fallback below */ }
+                        }
+                        // Legacy single-period fallback
+                        if (rentOwingArr.length === 0) {
+                            const rentCharged = Number(args.rentCharged) || 0;
+                            const rentPaid = Number(args.rentPaid) || 0;
+                            rentOwingArr = [{
+                                periodFrom: String(args.rentOwingPeriod || args.rentOwingPeriods || "Current period"),
+                                periodTo: String(args.rentOwingPeriod || args.rentOwingPeriods || "Current period"),
                                 rentCharged,
                                 rentPaid,
-                                rentOwing,
-                            }],
-                            totalOwing: rentOwing,
+                                rentOwing: rentCharged - rentPaid,
+                            }];
+                        }
+                        const totalOwing = rentOwingArr.reduce((sum, r) => sum + r.rentOwing, 0);
+                        pdfBuffer = await noticeService.generateN4Notice({
+                            ...common,
+                            rentOwing: rentOwingArr,
+                            totalOwing,
                             terminationDate: String(args.terminationDate || ""),
                         });
-                        description = `Non-payment of rent. Owing: $${rentOwing.toFixed(2)}. Termination: ${args.terminationDate}`;
+                        description = `Non-payment of rent. ${rentOwingArr.length} period(s), total owing: $${totalOwing.toFixed(2)}. Termination: ${args.terminationDate}`;
                         break;
                     }
                     case "N5": {
@@ -1095,6 +1203,10 @@ export function generateNoticeTool(): ToolDefinition {
                             ...common,
                             reason: String(args.reason || "interference"),
                             details: String(args.details || ""),
+                            events: parsedEvents,
+                            damageAmount: args.damageAmount ? Number(args.damageAmount) : undefined,
+                            otherAmount: args.otherAmount ? Number(args.otherAmount) : undefined,
+                            overcrowdingExplanation: args.overcrowdingExplanation ? String(args.overcrowdingExplanation) : undefined,
                             terminationDate: String(args.terminationDate || ""),
                         });
                         description = `Interference/damage/overcrowding (${args.reason || "interference"}). Termination: ${args.terminationDate}`;
@@ -1103,20 +1215,23 @@ export function generateNoticeTool(): ToolDefinition {
                     case "N6": {
                         pdfBuffer = await noticeService.generateN6Notice({
                             ...common,
-                            reason: String(args.reason || "illegal_act"),
+                            reason: String(args.reason || "illegal_act_unit"),
                             details: String(args.details || ""),
+                            events: parsedEvents,
                             terminationDate: String(args.terminationDate || ""),
                         });
-                        description = `Illegal act/misrepresentation (${args.reason || "illegal_act"}). Termination: ${args.terminationDate}`;
+                        description = `Illegal act/misrepresentation (${args.reason || "illegal_act_unit"}). Termination: ${args.terminationDate}`;
                         break;
                     }
                     case "N7": {
                         pdfBuffer = await noticeService.generateN7Notice({
                             ...common,
+                            reason: args.reason ? String(args.reason) : undefined,
                             details: String(args.details || ""),
+                            events: parsedEvents,
                             terminationDate: String(args.terminationDate || ""),
                         });
-                        description = `Impaired safety. Termination: ${args.terminationDate}`;
+                        description = `Impaired safety/serious problems (${args.reason || "impaired_safety"}). Termination: ${args.terminationDate}`;
                         break;
                     }
                     case "N8": {
@@ -1128,10 +1243,12 @@ export function generateNoticeTool(): ToolDefinition {
                         }
                         pdfBuffer = await noticeService.generateN8Notice({
                             ...common,
+                            reason: args.reason ? String(args.reason) : undefined,
                             latePayments,
+                            noticeDetail: args.noticeDetail ? String(args.noticeDetail) : undefined,
                             terminationDate: String(args.terminationDate || ""),
                         });
-                        description = `Persistent late payment (${latePayments.length} instances). Termination: ${args.terminationDate}`;
+                        description = `End of term (${args.reason || "persistent_late_payment"}, ${latePayments.length} instances). Termination: ${args.terminationDate}`;
                         break;
                     }
                     case "N9": {
@@ -1172,6 +1289,9 @@ export function generateNoticeTool(): ToolDefinition {
                             reason: (String(args.reason) || "personal_use") as any,
                             occupantName: String(args.occupantName || args.landlordName),
                             relationship: args.relationship ? String(args.relationship) : undefined,
+                            whoWillOccupy: args.whoWillOccupy ? String(args.whoWillOccupy) : undefined,
+                            isCareProvider: args.isCareProvider === true || args.isCareProvider === "true",
+                            careRecipient: args.careRecipient ? String(args.careRecipient) : undefined,
                             terminationDate: String(args.terminationDate || ""),
                         });
                         description = `Landlord/family/purchaser own use (${args.reason || "personal_use"}). Termination: ${args.terminationDate}`;
@@ -1182,9 +1302,30 @@ export function generateNoticeTool(): ToolDefinition {
                             ...common,
                             reason: String(args.reason || "repairs"),
                             details: String(args.details || ""),
+                            workPlan: args.workPlan ? String(args.workPlan) : undefined,
+                            permitsStatus: args.permitsStatus ? String(args.permitsStatus) : undefined,
                             terminationDate: String(args.terminationDate || ""),
                         });
-                        description = `Demolition/repair/conversion (${args.reason || "repairs"}). Termination: ${args.terminationDate}`;
+                        description = `Demolition/repair/conversion (${args.reason || "repairs"}). Permits: ${args.permitsStatus || "not specified"}. Termination: ${args.terminationDate}`;
+                        break;
+                    }
+                    case "N14": {
+                        pdfBuffer = await noticeService.generateN14Notice({
+                            spouseName: String(args.tenantName),
+                            landlordName: String(args.landlordName),
+                            landlordPhone: args.landlordPhone ? String(args.landlordPhone) : undefined,
+                            rentalUnitAddress: String(args.rentalUnitAddress),
+                            originalTenantName: String(args.originalTenantName || ""),
+                            periodEndDate: String(args.periodEndDate || ""),
+                            moveOutDate: String(args.moveOutDate || ""),
+                            paymentDueDate: String(args.paymentDueDate || args.terminationDate || ""),
+                            amountOwed: args.amountOwed ? Number(args.amountOwed) : undefined,
+                            currentRent: args.currentRent ? Number(args.currentRent) : undefined,
+                            payPeriod: args.payPeriod ? String(args.payPeriod) : undefined,
+                            dateGiven: new Date().toISOString().split("T")[0],
+                            signedBy: String(args.landlordName),
+                        });
+                        description = `Notice to spouse (${args.tenantName}) of vacated tenant (${args.originalTenantName}). Amount owed: $${Number(args.amountOwed || 0).toFixed(2)}`;
                         break;
                     }
                     default:

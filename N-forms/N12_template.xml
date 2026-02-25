@@ -1,0 +1,3899 @@
+
+<template xmlns="http://www.xfa.org/schema/xfa-template/3.0/"
+><?formServer defaultPDFRenderFormat acrobat9.1static?><?formServer allowRenderCaching 0?><?formServer formModel both?><subform layout="tb" locale="en_CA" name="form1"
+><pageSet
+><pageArea id="Page1" name="Page1"
+><contentArea h="266.7mm" w="198.12mm" x="8.89mm" y="6.35mm"
+/><medium long="279.4mm" short="215.9mm" stock="letter"
+/><?templateDesigner expand 1?></pageArea
+><?templateDesigner expand 0?></pageSet
+><subform w="198.12mm" h="10.5in" locale="en_CA"
+><draw h="16.51mm" name="Text1" w="165.1mm" x="32.512mm" y="0mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="text-decoration:none"
+>Notice to End your Tenancy</p
+><p style="text-decoration:none"
+>Because the Landlord, a Purchaser or a Family Member Requires the Rental Unit<span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="tab-interval:0.5in;tab-stops:center 3in right 6in;font-size:12pt;font-weight:normal;text-decoration:none"
+><span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>N12</span
+></p
+><p style="tab-interval:0.5in;tab-stops:center 3in right 6in;font-size:10pt;font-weight:normal;text-decoration:none"
+>(Disponible en français)</p
+></body
+></exData
+></value
+><font baselineShift="0pt" typeface="Arial" weight="bold" size="11pt" letterSpacing="-0.015em"
+/><margin bottomInset="0mm" leftInset="0mm" rightInset="0mm" topInset="0mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" hAlign="right" lineHeight="12pt"
+/><assist role="H1"
+/></draw
+><subform x="0in" y="19.16mm" locale="en_CA" name="Notice_Name_and_Address"
+><bind match="none"
+/><?templateDesigner expand 0?><draw locale="en_CA" h="5.08mm" name="Text1" w="98.806mm"
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold"
+><span style="xfa-spacerun:yes"
+> </span
+>To: (Tenant's name)<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>include all tenant names</span
+></p
+></body
+></exData
+></value
+><?renderCache.bounds 277246 11566 0 0 1417 1417 0 0?><?renderCache.textRun 21  To: (Tenant's name)  0 1417 9841 0 0 0 "Verdana" 1 0 9000 ISO-8859-1?><?renderCache.textRun 24 include all tenant names 0 110735 9841 0 0 0 "Verdana" 0 0 9000 ISO-8859-1?><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt"
+/><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+></draw
+><draw locale="en_CA" h="5.08mm" name="Text1" w="98.806mm" x="98.806mm"
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="tab-interval:0.5in;tab-stops:left 5.094in"
+><span style="xfa-spacerun:yes"
+> </span
+>From: (Landlord's name)<span style="xfa-spacerun:yes"
+> </span
+></p
+></body
+></exData
+></value
+><?renderCache.bounds 277246 11566 0 0 1417 1417 0 0?><?renderCache.textRun 25  From: (Landlord's name)  0 1417 9841 0 0 0 "Verdana" 1 0 9000 ISO-8859-1?><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt" weight="bold"
+/><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+></draw
+><draw locale="en_CA" h="5.08mm" name="Text2" w="197.612mm" y="19.05mm"
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold"
+><span style="xfa-spacerun:yes"
+> </span
+>Address of the Rental Unit:<span style="xfa-spacerun:yes"
+>  </span
+><span style="font-weight:normal"
+><span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+><?renderCache.bounds 557326 11566 0 0 1417 1417 0 0?><?renderCache.textRun 30  Address of the Rental Unit:   0 1417 9841 0 0 0 "Verdana" 1 0 9000 ISO-8859-1?><?renderCache.textRun 1   0 147254 9841 0 0 0 "Verdana" 0 0 9000 ISO-8859-1?><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt"
+/><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+></draw
+><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XE5vdGljZSBOYW1lIGFuZCBBZGRyZXNzLnhk
+cCNzb20oJHRlbXBsYXRlLmZvcm0xLk5vdGljZV9OYW1lX2FuZF9BZGRyZXNzKSIgeD0iMGluIiB5
+PSIxOS4xNm1tIiBsb2NhbGU9ImVuX0NBIiB4bWxucz0iaHR0cDovL3d3dy54ZmEub3JnL3NjaGVt
+YS94ZmEtdGVtcGxhdGUvMy4wLyIKPjxiaW5kCi8+PD90ZW1wbGF0ZURlc2lnbmVyIGV4cGFuZCAw
+Pz48ZHJhdyBsb2NhbGU9ImVuX0NBIiBoPSI1LjA4bW0iIG5hbWU9IlRleHQxIiB3PSI5OC44MDZt
+bSIKPjx2YWx1ZQo+PGV4RGF0YSBjb250ZW50VHlwZT0idGV4dC9odG1sIgo+PGJvZHkgeG1sbnM9
+Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGh0bWwiIHhtbG5zOnhmYT0iaHR0cDovL3d3dy54ZmEu
+b3JnL3NjaGVtYS94ZmEtZGF0YS8xLjAvIgo+PHAgc3R5bGU9ImZvbnQtd2VpZ2h0OmJvbGQiCj48
+c3BhbiBzdHlsZT0ieGZhLXNwYWNlcnVuOnllcyIKPsKgPC9zcGFuCj5UbzogKFRlbmFudCdzIG5h
+bWUpPHNwYW4gc3R5bGU9InhmYS1zcGFjZXJ1bjp5ZXMiCj7CoDwvc3Bhbgo+PHNwYW4gc3R5bGU9
+ImZvbnQtd2VpZ2h0Om5vcm1hbCIKPmluY2x1ZGUgYWxsIHRlbmFudCBuYW1lczwvc3Bhbgo+PC9w
+Cj48L2JvZHkKPjwvZXhEYXRhCj48L3ZhbHVlCj48P3JlbmRlckNhY2hlLmJvdW5kcyAyNzcyNDYg
+MTE1NjYgMCAwIDE0MTcgMTQxNyAwIDA/Pjw/cmVuZGVyQ2FjaGUudGV4dFJ1biAyMSAgVG86IChU
+ZW5hbnQncyBuYW1lKSAgMCAxNDE3IDk4NDEgMCAwIDAgIlZlcmRhbmEiIDEgMCA5MDAwIElTTy04
+ODU5LTE/Pjw/cmVuZGVyQ2FjaGUudGV4dFJ1biAyNCBpbmNsdWRlIGFsbCB0ZW5hbnQgbmFtZXMg
+MCAxMTA3MzUgOTg0MSAwIDAgMCAiVmVyZGFuYSIgMCAwIDkwMDAgSVNPLTg4NTktMT8+PC9kcmF3
+Cj48ZHJhdyBsb2NhbGU9ImVuX0NBIiBoPSI1LjA4bW0iIG5hbWU9IlRleHQxIiB3PSI5OC44MDZt
+bSIgeD0iOTguODA2bW0iCj48dmFsdWUKPjxleERhdGEgY29udGVudFR5cGU9InRleHQvaHRtbCIK
+Pjxib2R5IHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hodG1sIiB4bWxuczp4ZmE9Imh0
+dHA6Ly93d3cueGZhLm9yZy9zY2hlbWEveGZhLWRhdGEvMS4wLyIKPjxwIHN0eWxlPSJ0YWItaW50
+ZXJ2YWw6MC41aW47dGFiLXN0b3BzOmxlZnQgNS4wOTRpbiIKPjxzcGFuIHN0eWxlPSJ4ZmEtc3Bh
+Y2VydW46eWVzIgo+wqA8L3NwYW4KPkZyb206IChMYW5kbG9yZCdzIG5hbWUpPHNwYW4gc3R5bGU9
+InhmYS1zcGFjZXJ1bjp5ZXMiCj7CoDwvc3Bhbgo+PC9wCj48L2JvZHkKPjwvZXhEYXRhCj48L3Zh
+bHVlCj48P3JlbmRlckNhY2hlLmJvdW5kcyAyNzcyNDYgMTE1NjYgMCAwIDE0MTcgMTQxNyAwIDA/
+Pjw/cmVuZGVyQ2FjaGUudGV4dFJ1biAyNSAgRnJvbTogKExhbmRsb3JkJ3MgbmFtZSkgIDAgMTQx
+NyA5ODQxIDAgMCAwICJWZXJkYW5hIiAxIDAgOTAwMCBJU08tODg1OS0xPz48L2RyYXcKPjxkcmF3
+IGxvY2FsZT0iZW5fQ0EiIGg9IjUuMDhtbSIgbmFtZT0iVGV4dDIiIHc9IjE5Ny42MTJtbSIgeT0i
+MTkuMDVtbSIKPjx2YWx1ZQo+PGV4RGF0YSBjb250ZW50VHlwZT0idGV4dC9odG1sIgo+PGJvZHkg
+eG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGh0bWwiIHhtbG5zOnhmYT0iaHR0cDovL3d3
+dy54ZmEub3JnL3NjaGVtYS94ZmEtZGF0YS8xLjAvIgo+PHAgc3R5bGU9ImZvbnQtd2VpZ2h0OmJv
+bGQiCj48c3BhbiBzdHlsZT0ieGZhLXNwYWNlcnVuOnllcyIKPsKgPC9zcGFuCj5BZGRyZXNzIG9m
+IHRoZSBSZW50YWwgVW5pdDo8c3BhbiBzdHlsZT0ieGZhLXNwYWNlcnVuOnllcyIKPsKgIDwvc3Bh
+bgo+PHNwYW4gc3R5bGU9ImZvbnQtd2VpZ2h0Om5vcm1hbCIKPjxzcGFuIHN0eWxlPSJ4ZmEtc3Bh
+Y2VydW46eWVzIgo+wqA8L3NwYW4KPjwvc3Bhbgo+PC9wCj48L2JvZHkKPjwvZXhEYXRhCj48L3Zh
+bHVlCj48P3JlbmRlckNhY2hlLmJvdW5kcyA1NTczMjYgMTE1NjYgMCAwIDE0MTcgMTQxNyAwIDA/
+Pjw/cmVuZGVyQ2FjaGUudGV4dFJ1biAzMCAgQWRkcmVzcyBvZiB0aGUgUmVudGFsIFVuaXQ6ICAg
+MCAxNDE3IDk4NDEgMCAwIDAgIlZlcmRhbmEiIDEgMCA5MDAwIElTTy04ODU5LTE/Pjw/cmVuZGVy
+Q2FjaGUudGV4dFJ1biAxICAgMCAxNDcyNTQgOTg0MSAwIDAgMCAiVmVyZGFuYSIgMCAwIDkwMDAg
+SVNPLTg4NTktMT8+PC9kcmF3Cj48L3N1YmZvcm0KPg==?><field locale="en_CA" h="13.97mm" name="TO_TenameName" w="98.806mm" y="5.08mm"
+><assist
+><toolTip
+>Tenant's name</toolTip
+></assist
+><border
+><corner presence="hidden"
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="13.97mm" name="From_LandlordName" w="98.806mm" x="98.806mm" y="5.08mm"
+><assist
+><toolTip
+>Landlord's name</toolTip
+></assist
+><border
+><corner presence="hidden"
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="13.97mm" name="RentalUnitAddress" w="197.612mm" y="24.13mm"
+><assist
+><toolTip
+> Address of the Rental Unit</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+></subform
+><draw name="Text2" y="59.28mm" w="197.612mm" h="12.7mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> This is a legal notice that could lead to you being evicted from your home.</text
+></value
+><font size="13pt" typeface="Arial Black" baselineShift="0pt"
+><fill
+><color value="255,255,255"
+/></fill
+></font
+><margin topInset="0.5004mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center" vAlign="middle"
+/><border
+><edge thickness="0.762mm" presence="hidden"
+/><corner thickness="0.762mm" presence="hidden"
+/><fill
+><color value="0,0,0"
+/></fill
+></border
+><assist role="H2"
+/><?renderCache.bounds 557326 33165 0 0 1417 1418 0 0?><?renderCache.textRun 76  This is a legal notice that could lead to you being evicted from your home. 0 13907 21745 255 255 255 "Arial Black" 0 0 13000 ISO-8859-1?></draw
+><draw name="Text3" y="71.98mm" w="197.612mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>The following information is from your landlord</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><border
+><edge
+/><corner
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 557326 18766 0 0 1417 1417 0 0?><?renderCache.textRun 47 The following information is from your landlord 0 146603 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text4" y="79.6mm" w="197.612mm" h="19.05mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>I am giving you this notice because I want to end your tenancy. I want you to move out of your<span style="xfa-spacerun:yes"
+>   </span
+></p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>rental unit by the following termination date:<span style="xfa-spacerun:yes"
+>                                              </span
+>.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="19pt" vAlign="middle"
+/><border
+><edge
+/><corner
+/></border
+><?renderCache.bounds 557326 51166 0 0 1417 1417 0 0?><?renderCache.textRun 99  I am giving you this notice because I want to end your tenancy. I want you to move out of your     0 1417 20435 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 94  rental unit by the following termination date:                                              . 0 1417 39435 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="TerminationDate" y="87.167mm" x="95.44mm" w="50.8mm" h="12.192mm" locale="en_CA"
+><ui
+><dateTimeEdit hScrollPolicy="off"
+><border hand="right"
+><?templateDesigner StyleID aped2?><edge
+/></border
+><margin
+/><comb numberOfCells="10"
+/></dateTimeEdit
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="center"
+/><value
+><date
+/></value
+><caption reserve="3.556mm" placement="bottom"
+><para vAlign="middle" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><text
+>dd/mm/yyyy</text
+></value
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+/></caption
+><assist
+><toolTip
+>rental unit termination date</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	var d = new Date(yy,mm-1,dd);
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><validate scriptTest="warning"
+/><traversal
+><traverse ref="Text5[0]"
+/></traversal
+></field
+><draw name="Text5" y="88.195mm" x="106.768mm" w="3.81mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>/</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="13pt"
+/><assist
+><speak priority="toolTip"
+/><toolTip
+>  </toolTip
+></assist
+><caption
+><para vAlign="bottom"
+/></caption
+><traversal
+><traverse ref="Text6[0]"
+/></traversal
+></draw
+><draw name="Text6" y="87.941mm" x="121.475mm" w="3.81mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>/</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="13pt"
+/><assist
+><speak priority="toolTip"
+/><toolTip
+>  </toolTip
+></assist
+><?renderCache.bounds 7966 15166 0 0 1417 1417 0 0?><?renderCache.textRun 1 / 0 1953 14518 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text7" y="102.449mm" w="155.125mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>My Reason for Ending your Tenancy</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><assist role="H2"
+/><?renderCache.bounds 436890 15166 0 0 1417 1417 0 0?><?renderCache.textRun 33 My Reason for Ending your Tenancy 0 1417 11935 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text8" y="108.799mm" w="197.612mm" h="5.08mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>I have shaded the circle next to my reason for ending your tenancy. </text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 557326 11566 0 0 1417 1417 0 0?><?renderCache.textRun 68 I have shaded the circle next to my reason for ending your tenancy.  0 1417 10135 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><exclGroup name="Reason1" y="113.975mm"
+><field w="7mm" h="7.62mm" locale="en_CA" name="Reason1" y="0mm"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><assist
+><toolTip
+>Reason 1: The landlord or their spouse, parent, child, spouse’s child or their spouse’s parent (or a person who provides or will provide care services to the above) intends to move in to the rental unit and occupy it for at least one year</toolTip
+></assist
+><items
+><text
+>1</text
+></items
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><event activity="click" name="event__click"
+><script contentType="application/x-javascript"
+>Reason2.rawValue='2';
+Reason2_A1.rawValue = null;
+Reason2_A2.rawValue = null;
+Reason2_A3.rawValue = null;
+Reason2_A4.rawValue = null;
+Reason2_A5.rawValue = null;
+Reason2_A6.rawValue = null;
+Reason2_B.rawValue = null;
+Reason2_B1.rawValue = null;
+Reason2_B2.rawValue = null;
+Reason2_B3.rawValue = null;
+Reason2_B4.rawValue = null;
+Reason2_B5.rawValue = null;
+Reason2_B6.rawValue = null;
+
+</script
+></event
+><?templateDesigner itemValuesSpecified 1?><?templateDesigner expand 1?></exclGroup
+><draw name="Text9" y="115.548mm" x="9.525mm" w="7.405in" h="8.89mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="tab-interval:0.5in;tab-stops:left 0.895in;font-weight:bold"
+><span style="xfa-spacerun:yes"
+> </span
+>Reason 1:<span style="font-weight:normal"
+><span style="xfa-tab-count:1"
+>         </span
+>The following person intends to move into the rental unit and occupy it for at least one year:</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="-64.44pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 530326 22366 0 0 1417 1417 0 0?><?renderCache.textRun 10  Reason 1: 0 1417 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 60450 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 89 The following person intends to move into the rental unit and occupy it for at least one  0 65857 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 5 year: 0 65857 21352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field name="Reason1_A1" y="124.438mm" x="10.688mm" w="28.575mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="21.575mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> Me</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. The following person intends to move into the rental unit and occupy it for at least one year: Me</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_A2" y="124.438mm" x="68.105mm" w="31.486mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="24.486mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My spouse</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. The following person intends to move into the rental unit and occupy it for at least one year: My spouse</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_A3" y="124.438mm" x="132.634mm" w="28.575mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="21.859mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My child</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. The following person intends to move into the rental unit and occupy it for at least one year: My child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_A4" y="132.057mm" x="10.688mm" w="28.575mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="21.575mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My parent</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. The following person intends to move into the rental unit and occupy it for at least one year: My parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_A5" y="132.057mm" x="68.105mm" w="47.361mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="40.346mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My spouse's child</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. The following person intends to move into the rental unit and occupy it for at least one year: My spouse's child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_A6" y="132.057mm" x="132.634mm" w="50.536mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="43.819mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My spouse's parent</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. The following person intends to move into the rental unit and occupy it for at least one year: My spouse's parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><draw name="Text11" y="143.185mm" w="9.525mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Or</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 24166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 2 Or 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="Reason1_B" y="143.185mm" w="158.3mm" h="7.62mm" x="10.689mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="151.2712mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><value
+><text
+> A person who provides or will provide care services to:</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: </toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_B1" y="150.805mm" x="10.688mm" w="28.575mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="21.575mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> Me</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: Me</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_B2" y="150.805mm" x="68.105mm" w="31.223mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="24.223mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My spouse</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: My spouse</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_B3" y="150.805mm" x="132.634mm" w="28.575mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="21.8592mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My child</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: My child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_B4" y="158.425mm" x="10.688mm" w="28.575mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="21.575mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My parent</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: My parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_B5" y="158.425mm" x="68.105mm" w="47.361mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="40.346mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My spouse's child</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: My spouse's child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason1_B6" y="158.425mm" x="132.634mm" w="50.536mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1.0008mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="43.819mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> My spouse's parent</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 1. A person who provides or will provide care services to: My spouse's parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><exclGroup name="Reason2" y="169.379mm"
+><field w="7mm" h="7.62mm" locale="en_CA" name="Reason2" y="0mm"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><assist
+><toolTip
+>Reason 2: The landlord has signed an Agreement of Purchase and Sale of the rental unit. The purchaser, their spouse, their child, their parent, their spouse’s child or their spouse’s parent (or a person who provides or will provide care services to the above) intends to move in to the rental unit</toolTip
+></assist
+><items
+><text
+>1</text
+></items
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><?templateDesigner itemValuesSpecified 1?><event activity="click" name="event__click"
+><script contentType="application/x-javascript"
+>Reason1.rawValue='2'
+Reason1_A1.rawValue = null;
+Reason1_A2.rawValue = null;
+Reason1_A3.rawValue = null;
+Reason1_A4.rawValue = null;
+Reason1_A5.rawValue = null;
+Reason1_A6.rawValue = null;
+Reason1_B.rawValue = null;
+Reason1_B1.rawValue = null;
+Reason1_B2.rawValue = null;
+Reason1_B3.rawValue = null;
+Reason1_B4.rawValue = null;
+Reason1_B5.rawValue = null;
+Reason1_B6.rawValue = null;
+</script
+></event
+><?templateDesigner expand 1?></exclGroup
+><draw name="Text12" y="170.951mm" x="9.525mm" w="7.405in" h="8.89mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="tab-interval:0.5in;tab-stops:left 0.895in"
+><span style="xfa-spacerun:yes"
+> </span
+>Reason 2:<span style="xfa-tab-count:1"
+>         </span
+><span style="font-weight:normal"
+>I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit:</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="-64.44pt" marginLeft="0pt" marginRight="0pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 530326 22366 0 0 1417 1417 0 0?><?renderCache.textRun 10  Reason 2: 0 1417 9535 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 1   0 60450 9535 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 85 I have signed an Agreement of Purchase and Sale of the rental unit and the following  0 65857 9535 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 44 person intends to move into the rental unit: 0 65857 21535 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field name="Reason2_A1" y="179.841mm" x="10.688mm" w="41.012mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="34.012mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> The purchaser</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit: The purchaser</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_A2" y="179.841mm" x="68.105mm" w="56.623mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="49.623mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> The purchaser's spouse</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit: The purchaser's spouse</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_A3" y="179.841mm" x="132.634mm" w="64.666mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="57.95mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> The purchaser's child</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><traversal
+><traverse ref="Reason2_A4[0]"
+/></traversal
+><assist
+><toolTip
+>Reason 2. I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit: The purchaser's child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_A4" y="182.223mm" x="10.688mm" w="52.017mm" h="15.227mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm" topInset="3.048mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="45.017mm"
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>The purchaser's</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>parent</p
+></body
+></exData
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><traversal
+><traverse ref="Reason2_A5[0]"
+/></traversal
+><assist
+><toolTip
+>Reason 2. I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit: The purchaser's parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_A5" y="182.223mm" x="68.105mm" w="59.425mm" h="15.228mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm" topInset="3.048mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="52.41mm"
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>The purchaser's spouse's</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>child</p
+></body
+></exData
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit: The purchaser's spouse's child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_A6" y="182.224mm" x="132.634mm" w="59.426mm" h="15.227mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm" topInset="3.048mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="52.709mm"
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>The purchaser's spouse's<span style="xfa-spacerun:yes"
+>  </span
+></p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>parent</p
+></body
+></exData
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. I have signed an Agreement of Purchase and Sale of the rental unit and the following person intends to move into the rental unit: The purchaser's spouse's parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><draw name="Text14" y="200.959mm" w="9.525mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Or</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 24166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 2 Or 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><field name="Reason2_B" y="200.959mm" w="158.3mm" h="7.62mm" x="10.688mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="151.3mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><value
+><text
+> A person who provides or will provide care services to:</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: </toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_B1" y="208.579mm" x="10.688mm" w="41.012mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="34.012mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> The purchaser</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: The purchaser</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_B2" y="208.579mm" x="68.105mm" w="56.623mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="49.623mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> The purchaser's spouse</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: The purchaser's spouse</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_B3" y="208.579mm" x="132.634mm" w="64.666mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="57.95mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><text
+> The purchaser's child</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: The purchaser's child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_B4" y="210.961mm" x="10.688mm" w="52.017mm" h="15.227mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm" topInset="3.048mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="45.017mm"
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>The purchaser's</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>parent</p
+></body
+></exData
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: The purchaser's parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_B5" y="210.961mm" x="68.105mm" w="59.426mm" h="15.227mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm" topInset="3.048mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="52.411mm"
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>The purchaser's spouse's</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>child</p
+></body
+></exData
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: The purchaser's spouse's child</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field name="Reason2_B6" y="210.961mm" x="132.634mm" w="59.426mm" h="15.227mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm" topInset="3.048mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption placement="right" reserve="52.709mm"
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>The purchaser's spouse's</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>parent</p
+></body
+></exData
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Reason 2. A person who provides or will provide care services to: The purchaser's spouse's parent</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><subform x="0in" y="230.014mm" locale="en_CA" name="office_use_only_2"
+><bind match="none"
+/><?templateDesigner expand 0?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XG9mZmljZSB1c2Ugb25seSAyLnhkcCNzb20o
+JHRlbXBsYXRlLmZvcm0xLm9mZmljZV91c2Vfb25seV8yKSIgeD0iMGluIiB5PSIyMzAuMDE0bW0i
+IGxvY2FsZT0iZW5fQ0EiIHhtbG5zPSJodHRwOi8vd3d3LnhmYS5vcmcvc2NoZW1hL3hmYS10ZW1w
+bGF0ZS8zLjAvIgo+PGJpbmQKLz48P3RlbXBsYXRlRGVzaWduZXIgZXhwYW5kIDA/Pjwvc3ViZm9y
+bQo+?><traversal
+><traverse operation="first" ref="Text2[0]"
+/></traversal
+><draw h="31.295mm" name="Rectangle16" w="51.331mm" x="146.241mm" y="0.001mm"
+><value
+><rectangle
+><corner radius="5.08mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+></rectangle
+></value
+></draw
+><draw locale="en_CA" h="19.858mm" name="Text1" w="144.892mm" y="11.438mm"
+><assist
+><speak priority="toolTip"
+/></assist
+><border
+><corner thickness="0.175mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Arial Black" baselineShift="0pt" size="11pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="1.016mm" rightInset="0.5mm" topInset="2.286mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt"
+/><traversal
+><traverse ref="FileNumber[0]"
+/></traversal
+><ui
+><textEdit
+/></ui
+><value
+><text
+>OFFICE USE ONLY:</text
+></value
+></draw
+><field locale="en_CA" access="protected" h="9.652mm" name="FileNumber" w="76.144mm" x="65.392mm" y="12.96mm"
+><assist
+><toolTip
+>Enter the file number.</toolTip
+></assist
+><border
+><corner presence="hidden" thickness="0.175mm"
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.1754mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>File Number </text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0mm" leftInset="0mm" rightInset="0mm" topInset="0mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{AAA-A-999999-99}|text{AAA-A-999999 99}|text{AAA A-999999-99}|text{AAA-A 999999-99}|text{AAA A 999999 99}|text{AAA A 999999-99}|text{AAA A-999999 99}|text{AAA-A 999999 99}|text{AAA A 99999999}|text{AAA-A-99999999}|text{AAA-A 99999999}|text{AAA A-99999999}|text{AAAA 999999-99}|text{AAAA-999999-99}|text{AAAA 999999 99}|text{AAAA-999999 99}|text{AAA-A999999-99}|text{AAA A999999 99}|text{AAA A999999-99}|text{AAA-A999999 99}|text{AAA A99999999}|text{AAAA-99999999}|text{AAAA 99999999}|text{AAAA999999 99}|text{AAAA999999-99}|text{AAAA99999999}|text{AAA-A99999999}|text{AAA-99999-99}|text{AAA9999999}|text{AAA-99999 99}|text{AAA 99999-99}|text{AAA-9999999}|text{AAA 99999 99}|text{AAA99999-99}|text{AAA99999 99}|text{AAA 9999999}</picture
+><textEdit hScrollPolicy="off"
+><border hand="right"
+><edge
+><color
+/></edge
+><fill
+/><edge
+/><edge
+/><edge
+/><margin
+/></border
+><comb numberOfCells="15"
+/><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{AAA-A-999999-99}|text{AAA-99999-99}</picture
+></bind
+><format
+><picture
+>text{AAA-A-999999-99}|text{AAA-99999-99}</picture
+></format
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+function validateFileNumber1(elementValue)
+{  
+	if (elementValue == null) return true;
+	
+    var FileNumberPattern1 =/^[a-zA-Z]{3}(-| |)[0-9]{5}(-| |)[0-9]{2}$/;
+	return(FileNumberPattern1.test(elementValue));
+}
+
+function validateFileNumber2(elementValue)
+{  
+	if (elementValue == null) return true;
+	
+    var FileNumberPattern2 =/^[a-zA-Z]{3}(-| |)[a-zA-Z]{1}(-| |)[0-9]{6}(-| |)[0-9]{2}$/;
+	return(FileNumberPattern2.test(elementValue));
+}
+
+if (!validateFileNumber1(this.rawValue) &amp;&amp; !validateFileNumber2(this.rawValue))
+{
+    app.alert("File Number field failed validation. Please use the format TSL-12345-22 or LTB-L-123456-22.");  //Le champ Numéro de dossier n'a pu être validé. Veuillez utiliser le format TSL-12345-22 ou LTB-L-123456-22.
+    this.rawValue = "";
+    xfa.host.setFocus(this);
+}
+else
+{
+	this.rawValue = this.rawValue.toUpperCase();
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><draw locale="en_CA" h="5.999mm" name="Text2" w="25.736mm" x="0.517mm" y="23.912mm"
+><assist
+><speak priority="toolTip"
+/></assist
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><traversal
+><traverse ref="DeliveryMethod[0]"
+/></traversal
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Delivery Method:</text
+></value
+></draw
+><exclGroup access="protected" name="DeliveryMethod" x="25.993mm" y="23.912mm"
+><traversal
+><traverse ref="FilingLocation[0]"
+/></traversal
+><field locale="en_CA" h="6mm" w="21.709mm"
+><assist
+><toolTip
+>select your delivery method: in person</toolTip
+></assist
+><caption placement="right" reserve="15.709mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> In Person</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>1</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="3.8806mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="6mm" w="14.394mm" x="21.709mm"
+><assist
+><toolTip
+>select your delivery method: mail</toolTip
+></assist
+><caption placement="right" reserve="8.394mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> Mail</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>2</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="3.8806mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="6mm" w="18.729mm" x="36.103mm"
+><assist
+><toolTip
+>select your delivery method: courier</toolTip
+></assist
+><caption placement="right" reserve="12.729mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> Courier</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>3</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="3.8806mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="6mm" w="16.225mm" x="54.832mm"
+><assist
+><toolTip
+>select your delivery method: email</toolTip
+></assist
+><caption placement="right" reserve="10.226mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> Email</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>4</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="3.8806mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="6mm" w="14.385mm" x="71.057mm"
+><assist
+><toolTip
+>select your delivery method: Efile</toolTip
+></assist
+><caption placement="right" reserve="8.386mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> Efile</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>5</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="3.8806mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="6mm" w="12.898mm" x="85.442mm"
+><assist
+><toolTip
+>select your delivery method: fax</toolTip
+></assist
+><caption placement="right" reserve="6.899mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> Fax</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>6</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="3.8806mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+></exclGroup
+><field locale="en_CA" access="protected" h="6mm" name="FilingLocation" w="16.616mm" x="128.412mm" y="23.912mm"
+><assist
+><toolTip
+>filing location</toolTip
+></assist
+><caption reserve="5.4616mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="2pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>FL</text
+></value
+></caption
+><font typeface="Arial" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin leftInset="1mm" rightInset="1mm"
+/><para spaceAbove="2pt" vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border hand="right"
+><fill
+/><margin
+/></border
+><comb numberOfCells="2"
+/></textEdit
+></ui
+></field
+></subform
+><draw name="version_date" w="15.163mm" h="3.302mm" locale="en_CA" y="263.398mm"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>v. 01/04/2022</text
+></value
+><font size="6pt" typeface="Arial" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="bottom"
+/><assist
+><toolTip
+>version date</toolTip
+><speak
+>version date</speak
+></assist
+><?renderCache.bounds 40148 6526 0 0 1417 1417 0 0?><?renderCache.textRun 13 v. 01/04/2022 0 1417 6680 0 0 0 "Arial" 0 0 6000 ISO-8859-1?></draw
+><draw h="5.08mm" name="PageFoot1" w="31.75mm" y="261.62mm" x="165.862mm" locale="en_CA"
+><ui
+><textEdit
+><margin
+/></textEdit
+></ui
+><value
+><text
+>Page 1 of 2</text
+></value
+><font baselineShift="0pt" size="9pt" typeface="Arial"
+/><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" lineHeight="16.8pt" hAlign="center" vAlign="bottom"
+/><?renderCache.bounds 87166 11566 0 0 1417 1417 0 0?><?renderCache.textRun 11 Page 1 of 2 0 21981 11089 0 0 0 "Arial" 0 0 9000 ISO-8859-1?></draw
+><?templateDesigner expand 1?></subform
+><subform h="10.5in" w="198.12mm" locale="en_CA"
+><draw name="Text15" w="197.612mm" h="5.232mm" x="0mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Important Information from the Landlord and Tenant Board (LTB)</text
+></value
+><font size="11pt" typeface="Arial" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><assist role="H2"
+/><?renderCache.bounds 557326 11997 0 0 1417 1417 0 0?><?renderCache.textRun 62 Important Information from the Landlord and Tenant Board (LTB) 0 110200 10600 0 0 0 "Arial" 1 0 11000 ISO-8859-1?></draw
+><draw name="Text16" y="6.978mm" w="29.2864mm" h="31.496mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>The<span style="xfa-spacerun:yes"
+> </span
+></p
+><p
+>termination<span style="xfa-spacerun:yes"
+> </span
+></p
+><p
+>date</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80183 86446 0 0 1417 1417 0 0?><?renderCache.textRun 4 The  0 61019 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 termination  0 15667 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 4 date 0 56732 31352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text17" y="6.978mm" x="34.925mm" w="162.687mm" h="31.496mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>The termination date the landlord sets out in this notice must be at least<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>60 days</span
+> after the landlord gives you this notice.</p
+><p style="margin-top:5pt"
+>Also, the termination date must be the last day of the rental period.<span style="xfa-spacerun:yes"
+>  </span
+>For example, if you pay rent on the first of each month, the termination date must be the last day of a month.</p
+><p style="margin-top:5pt"
+>Finally, if the tenancy is for a fixed term the termination date cannot be earlier than the last day of the fixed term.<span style="xfa-spacerun:yes"
+>  </span
+>For example, if you signed a one-year lease, the termination date cannot be earlier than the last day of the one-year period set out in the lease.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><?renderCache.bounds 458326 86446 0 0 1417 1417 0 0?><?renderCache.textRun 75 The termination date the landlord sets out in this notice must be at least  0 1417 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 7 60 days 0 371510 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7  after  0 415260 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 36 the landlord gives you this notice.  0 1417 20352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 91 Also, the termination date must be the last day of the rental period.  For example, if you  0 1417 36352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 91 pay rent on the first of each month, the termination date must be the last day of a month.  0 1417 47352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 92 Finally, if the tenancy is for a fixed term the termination date cannot be earlier than the  0 1417 63352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 90 last day of the fixed term.  For example, if you signed a one-year lease, the termination  0 1417 74352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 85 date cannot be earlier than the last day of the one-year period set out in the lease. 0 1417 85352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text18" y="40.716mm" w="29.286mm" h="16.002mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="letter-spacing:-0.03em"
+>Tenant is entitled to compensation or another unit<span style="letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+></draw
+><draw name="Text19" y="40.716mm" x="34.925mm" w="6.405in" h="16.002mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="text-decoration:none;letter-spacing:0in"
+>The landlord must:</p
+><p style="margin-top:2pt;tab-interval:0.5in;tab-stops:left 0.075in left 0.175in;text-decoration:none;letter-spacing:0in"
+>●<span style="xfa-tab-count:1"
+>         </span
+>Pay you an amount equal to one month's rent by the termination date in this notice, or</p
+><p style="margin-top:2pt;tab-interval:0.5in;tab-stops:left 0.075in left 0.175in;text-decoration:none;letter-spacing:0in"
+>●<span style="xfa-tab-count:1"
+>         </span
+>Offer you another rental unit that is acceptable to you.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/></draw
+><draw name="Text18" y="58.96mm" w="29.2864mm" h="16.002mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>A tenant can</p
+><p
+>give 10 days'</p
+><p
+>notice to end</p
+><p
+>the tenancy<span style="xfa-spacerun:yes"
+> </span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80183 42526 0 0 1417 1417 0 0?><?renderCache.textRun 13 A tenant can  0 10633 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 14 give 10 days'  0 7562 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 14 notice to end  0 8099 31352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 the tenancy  0 15345 42352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text19" y="58.96mm" x="34.925mm" w="162.687mm" h="16.002mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>You can terminate the tenancy sooner than the date set out in this notice as long as you give the landlord at least<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>10 days'</span
+> notice that you intend to move out of the rental unit.<span style="xfa-spacerun:yes"
+>  </span
+>You must use the Landlord and Tenant Board's Form N9<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:italic"
+>Tenant's Notice to End the Tenancy</span
+> to give your written notice to the landlord.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><?renderCache.bounds 458326 42526 0 0 1417 1417 0 0?><?renderCache.textRun 89 You can terminate the tenancy sooner than the date set out in this notice as long as you  0 1417 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 27 give the landlord at least  0 1417 20352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 8 10 days' 0 130494 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 57  notice that you intend to move out of the rental unit.   0 177564 20352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 53 You must use the Landlord and Tenant Board's Form N9  0 1417 31352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 27 Tenant's Notice to End the  0 287750 31352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 7 Tenancy 0 1417 42352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 45  to give your written notice to the landlord. 0 43316 42352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text20" y="77.204mm" w="29.2864mm" h="16.002mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>What if you</p
+><p
+>disagree</p
+><p
+>with the</p
+><p
+>notice?</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80183 42526 0 0 1417 1417 0 0?><?renderCache.textRun 12 What if you  0 16981 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 9 disagree  0 33333 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 9 with the  0 34969 31352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 7 notice? 0 40946 42352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text21" y="77.204mm" x="34.925mm" w="162.687mm" h="16.002mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>You do not have to move out if you disagree with what the landlord has put in this notice.  However, the landlord can apply to the LTB to evict you.  The LTB will schedule a hearing where you can explain why you disagree.</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><?renderCache.bounds 458326 42526 0 0 1417 1417 0 0?><?renderCache.textRun 92 You do not have to move out if you disagree with what the landlord has put in this notice.   0 1417 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 90 However, the landlord can apply to the LTB to evict you.  The LTB will schedule a hearing  0 1417 20352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 39 where you can explain why you disagree. 0 1417 31352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text22" y="95.448mm" w="29.2864mm" h="8.128mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>What if you</p
+><p
+>move out?</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80183 20206 0 0 1417 1417 0 0?><?renderCache.textRun 12 What if you  0 16981 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 9 move out? 0 22884 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text23" y="95.448mm" x="34.925mm" w="162.687mm" h="8.128mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>If you move out of the rental unit by the termination date, your tenancy ends on that date.  </text
+></value
+><font typeface="Verdana" baselineShift="0pt" letterSpacing="-0.001em"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/></draw
+><draw name="Text24" y="105.817mm" w="29.2864mm" h="31.496mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>What if the</p
+><p
+>landlord</p
+><p
+>applies to</p
+><p
+>the LTB?</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80183 86446 0 0 1417 1417 0 0?><?renderCache.textRun 12 What if the  0 19159 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 9 landlord  0 35140 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 applies to  0 26688 31352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 8 the LTB? 0 32889 42352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text25" y="105.817mm" x="34.925mm" w="162.687mm" h="31.496mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>The landlord can apply to the LTB to evict you immediately after giving you this notice.<span style="xfa-spacerun:yes"
+>  </span
+>If the landlord applies to the LTB to evict you, the LTB will schedule a hearing and send you a copy of the application and the<span style="font-style:italic"
+> Notice of Hearing</span
+>.<span style="xfa-spacerun:yes"
+>  </span
+>The<span style="font-style:italic"
+> Notice of Hearing</span
+> sets out the date, time and location of the hearing. At the hearing, the landlord will have to prove the claims they made in this<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:italic"
+>Notice to End your Tenancy</span
+> and in the application and you can respond to the claims your landlord makes.<span style="xfa-spacerun:yes"
+>  </span
+>If the LTB issues an order ending your tenancy and evicting you, the order will not require you to move out any earlier than the termination date included in this notice.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><?renderCache.bounds 458326 86446 0 0 1417 1417 0 0?><?renderCache.textRun 93 The landlord can apply to the LTB to evict you immediately after giving you this notice.  If  0 1417 9352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 91 the landlord applies to the LTB to evict you, the LTB will schedule a hearing and send you  0 1417 20352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 33 a copy of the application and the 0 1417 31352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 18  Notice of Hearing 0 166798 31352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 6 .  The 0 257364 31352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 18  Notice of Hearing 0 286480 31352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 14  sets out the  0 377047 31352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 92 date, time and location of the hearing. At the hearing, the landlord will have to prove the  0 1417 42352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 25 claims they made in this  0 1417 53352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 26 Notice to End your Tenancy 0 127994 53352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 36  and in the application and you can  0 266822 53352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 83 respond to the claims your landlord makes.  If the LTB issues an order ending your  0 1417 64352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 90 tenancy and evicting you, the order will not require you to move out any earlier than the  0 1417 75352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 41 termination date included in this notice. 0 1417 86352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text26" y="139.557mm" w="29.2864mm" h="11.936mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>How to get</p
+><p
+>more</p
+><p
+>information</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="11pt"
+/><border
+><edge presence="hidden"
+/><fill
+><color value="241,242,242"
+/></fill
+></border
+><?renderCache.bounds 80183 31000 0 0 1417 1417 0 0?><?renderCache.textRun 11 How to get  0 20121 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 5 more  0 52542 20352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 11 information 0 15775 31352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text27" y="139.557mm" x="35.247mm" w="6.392319in" h="11.936mm"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="text-decoration:none;letter-spacing:0in"
+>For more information about this notice or your rights, you can contact the Landlord and Tenant Board.<span style="xfa-spacerun:yes"
+>  </span
+>You can reach the LTB by phone at 416-645-8080 or 1-888-332-3234. You can visit the LTB website at<span style="xfa-spacerun:yes"
+> </span
+><a href="https://tribunalsontario.ca/ltb/" style="margin-top:0pt;margin-bottom:0pt;line-height:11pt;font-family:Verdana;font-size:10pt"
+>tribunalsontario.ca/ltb</a
+>.</p
+></body
+></exData
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para lineHeight="11pt"
+/></draw
+><draw name="Text28" w="37.672mm" h="5.08mm" locale="en_CA" y="154.985mm"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Signature</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><assist role="H2"
+><speak priority="toolTip"
+/></assist
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 103953 11566 0 0 1417 1417 0 0?><?renderCache.textRun 9 Signature 0 1417 10135 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><exclGroup name="SelectSign" x="43.038mm" y="154.985mm"
+><?templateDesigner itemValuesSpecified 1?><field w="28mm" h="5.08mm" locale="en_CA" x="0mm"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="22mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt"
+/><value
+><text
+> Landlord</text
+></value
+></caption
+><items
+><integer
+>1</integer
+></items
+><assist
+><toolTip
+>Who is signing this notice? Landlord</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field x="39.512mm" w="49.346mm" h="5.08mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="43.346mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt"
+/><value
+><text
+> Representative</text
+></value
+></caption
+><items
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Who is signing this notice? Representative</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><?templateDesigner expand 1?></exclGroup
+><subform x="0in" y="160.065mm" locale="en_CA" name="Signature_for_Notice_N12"
+><?templateDesigner expand 1?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XFNpZ25hdHVyZSBmb3IgTm90aWNlIE4xMi54
+ZHAjc29tKCR0ZW1wbGF0ZS5mb3JtMS5TaWduYXR1cmVfZm9yX05vdGljZV9OMTIpIiB4PSIwaW4i
+IHk9IjE2MC4wNjVtbSIgeG1sbnM9Imh0dHA6Ly93d3cueGZhLm9yZy9zY2hlbWEveGZhLXRlbXBs
+YXRlLzMuMC8iCj48P3RlbXBsYXRlRGVzaWduZXIgZXhwYW5kIDE/Pjwvc3ViZm9ybQo+?><bind match="none"
+/><field locale="en_CA" h="12.7mm" name="RFirstName" w="197.612mm"
+><assist
+><toolTip
+>First name of the person who is signing this notice</toolTip
+></assist
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>First Name</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="0mm" rightInset="0mm" topInset="1mm"
+/><para textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border hand="right"
+><edge
+><color
+/></edge
+><edge
+/><edge
+/><edge
+/><margin
+/></border
+><comb numberOfCells="39"
+/><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="RLastName" w="197.612mm" y="12.562mm"
+><assist
+><toolTip
+>Last name of the person who is signing this notice</toolTip
+></assist
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Last Name</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="0mm" rightInset="0mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border hand="right"
+><edge
+><color
+/></edge
+><edge
+/><edge
+/><edge
+/><margin
+/></border
+><comb numberOfCells="39"
+/><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="RDayPhone" w="66.04mm" y="25.269mm"
+><assist
+><toolTip
+>Phone number of the person who is signing this notice</toolTip
+></assist
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Phone Number </text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="0mm" rightInset="0mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border hand="right"
+><edge
+><color
+/></edge
+><edge
+/><edge
+/><edge
+/><margin
+/></border
+><comb numberOfCells="13"
+/><margin
+/></textEdit
+></ui
+><format
+><picture
+>text{'('999')'999-9999}</picture
+></format
+><validate scriptTest="warning"
+/><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><draw locale="en_CA" h="6.35mm" name="Text42" w="3.81mm" x="1.016mm" y="29.612mm"
+><assist
+><toolTip
+>  </toolTip
+></assist
+><caption
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><para vAlign="bottom"
+/></caption
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para hAlign="center" lineHeight="13pt" marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="bottom"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>(</text
+></value
+></draw
+><draw locale="en_CA" h="6.35mm" name="Text42" w="3.81mm" x="21.082mm" y="29.612mm"
+><assist
+><toolTip
+>  </toolTip
+></assist
+><caption
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><para vAlign="bottom"
+/></caption
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para hAlign="center" lineHeight="13pt" marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="bottom"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>)</text
+></value
+></draw
+><draw locale="en_CA" h="6.35mm" name="Text42" w="3.81mm" x="40.894mm" y="29.612mm"
+><assist
+><toolTip
+>  </toolTip
+></assist
+><caption
+><font typeface="Arial" baselineShift="0pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><para vAlign="bottom"
+/></caption
+><font typeface="Arial" baselineShift="0pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para hAlign="center" lineHeight="13pt" marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="bottom"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>-</text
+></value
+></draw
+><draw h="14.058mm" name="Rectangle1" w="88.969mm" y="39.715mm"
+><value
+><rectangle
+><corner radius="5.08mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+></rectangle
+></value
+></draw
+><draw h="14.059mm" name="Rectangle2" w="53.669mm" x="89.046mm" y="39.715mm"
+><value
+><rectangle
+><corner radius="5.08mm"
+><color
+/></corner
+><edge
+><color
+/></edge
+></rectangle
+></value
+></draw
+><draw locale="en_CA" h="4.191mm" name="Text43" w="29.2864mm" x="0.84mm" y="40.057mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>Signature</text
+></value
+></draw
+><draw locale="en_CA" h="4.191mm" name="Text44" w="32.897mm" x="89.834mm" y="40.057mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>Date (dd/mm/yyyy)</text
+></value
+></draw
+><field locale="en_CA" h="9mm" name="Signature" w="87.395mm" x="0.049mm" y="44.248mm"
+><assist
+><toolTip
+>Sign your name</toolTip
+></assist
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="9mm" name="SignDate" w="52.082mm" x="89.976mm" y="44.248mm"
+><assist
+><toolTip
+>The date you sign this form</toolTip
+></assist
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+><dateTimeEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></dateTimeEdit
+></ui
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><value
+><date
+/></value
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+    	    dd = this.rawValue.substring(8,10);
+        	mm = this.rawValue.substring(5,7);
+        	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+></field
+></subform
+><draw name="Text29" w="85.264mm" h="5.08mm" locale="en_CA" y="217.331mm"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>Representative Information<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>(if applicable)</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 238859 11566 0 0 1417 1417 0 0?><?renderCache.textRun 27 Representative Information  0 1417 10135 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 15 (if applicable) 0 161231 10135 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><subform x="0in" y="224.157mm" locale="en_CA" name="Agent_Information_for_Notice"
+><?templateDesigner expand 0?><bind match="none"
+/><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XEFnZW50IEluZm9ybWF0aW9uIC0gTm90aWNl
+cy54ZHAjc29tKCR0ZW1wbGF0ZS5mb3JtMS5BZ2VudF9JbmZvcm1hdGlvbl9mb3JfTm90aWNlKSIg
+eD0iMGluIiB5PSIyMjQuMTU3bW0iIHhtbG5zPSJodHRwOi8vd3d3LnhmYS5vcmcvc2NoZW1hL3hm
+YS10ZW1wbGF0ZS8zLjAvIgo+PD90ZW1wbGF0ZURlc2lnbmVyIGV4cGFuZCAwPz48YmluZAovPjwv
+c3ViZm9ybQo+?><field locale="en_CA" h="12.7mm" name="AgentName" w="86.36mm" x="0.001mm"
+><assist
+><toolTip
+>Representative’s Name</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Name</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentLSUC" w="25.4mm" x="86.361mm" y="0mm"
+><assist
+><toolTip
+>Representative’s Law Society of Upper Canada (LSUC) Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>LSUC #</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><value
+><text maxChars="6"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentCompany" w="85.852mm" x="111.761mm"
+><assist
+><toolTip
+>Representative’s Company Name (if applicable)</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Company Name (if applicable)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentAddress" w="134.112mm" x="0.001mm" y="12.7mm"
+><assist
+><toolTip
+>Representative’s Mailing Address</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Mailing Address</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentPhoneNum" w="63.5mm" x="134.112mm" y="12.7mm"
+><assist
+><toolTip
+>Representative’s Phone Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Phone Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')' 999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><field locale="en_CA" h="12.7mm" name="AgentMunicipality" w="71.882mm" x="0.001mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Municipality (City, Town, etc.)</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Municipality (City, Town, etc.)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentProvince" w="27.94mm" x="71.883mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Province</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Province</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><value
+><text maxChars="2"
+/></value
+></field
+><field locale="en_CA" h="12.7mm" name="AgentPostCode" w="34.29mm" x="99.823mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Postal Code</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Postal Code</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{A9A 9A9}|text{A9A9A9}</picture
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{A9A 9A9}</picture
+></bind
+><format
+><picture
+>text{A9A 9A9}</picture
+></format
+><value
+><text maxChars="7"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");  ///Le champ Code postal n'a pu être validé. Veuillez utiliser le format L1L 1N1.
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+else
+{
+	this.rawValue = this.rawValue.toUpperCase();
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    //app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");
+    xfa.host.setFocus(this);
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentFaxNum" w="63.5mm" x="134.112mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Fax Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Fax Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')' 999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Fax Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+></subform
+><draw h="3.55mm" name="pageFoot2" w="31.75mm" y="263.15mm" x="165.862mm" locale="en_CA"
+><ui
+><textEdit
+><margin
+/></textEdit
+></ui
+><value
+><text
+>Page 2 of 2</text
+></value
+><font baselineShift="0pt" size="9pt" typeface="Arial"
+/><margin bottomInset="0mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" hAlign="center" vAlign="bottom"
+/><?renderCache.bounds 87166 10063 0 0 1417 0 0 0?><?renderCache.textRun 11 Page 2 of 2 0 21981 8169 0 0 0 "Arial" 0 0 9000 ISO-8859-1?></draw
+><breakBefore targetType="pageArea" startNew="1"
+/><?templateDesigner expand 0?></subform
+><proto
+/><desc
+><text name="title"
+>Form N12</text
+></desc
+><?templateDesigner Hyphenation excludeInitialCap:1, excludeAllCaps:1, wordCharCnt:7, remainCharCnt:3, pushCharCnt:3?><?templateDesigner expand 1?><?renderCache.subset "Adobe Pi Std" 0 0 UTF-16 2 4 004F?><?renderCache.subset "Arial" 0 0 ISO-8859-1 4 192 49 00030006000B000C000F001100120013001400150017001D00240026002700280029002C002F003000310033003600370038004400450046004700480049004A004B004C004F005000510052005300550056005700580059005A005B005C006F #(),./0124:ACDEFILMNPSTUabcdefghilmnoprstuvwxyç?><?renderCache.subset "Arial" 1 0 ISO-8859-1 4 148 37 0003000B000C000F001000140015002500280029002C002F003000310033003500370038004400450046004700480049004B004C004F005000510052005300540055005600570058005C (),-12BEFILMNPRTUabcdefhilmnopqrstuy?><?renderCache.subset "Arial Black" 0 0 ISO-8859-1 4 132 33 00030011001D002600280029002C002F00310032003600370038003C004400450046004700480049004A004B004C004F00500051005200550056005700580059005C .:CEFILNOSTUYabcdefghilmnorstuvy?><?renderCache.subset "Verdana" 0 0 ISO-8859-1 4 220 55 0003000A000B000C000F0010001100120013001400150016001700180019001B001C001D002400250029002B002C002F003100320033003500360037003C004400450046004700480049004A004B004C004E004F0050005100520053005400550056005700580059005A005B005C '(),-./012345689:ABFHILNOPRSTYabcdefghiklmnopqrstuvwxy?><?renderCache.subset "Verdana" 0 0 UTF-16 2 4 0142?><?renderCache.subset "Verdana" 1 0 ISO-8859-1 4 188 47 0003000A000B000C001100120013001400150019001D00220024002500280029002B002C002F003000320035003600370038003A004400450046004700480049004A004B004C004F005000510052005300550056005700580059005A005C '()./0126:?ABEFHILMORSTUWabcdefghilmnoprstuvwy?><?renderCache.subset "Verdana" 0 1 ISO-8859-1 4 84 21 0003000A0028002B0031003700440046004700480049004A004B004C005100520055005600570058005C 'EHNTacdefghinorstuy?></subform
+><?originalXFAVersion http://www.xfa.org/schema/xfa-template/2.1/ LegacyPositioning:0 LegacyEventModel:0?><?templateDesigner Grid show:0, snap:0, units:0, color:ff8080, origin:(0,0), interval:(125000,125000), objsnap:1, guidesnap:0, pagecentersnap:871760592?><?templateDesigner DefaultLanguage JavaScript?><?templateDesigner DefaultRunAt client?><?acrobat JavaScript strictScoping?><?PDFPrintOptions embedViewerPrefs 0?><?PDFPrintOptions embedPrintOnFormOpen 0?><?PDFPrintOptions scalingPrefs 0?><?PDFPrintOptions enforceScalingPrefs 0?><?PDFPrintOptions paperSource 0?><?PDFPrintOptions duplexMode 0?><?templateDesigner DefaultPreviewType interactive?><?templateDesigner DefaultPreviewPagination simplex?><?templateDesigner XDPPreviewFormat 19?><?templateDesigner DefaultCaptionFontSettings face:Myriad Pro;size:10;weight:normal;style:normal?><?templateDesigner DefaultValueFontSettings face:Myriad Pro;size:10;weight:normal;style:normal?><?templateDesigner FormTargetVersion 30?><?templateDesigner Zoom 133?><?templateDesigner SaveTaggedPDF 1?><?templateDesigner SavePDFWithEmbeddedFonts 1?><?templateDesigner Rulers horizontal:1, vertical:1, guidelines:0, crosshairs:0?><?templateDesigner Guidelines v:322835;v:1208268;v:1380118;v:10236;h:4145669?></template
+>

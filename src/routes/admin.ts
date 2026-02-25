@@ -2531,37 +2531,78 @@ router.get("/financial/summary", async (req, res) => {
 //  LEGAL NOTICE PDF GENERATION ENDPOINT
 // ═══════════════════════════════════════════════════════════
 
-/** POST /admin/notices/generate — Generate Ontario LTB notice PDF (N1–N13) */
+/** POST /admin/notices/generate — Generate Ontario LTB notice PDF (N1–N14) */
 router.post("/notices/generate", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   const schema = z.object({
-    noticeType: z.enum(["N1", "N2", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12", "N13"]),
+    noticeType: z.enum(["N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12", "N13", "N14"]),
     tenantName: z.string().min(1),
     rentalUnitAddress: z.string().min(1),
     landlordName: z.string().min(1),
     landlordPhone: z.string().optional(),
     terminationDate: z.string().optional(),
-    // N1/N13 fields
+    // Rent increase fields (N1/N2/N3/N10)
     currentRent: z.number().optional(),
     newRent: z.number().optional(),
+    paymentPeriod: z.string().optional(),
+    // N1-specific
+    increaseType: z.string().optional(),
+    aboveGuidelineReason: z.string().optional(),
+    aboveGuidelineAmount: z.number().optional(),
+    // N3-specific
+    rentWillIncrease: z.boolean().optional(),
+    rentIncreaseApproval: z.string().optional(),
+    careChargesIncrease: z.boolean().optional(),
+    newCareCharge: z.number().optional(),
+    totalNewAmount: z.number().optional(),
     // N4 fields
+    rentOwingPeriods: z.array(z.object({
+      periodFrom: z.string(),
+      periodTo: z.string(),
+      rentCharged: z.number(),
+      rentPaid: z.number(),
+    })).optional(),
+    // Legacy N4 single-period fields
     rentOwingPeriod: z.string().optional(),
     rentCharged: z.number().optional(),
     rentPaid: z.number().optional(),
-    // N5/N6/N10/N12/N13 fields
+    // N5/N6/N7/N8/N10/N12/N13 fields
     reason: z.string().optional(),
     details: z.string().optional(),
+    // N5-specific
+    damageAmount: z.number().optional(),
+    otherAmount: z.number().optional(),
+    overcrowdingExplanation: z.string().optional(),
+    // N5/N6/N7 events
+    events: z.array(z.object({
+      dateTime: z.string(),
+      description: z.string(),
+    })).optional(),
     // N8 fields
     latePayments: z.array(z.object({
       period: z.string(),
       dueDate: z.string(),
       datePaid: z.string(),
     })).optional(),
-    // N11 fields
+    noticeDetail: z.string().optional(),
+    // N10/N11 fields
     tenantSignedBy: z.string().optional(),
     // N12 fields
     occupantName: z.string().optional(),
     relationship: z.string().optional(),
+    whoWillOccupy: z.string().optional(),
+    isCareProvider: z.boolean().optional(),
+    careRecipient: z.string().optional(),
+    // N13 fields
+    workPlan: z.string().optional(),
+    permitsStatus: z.string().optional(),
+    // N14 fields
+    originalTenantName: z.string().optional(),
+    periodEndDate: z.string().optional(),
+    moveOutDate: z.string().optional(),
+    paymentDueDate: z.string().optional(),
+    amountOwed: z.number().optional(),
+    payPeriod: z.string().optional(),
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "validation_error", details: parsed.error.issues });
@@ -2588,6 +2629,10 @@ router.post("/notices/generate", async (req, res) => {
           currentRent: d.currentRent || 0,
           newRent: d.newRent || 0,
           effectiveDate: d.terminationDate || "",
+          increaseType: d.increaseType,
+          aboveGuidelineReason: d.aboveGuidelineReason,
+          aboveGuidelineAmount: d.aboveGuidelineAmount,
+          paymentPeriod: d.paymentPeriod,
         });
         break;
       case "N2":
@@ -2597,20 +2642,49 @@ router.post("/notices/generate", async (req, res) => {
           newRent: d.newRent || 0,
           effectiveDate: d.terminationDate || "",
           exemptionReason: d.reason || "post_nov_2018",
+          paymentPeriod: d.paymentPeriod,
+        });
+        break;
+      case "N3":
+        pdfBuffer = await noticeService.generateN3Notice({
+          ...common,
+          currentRent: d.currentRent || 0,
+          newRent: d.newRent || 0,
+          effectiveDate: d.terminationDate || "",
+          rentWillIncrease: d.rentWillIncrease,
+          rentIncreaseApproval: d.rentIncreaseApproval,
+          careChargesIncrease: d.careChargesIncrease,
+          newCareCharge: d.newCareCharge,
+          totalNewAmount: d.totalNewAmount,
+          paymentPeriod: d.paymentPeriod,
         });
         break;
       case "N4": {
-        const rentCharged = d.rentCharged || 0;
-        const rentPaid = d.rentPaid || 0;
-        pdfBuffer = await noticeService.generateN4Notice({
-          ...common,
-          rentOwing: [{
-            period: d.rentOwingPeriod || "Current period",
+        let rentOwingArr: Array<{ periodFrom: string; periodTo: string; rentCharged: number; rentPaid: number; rentOwing: number }> = [];
+        if (d.rentOwingPeriods && d.rentOwingPeriods.length > 0) {
+          rentOwingArr = d.rentOwingPeriods.map(p => ({
+            periodFrom: p.periodFrom,
+            periodTo: p.periodTo,
+            rentCharged: p.rentCharged,
+            rentPaid: p.rentPaid,
+            rentOwing: p.rentCharged - p.rentPaid,
+          }));
+        } else {
+          const rentCharged = d.rentCharged || 0;
+          const rentPaid = d.rentPaid || 0;
+          rentOwingArr = [{
+            periodFrom: d.rentOwingPeriod || "Current period",
+            periodTo: d.rentOwingPeriod || "Current period",
             rentCharged,
             rentPaid,
             rentOwing: rentCharged - rentPaid,
-          }],
-          totalOwing: rentCharged - rentPaid,
+          }];
+        }
+        const totalOwing = rentOwingArr.reduce((sum, r) => sum + r.rentOwing, 0);
+        pdfBuffer = await noticeService.generateN4Notice({
+          ...common,
+          rentOwing: rentOwingArr,
+          totalOwing,
           terminationDate: d.terminationDate || "",
         });
         break;
@@ -2620,28 +2694,37 @@ router.post("/notices/generate", async (req, res) => {
           ...common,
           reason: d.reason || "interference",
           details: d.details || "",
+          events: d.events,
+          damageAmount: d.damageAmount,
+          otherAmount: d.otherAmount,
+          overcrowdingExplanation: d.overcrowdingExplanation,
           terminationDate: d.terminationDate || "",
         });
         break;
       case "N6":
         pdfBuffer = await noticeService.generateN6Notice({
           ...common,
-          reason: d.reason || "illegal_act",
+          reason: d.reason || "illegal_act_unit",
           details: d.details || "",
+          events: d.events,
           terminationDate: d.terminationDate || "",
         });
         break;
       case "N7":
         pdfBuffer = await noticeService.generateN7Notice({
           ...common,
+          reason: d.reason,
           details: d.details || "",
+          events: d.events,
           terminationDate: d.terminationDate || "",
         });
         break;
       case "N8":
         pdfBuffer = await noticeService.generateN8Notice({
           ...common,
+          reason: d.reason,
           latePayments: d.latePayments || [{ period: "Current period", dueDate: "See pattern", datePaid: "Late" }],
+          noticeDetail: d.noticeDetail,
           terminationDate: d.terminationDate || "",
         });
         break;
@@ -2675,6 +2758,9 @@ router.post("/notices/generate", async (req, res) => {
           reason: (d.reason || "personal_use") as any,
           occupantName: d.occupantName || d.landlordName,
           relationship: d.relationship,
+          whoWillOccupy: d.whoWillOccupy,
+          isCareProvider: d.isCareProvider,
+          careRecipient: d.careRecipient,
           terminationDate: d.terminationDate || "",
         });
         break;
@@ -2683,7 +2769,26 @@ router.post("/notices/generate", async (req, res) => {
           ...common,
           reason: d.reason || "repairs",
           details: d.details || "",
+          workPlan: d.workPlan,
+          permitsStatus: d.permitsStatus,
           terminationDate: d.terminationDate || "",
+        });
+        break;
+      case "N14":
+        pdfBuffer = await noticeService.generateN14Notice({
+          spouseName: d.tenantName,
+          landlordName: d.landlordName,
+          landlordPhone: d.landlordPhone,
+          rentalUnitAddress: d.rentalUnitAddress,
+          originalTenantName: d.originalTenantName || "",
+          periodEndDate: d.periodEndDate || "",
+          moveOutDate: d.moveOutDate || "",
+          paymentDueDate: d.paymentDueDate || d.terminationDate || "",
+          amountOwed: d.amountOwed,
+          currentRent: d.currentRent,
+          payPeriod: d.payPeriod,
+          dateGiven,
+          signedBy: d.landlordName,
         });
         break;
       default:

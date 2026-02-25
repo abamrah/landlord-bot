@@ -1,0 +1,2577 @@
+
+<template xmlns="http://www.xfa.org/schema/xfa-template/3.0/"
+><?formServer defaultPDFRenderFormat acrobat9.1static?><?formServer allowRenderCaching 0?><?formServer formModel both?><subform layout="tb" locale="en_CA" name="form1"
+><pageSet
+><pageArea id="Page1" name="Page1"
+><draw h="15.875mm" name="Text1" w="117.925mm" x="89.085mm" y="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-size:12pt;letter-spacing:0in"
+>Notice of Rent Increase</p
+><p style="tab-interval:0.5in;tab-stops:center 3in right 6in;font-size:12pt;letter-spacing:0in"
+>N1</p
+><p style="tab-interval:0.5in;tab-stops:center 3in right 6in;font-size:10pt;font-weight:normal;letter-spacing:0in"
+>(Disponible en français)<span style="font-size:12pt;font-weight:bold"
+><span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+><font baselineShift="0pt" typeface="Arial" weight="bold" size="11pt"
+/><margin bottomInset="0mm" leftInset="0mm" rightInset="0mm" topInset="0mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" hAlign="right"
+/><assist role="H1"
+/></draw
+><contentArea h="247.65mm" w="198.12mm" x="8.89mm" y="25.4mm"
+/><medium long="279.4mm" short="215.9mm" stock="letter"
+/><?templateDesigner expand 1?></pageArea
+><?templateDesigner expand 0?></pageSet
+><subform w="198.12mm" h="247.65mm" locale="en_CA"
+><draw name="Text2" w="139.7mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Read the instructions carefully before completing this form.</text
+></value
+><font typeface="Arial" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 393166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 60 Read the instructions carefully before completing this form. 0 1417 13696 0 0 0 "Arial" 1 0 10000 ISO-8859-1?></draw
+><subform x="0in" y="7.62mm" locale="en_CA" name="Notice_Name_And_Address_1"
+><?templateDesigner expand 0?><bind match="none"
+/><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XE5vdGljZSBOYW1lIEFuZCBBZGRyZXNzIDEu
+eGRwI3NvbSgkdGVtcGxhdGUuZm9ybTEuTm90aWNlX05hbWVfQW5kX0FkZHJlc3NfMSkiIHg9IjBp
+biIgeT0iNy42Mm1tIiBsb2NhbGU9ImVuX0NBIiB4bWxucz0iaHR0cDovL3d3dy54ZmEub3JnL3Nj
+aGVtYS94ZmEtdGVtcGxhdGUvMy4wLyIKPjw/dGVtcGxhdGVEZXNpZ25lciBleHBhbmQgMD8+PGJp
+bmQKLz48L3N1YmZvcm0KPg==?><draw locale="en_CA" h="5.08mm" name="Text1" w="98.806mm"
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+>To:<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>(Tenant's name and address)</span
+></p
+></body
+></exData
+></value
+></draw
+><draw locale="en_CA" h="5.08mm" name="Text1" w="98.806mm" x="98.806mm"
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt" weight="bold"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="tab-interval:0.5in;tab-stops:left 5.094in;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+>From:<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>(Landlord's name and address)<span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+></draw
+><field locale="en_CA" h="13.97mm" name="To_TenantName" w="98.806mm" y="5.08mm"
+><assist
+><toolTip
+>Tenant's name and address</toolTip
+></assist
+><border
+><corner presence="hidden"
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="13.97mm" name="From_LandlordName" w="98.806mm" x="98.806mm" y="5.08mm"
+><assist
+><toolTip
+>Landlord's name and address</toolTip
+></assist
+><border
+><corner presence="hidden"
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><draw locale="en_CA" h="5.08mm" name="Text2" w="197.612mm" y="19.05mm"
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><fill
+><color value="241,242,242"
+/><solid
+/></fill
+><margin
+/></border
+><font typeface="Verdana" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p style="font-weight:bold;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+>Address of the Rental Unit:<span style="xfa-spacerun:yes"
+>  </span
+><span style="font-weight:normal"
+><span style="xfa-spacerun:yes"
+> </span
+></span
+></p
+></body
+></exData
+></value
+></draw
+><field locale="en_CA" h="13.97mm" name="RentUnitAddress" w="197.612mm" y="24.13mm"
+><assist
+><toolTip
+> Address of the Rental Unit</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge
+><color
+/></edge
+><margin
+/></border
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+></subform
+><draw name="Text3" y="53.376mm" w="29.2864mm" h="12.7mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>Your New</p
+><p
+>Rent</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right"
+/><?renderCache.bounds 80183 33166 0 0 1417 1417 0 0?><?renderCache.textRun 9 Your New  0 26952 14935 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 4 Rent 0 55457 26935 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Rectangle17" y="53.376mm" x="34.417mm" w="163.195mm" h="45.72mm"
+><value
+><rectangle
+><edge
+/><corner radius="5.08mm"
+/></rectangle
+></value
+></draw
+><draw name="Text4" y="54.654mm" x="36.83mm" w="9.525mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>On</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="7pt"
+/><?renderCache.bounds 24166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 2 On 0 1417 17235 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field name="StartDate" y="54.654mm" x="46.355mm" w="50.8mm" h="12.192mm" locale="en_CA"
+><ui
+><dateTimeEdit hScrollPolicy="off"
+><border hand="right"
+><?templateDesigner StyleID aped2?><edge
+/></border
+><margin
+/><comb numberOfCells="10"
+/></dateTimeEdit
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="center"
+/><value
+><date
+/></value
+><caption reserve="3.556mm" placement="bottom"
+><para vAlign="middle" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><value
+><text
+>dd/mm/yyyy</text
+></value
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+/></caption
+><assist
+><toolTip
+>Date the rent increase takes effect </toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	var d = new Date(yy,mm-1,dd);
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><validate scriptTest="warning"
+/></field
+><draw name="Text5" y="55.293mm" x="57.683mm" w="3.81mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>/</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="13pt"
+/><assist
+><toolTip
+> .</toolTip
+></assist
+><caption
+><para vAlign="bottom"
+/></caption
+></draw
+><draw name="Text6" y="55.293mm" x="72.39mm" w="3.81mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>/</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="13pt"
+/><assist
+><toolTip
+> .</toolTip
+></assist
+><?renderCache.bounds 7966 15166 0 0 1417 1417 0 0?><?renderCache.textRun 1 / 0 1953 14518 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text7" y="54.654mm" x="98.425mm" w="47.625mm" h="7.62mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>, your rent will increase to</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="7pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 132166 18766 0 0 1417 1417 0 0?><?renderCache.textRun 28 , your rent will increase to 0 1417 17235 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field y="54.654mm" x="146.05mm" w="50.8mm" h="8.89mm" locale="en_CA" name="RentIncAmount1"
+><ui
+><numericEdit hScrollPolicy="off"
+><border hand="right"
+><?templateDesigner StyleID aped2?><edge
+/></border
+><margin
+/><comb numberOfCells="9"
+/></numericEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="right"
+/><caption reserve="5.7465mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center"
+/><value
+><text
+> $</text
+></value
+><font typeface="Arial" size="12pt" baselineShift="0pt"
+/></caption
+><format
+><picture
+>num{zz,zz9.99}</picture
+></format
+><validate scriptTest="warning"
+/><assist
+><toolTip
+>The new rent will be</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+	this.rawValue="";
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	//app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+}
+</script
+></event
+></field
+><draw name="Text8" y="56.432mm" x="182.118mm" w="3.81mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>•</text
+></value
+><font typeface="Arial" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="13pt"
+/><?renderCache.bounds 7966 15166 0 0 1417 1417 0 0?><?renderCache.textRun 3 • 0 3650 14479 0 0 0 "Arial" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text9" y="66.846mm" x="36.83mm" w="9.525mm" h="8.89mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>per</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="1pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 24166 22366 0 0 1417 1417 0 0?><?renderCache.textRun 3 per 0 1417 16035 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><subform x="46.355mm" y="66.846mm" locale="en_CA" name="period"
+><?templateDesigner expand 1?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XHBlcmlvZC54ZHAjc29tKCR0ZW1wbGF0ZS5m
+b3JtMS5wZXJpb2QpIiB4PSI0Ni4zNTVtbSIgeT0iNjYuODQ2bW0iIHhtbG5zPSJodHRwOi8vd3d3
+LnhmYS5vcmcvc2NoZW1hL3hmYS10ZW1wbGF0ZS8zLjAvIgo+PD90ZW1wbGF0ZURlc2lnbmVyIGV4
+cGFuZCAxPz48L3N1YmZvcm0KPg==?><traversal
+><traverse operation="first" ref="PaymentPeriodM[0]"
+/></traversal
+><bind match="none"
+/><exclGroup name="PaymentPeriodM" y="0.001mm"
+><traversal
+><traverse ref="OtherSpecify[0]"
+/></traversal
+><field locale="en_CA" h="8.89mm" w="19.57mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: Month</toolTip
+></assist
+><caption placement="right" reserve="13.57mm"
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> month</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>1</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="4.2333mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="8.89mm" w="17.149mm" x="20.745mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: Week</toolTip
+></assist
+><caption placement="right" reserve="11.149mm"
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> week</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>2</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="4.2333mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="8.89mm" w="33.882mm" x="39.565mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: Other</toolTip
+></assist
+><caption placement="right" reserve="27.882mm"
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> other (specify)</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>3</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="4.2333mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+></exclGroup
+><field locale="en_CA" h="8.89mm" name="OtherSpecify" w="27.259mm" x="74.442mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: other (specify)</toolTip
+></assist
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+></subform
+><draw name="Text10" y="66.846mm" x="148.008mm" w="5.945mm" h="8.89mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>.</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom"
+/><?renderCache.bounds 14018 22366 0 0 1417 1417 0 0?><?renderCache.textRun 1 . 0 1417 21718 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text11" y="85.126mm" x="36.83mm" w="156.845mm" h="12.7mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>This rent includes the basic rent for your rental unit, plus any amount you pay separately to your landlord for services.</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 441766 33166 0 0 1417 1417 0 0?><?renderCache.textRun 80 This rent includes the basic rent for your rental unit, plus any amount you pay  0 1417 14935 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 41 separately to your landlord for services. 0 1417 26935 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text12" y="104.775mm" w="29.286mm" h="16.51mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>Explanation</p
+><p
+>of the Rent</p
+><p
+>Increase</p
+></body
+></exData
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle" hAlign="right"
+/><assist role="H2"
+/><?renderCache.bounds 80181 43966 0 0 1417 1417 0 0?><?renderCache.textRun 12 Explanation  0 15221 14335 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 of the Rent  0 19210 26335 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 8 Increase 0 32267 38335 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text13" y="104.775mm" w="47.625mm" h="8.761mm" locale="en_CA" x="34.925mm"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>This is a rent increase of: </text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="4pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 132166 22000 0 0 1417 1417 0 0?><?renderCache.textRun 28 This is a rent increase of:  0 1417 17352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field y="104.775mm" x="82.55mm" w="50.8mm" h="8.89mm" locale="en_CA" name="RentIncAmount2"
+><ui
+><numericEdit hScrollPolicy="off"
+><border hand="right"
+><?templateDesigner StyleID aped2?><edge
+/></border
+><margin
+/><comb numberOfCells="9"
+/></numericEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle" hAlign="right"
+/><caption reserve="5.7465mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="center"
+/><value
+><text
+> $</text
+></value
+><font typeface="Arial" size="12pt" baselineShift="0pt"
+/></caption
+><format
+><picture
+>num{zz,zz9.99}</picture
+></format
+><validate scriptTest="warning"
+/><assist
+><toolTip
+>This is a rent increase of $</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (this.rawValue&gt;99999.99 || this.rawValue&lt;0)
+{
+	app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+	this.rawValue="";
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+{
+	//app.alert("Amount field failed validation. Please use the format 99999.99.");
+	xfa.host.setFocus(this);
+}
+</script
+></event
+></field
+><draw name="Text14" y="106.553mm" x="118.618mm" w="3.81mm" h="6.35mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>•</text
+></value
+><font typeface="Arial" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="bottom" hAlign="center" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" lineHeight="13pt"
+/><?renderCache.bounds 7966 15166 0 0 1417 1417 0 0?><?renderCache.textRun 3 • 0 3650 14479 0 0 0 "Arial" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text15" y="117.094mm" x="34.925mm" w="9.525mm" h="9.642mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>per</text
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 24166 24498 0 0 1417 1417 0 0?><?renderCache.textRun 3 per 0 1417 16601 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><subform x="44.45mm" y="117.094mm" locale="en_CA" name="period"
+><?templateDesigner expand 0?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XHBlcmlvZC54ZHAjc29tKCR0ZW1wbGF0ZS5m
+b3JtMS5wZXJpb2QpIiB4PSI0NC40NW1tIiB5PSIxMTcuMDk0bW0iIHhtbG5zPSJodHRwOi8vd3d3
+LnhmYS5vcmcvc2NoZW1hL3hmYS10ZW1wbGF0ZS8zLjAvIgo+PD90ZW1wbGF0ZURlc2lnbmVyIGV4
+cGFuZCAwPz48L3N1YmZvcm0KPg==?><traversal
+><traverse operation="first" ref="PaymentPeriodM[0]"
+/></traversal
+><bind match="none"
+/><exclGroup name="PaymentPeriodM" y="0.001mm"
+><traversal
+><traverse ref="OtherSpecify[0]"
+/></traversal
+><field locale="en_CA" h="8.89mm" w="19.57mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: Month</toolTip
+></assist
+><caption placement="right" reserve="13.57mm"
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> month</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>1</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="4.2333mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="8.89mm" w="17.149mm" x="20.745mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: Week</toolTip
+></assist
+><caption placement="right" reserve="11.149mm"
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> week</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>2</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="4.2333mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field locale="en_CA" h="8.89mm" w="33.882mm" x="39.565mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: Other</toolTip
+></assist
+><caption placement="right" reserve="27.882mm"
+><font typeface="Verdana" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+> other (specify)</text
+></value
+></caption
+><font typeface="Myriad Pro"
+/><items
+><text
+>3</text
+></items
+><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><ui
+><checkButton mark="check" size="4.2333mm"
+><border
+><edge
+><color
+/></edge
+><fill
+><solid
+/><color
+/></fill
+><margin
+/></border
+></checkButton
+></ui
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+></exclGroup
+><field locale="en_CA" h="8.89mm" name="OtherSpecify" w="27.259mm" x="74.442mm" y="0mm"
+><assist
+><toolTip
+>select the payment period: other (specify)</toolTip
+></assist
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><edge
+><color
+/></edge
+><edge presence="hidden"
+><color
+/></edge
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+></subform
+><draw name="Text16" y="117.094mm" x="146.151mm" w="7.62mm" h="9.642mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> or</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 18766 24498 0 0 1417 1417 0 0?><?renderCache.textRun 3  or 0 1417 16601 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><field name="RentIncPercent" y="117.094mm" x="153.953mm" w="35.56mm" h="9mm" locale="en_CA"
+><ui
+><textEdit hScrollPolicy="off"
+><border
+><edge presence="hidden"
+/><edge presence="hidden"
+/><edge
+/><edge presence="hidden"
+/><?templateDesigner StyleID aped1?></border
+><margin
+/></textEdit
+></ui
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin topInset="1mm" bottomInset="1mm" leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><assist
+><toolTip
+>Percentage Increase</toolTip
+></assist
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><draw name="Text17" y="117.094mm" x="188.595mm" w="9.525mm" h="9.642mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+> %.</text
+></value
+><font typeface="Verdana"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 24166 24498 0 0 1417 1417 0 0?><?renderCache.textRun 3  %. 0 1417 16601 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><draw name="Text18" y="130.175mm" x="34.925mm" w="127mm" h="8.89mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Shade one of the following:</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="middle"
+/><?renderCache.bounds 357166 22366 0 0 1417 1417 0 0?><?renderCache.textRun 27 Shade one of the following: 0 1417 15535 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><exclGroup name="Check1" x="34.925mm" y="139.065mm"
+><field x="0.000014in" w="161.925mm" h="12.192mm" locale="en_CA" name="Check_1"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="155.321mm"
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>This rent increase is less than or equal to the rent increase guideline and does not</p
+><p
+><span style="xfa-spacerun:yes"
+> </span
+>need approval by an order under the<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:italic"
+>Residential Tenancies Act, 2006.</span
+></p
+></body
+></exData
+></value
+><para vAlign="bottom" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt"
+/></caption
+><assist
+><toolTip
+>This rent increase is less than or equal to the rent increase guideline and does not need approval by an order under the Residential Tenancies Act.</toolTip
+></assist
+><border
+><edge presence="hidden"
+/><fill
+/></border
+><items
+><text
+>1</text
+></items
+><event activity="click" name="event__click"
+><script contentType="application/x-javascript"
+>
+Check2.rawValue = '2';
+Check_2_1.rawValue = null;
+Check_2_2.rawValue = null;
+</script
+></event
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><?templateDesigner itemValuesSpecified 1?><?templateDesigner expand 1?></exclGroup
+><draw name="Text19" y="155.575mm" x="34.925mm" w="7.62mm" h="8.89mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>OR</text
+></value
+><font typeface="Verdana" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle"
+/><?renderCache.bounds 18766 22366 0 0 1417 1417 0 0?><?renderCache.textRun 2 OR 0 1417 15535 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><exclGroup name="Check2" x="34.925mm" y="168.275mm"
+><field w="161.925mm" h="7.62mm" locale="en_CA" name="Check_2"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="155.321mm"
+><para vAlign="middle"
+/><font typeface="Verdana"
+/><value
+><text
+> This rent increase is more than the rent increase guideline, but:</text
+></value
+></caption
+><items
+><text
+>1</text
+></items
+><event activity="click" name="event__click"
+><script contentType="application/x-javascript"
+>
+Check1.rawValue = '2';
+</script
+></event
+><assist
+><toolTip
+>This rent increase is more than the rent increase guideline</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><?templateDesigner itemValuesSpecified 1?><?templateDesigner expand 1?></exclGroup
+><field name="Check_2_1" y="180.975mm" x="41.275mm" w="12.7mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption reserve="5.6998mm"
+><para vAlign="middle"
+/><font typeface="Verdana"
+/><value
+><text
+>1.</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><event activity="click" name="event__click"
+><script contentType="application/x-javascript"
+>Check2.rawValue = '1';
+Check1.rawValue = '2';
+</script
+></event
+><assist
+><toolTip
+>1. The rent increase has been approved by an order under the Residential Tenancies Act, 2006</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><draw name="Text20" y="180.975mm" x="55.88mm" w="140.97mm" h="11.333mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>The rent increase has been approved by an order under the<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:italic"
+>Residential Tenancies Act, 2006.</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="4pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 396766 29291 0 0 1417 1417 0 0?><?renderCache.textRun 58 The rent increase has been approved by an order under the  0 1417 13352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 12 Residential  0 306246 13352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 20 Tenancies Act, 2006. 0 1417 25352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?></draw
+><field name="Check_2_2" y="196.85mm" x="41.275mm" w="12.7mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><fill
+><color value="255, 255, 255"
+/></fill
+><?templateDesigner StyleID apcb1?></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="1mm" rightInset="1mm"
+/><para vAlign="middle"
+/><value
+><integer
+>0</integer
+></value
+><caption reserve="5.7mm"
+><para vAlign="middle"
+/><font typeface="Verdana"
+/><value
+><text
+>2.</text
+></value
+></caption
+><items
+><integer
+>1</integer
+><integer
+>0</integer
+><integer
+>2</integer
+></items
+><event activity="click" name="event__click"
+><script contentType="application/x-javascript"
+>Check2.rawValue = '1';
+Check1.rawValue = '2';
+</script
+></event
+><assist
+><toolTip
+>2. The rent increase must be approved by an order under the Residential Tenancies Act, 2006. I have applied to the Board for a Rent Increase Above the Guideline.</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><draw name="Text21" y="196.85mm" x="55.88mm" w="140.97mm" h="14.608mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>The rent increase must be approved by an order under the<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:italic"
+>Residential Tenancies Act, 2006</span
+>. I have applied to the Board for a Rent Increase Above the Guideline.</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="4pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 396766 38575 0 0 1417 1417 0 0?><?renderCache.textRun 57 The rent increase must be approved by an order under the  0 1417 13352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 12 Residential  0 301622 13352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 19 Tenancies Act, 2006 0 1417 25352 0 0 0 "Verdana" 0 1 10000 ISO-8859-1?><?renderCache.textRun 56 . I have applied to the Board for a Rent Increase Above  0 103395 25352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?><?renderCache.textRun 14 the Guideline. 0 1417 37352 0 0 0 "Verdana" 0 0 10000 ISO-8859-1?></draw
+><subform x="0mm" y="244.348mm" locale="en_CA" name="version_date"
+><?templateDesigner expand 1?><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XHZlcnNpb25fZGF0ZV8yMDIyMDQwMS54ZHAj
+c29tKCR0ZW1wbGF0ZS5mb3JtMS52ZXJzaW9uX2RhdGUpIiB4PSIwbW0iIHk9IjI0NC4zNDhtbSIg
+eG1sbnM9Imh0dHA6Ly93d3cueGZhLm9yZy9zY2hlbWEveGZhLXRlbXBsYXRlLzMuMC8iCj48P3Rl
+bXBsYXRlRGVzaWduZXIgZXhwYW5kIDE/Pjwvc3ViZm9ybQo+?><traversal
+><traverse operation="first" ref="Text2[0]"
+/></traversal
+><bind match="none"
+/><draw locale="en_CA" h="3.302mm" name="Text2" w="15.163mm"
+><assist
+><speak
+>version date</speak
+><toolTip
+>version date</toolTip
+></assist
+><font typeface="Arial" baselineShift="0pt" size="6pt"
+><fill
+><color
+/></fill
+></font
+><margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"
+/><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="bottom"
+/><ui
+><textEdit
+/></ui
+><value
+><text
+>v. 01/04/2022</text
+></value
+></draw
+></subform
+><draw name="PageFoot1" y="242.417mm" x="166.37mm" w="31.75mm" h="5.2331mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Page 1 of 2</text
+></value
+><font size="9pt" typeface="Arial" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" lineHeight="16.8pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="bottom"
+/><?renderCache.bounds 87166 13417 0 0 1417 1417 0 0?><?renderCache.textRun 11 Page 1 of 2 0 42546 12940 0 0 0 "Arial" 0 0 9000 ISO-8859-1?></draw
+><breakBefore targetType="pageArea" target="Page1"
+/><?templateDesigner expand 0?></subform
+><subform h="247.65mm" w="198.12mm" locale="en_CA"
+><draw name="Text22" w="29.286mm" h="17.228mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"
+><p
+>Important</p
+><p
+>Information</p
+><p
+>About the</p
+><p
+>Law</p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" hAlign="right"
+/><?renderCache.bounds 80181 46001 0 0 1417 1417 0 0?><?renderCache.textRun 10 Important  0 23815 9352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 12 Information  0 13732 21352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 10 About the  0 26559 33352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?><?renderCache.textRun 3 Law 0 58751 45352 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><draw name="Text23" x="34.925mm" w="6.425in" h="106.128mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><exData contentType="text/html"
+><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="2.7.0.0"
+><p style="text-decoration:none;letter-spacing:0in"
+>1.<span style="xfa-spacerun:yes"
+>   </span
+>The landlord must give the tenant this notice at least 90 days before the date of the</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>rent increase. A landlord may increase the rent if at least 12 months have passed</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>since the last rent increase or since a new tenant moved into the rental unit. No</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>Notice of Rent Increase is required where the landlord and tenant have signed an</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>Agreement to Increase the Rent Above the Guideline (Form N10).</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+>2.<span style="xfa-spacerun:yes"
+>   </span
+>A tenant does not have to sign a new lease when a fixed term tenancy ends. If the</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>tenant decides not to sign a new lease, the tenant does not have to move, but the</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>tenancy becomes "month-to-month".<span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>If a tenant plans to move, the tenant must notify the landlord on Form N9 (Tenant's</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>Notice to End the Tenancy) at least 60 days before the lease expires if the tenant has</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>a fixed term of tenancy or 60 days before the end of a monthly or yearly rental period.</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>The tenant must notify the landlord on Form N9 at least 28 days before the end of a</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>weekly rental period.</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+>3.<span style="xfa-spacerun:yes"
+>   </span
+>If the rent increase needs approval by an order under the<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:italic"
+>Residential Tenancies Act,</span
+></p
+><p style="font-style:italic;text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>2006<span style="xfa-spacerun:yes"
+> </span
+><span style="font-style:normal"
+>the tenant is not required to pay more than the guideline increase until the order</span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>is issued. If the tenant only pays the guideline increase, the tenant may owe the</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>landlord once the order is issued.</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+>4.<span style="xfa-spacerun:yes"
+>   </span
+>If you have any questions about the law related to rent increases and how it applies<span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>to this notice, you can contact the Landlord and Tenant Board at<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>416-645-8080<span style="xfa-spacerun:yes"
+> </span
+></span
+>or</p
+><p style="text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+>toll-free at<span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:bold"
+>1-888-332-3234</span
+>. Or, you may also visit the Board's website at<span style="xfa-spacerun:yes"
+> </span
+></p
+><p style="font-weight:bold;text-decoration:none;letter-spacing:0in"
+><span style="xfa-spacerun:yes"
+>      </span
+><a href="https://tribunalsontario.ca/ltb/" style="margin-top:0pt;margin-bottom:0pt;font-family:Verdana;font-size:10pt"
+>tribunalsontario.ca/ltb</a
+><span style="xfa-spacerun:yes"
+> </span
+><span style="font-weight:normal"
+>for further information.</span
+></p
+></body
+></exData
+></value
+><font typeface="Verdana" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/></draw
+><draw name="Text24" w="37.672mm" h="7.62mm" locale="en_CA" y="116.205mm"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Signature</text
+></value
+><font typeface="Verdana" baselineShift="0pt" weight="bold"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><assist role="H2"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 103953 18766 0 0 1417 1417 0 0?><?renderCache.textRun 9 Signature 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><exclGroup name="SelectSign" x="43.037mm" y="116.205mm"
+><?templateDesigner itemValuesSpecified 1?><field w="28mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="22mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt"
+/><value
+><text
+> Landlord</text
+></value
+></caption
+><items
+><integer
+>1</integer
+></items
+><assist
+><toolTip
+>Who is signing this form? Landlord</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><field x="39.513mm" w="49.038mm" h="7.62mm" locale="en_CA"
+><ui
+><checkButton size="4.2333mm" mark="check"
+><border
+><?templateDesigner StyleID apcb3?><edge
+/><fill
+/></border
+></checkButton
+></ui
+><font typeface="Myriad Pro"
+/><margin leftInset="0mm" rightInset="1mm"
+/><para vAlign="middle"
+/><caption placement="right" reserve="43.038mm"
+><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><font typeface="Verdana" baselineShift="0pt"
+/><value
+><text
+> Representative</text
+></value
+></caption
+><items
+><integer
+>2</integer
+></items
+><assist
+><toolTip
+>Who is signing this form? Representative</toolTip
+></assist
+><event activity="initialize" name="event__initialize"
+><script
+>
+$.font.fill.color.value="0,0,255";
+</script
+></event
+></field
+><?templateDesigner expand 1?></exclGroup
+><subform x="0in" y="123.825mm" locale="en_CA" name="SignatureN1ToN3"
+><bind match="none"
+/><?templateDesigner expand 1?><?designerFragmentSource CjxzdWJmb3JtIHg9IjBpbiIgeT0iMTIzLjgyNW1tIiB1c2VocmVmPSIuLlxGcmFnbWVudFxTaWdu
+YXR1cmVOMVRvTjMueGRwI3NvbSgkdGVtcGxhdGUuZm9ybTEuU2lnbmF0dXJlTjFUb04zKSIgbG9j
+YWxlPSJlbl9DQSIgeG1sbnM9Imh0dHA6Ly93d3cueGZhLm9yZy9zY2hlbWEveGZhLXRlbXBsYXRl
+LzMuMC8iCj48YmluZAovPjw/dGVtcGxhdGVEZXNpZ25lciBleHBhbmQgMT8+PC9zdWJmb3JtCj4=?><field locale="en_CA" h="17.272mm" name="SignName" w="98.806mm"
+><assist
+><toolTip
+>name of the person who is signing this form</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Name of Person Signing</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="17.272mm" name="SignPhoneNum" w="98.806mm" x="98.806mm"
+><assist
+><toolTip
+>Phone number of the person who is signing this form</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Phone Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')'999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Le champ No de téléphone n'a pu être validé. Veuillez utiliser le format 111-111-1111.");
+    app.alert("Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Le champ No de téléphone (jour) n’a pu être validé. Veuillez utiliser le format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><field locale="en_CA" h="17.272mm" name="Signature" w="98.806mm" y="17.348mm"
+><assist
+><toolTip
+>Sign your name</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Signature</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="17.272mm" name="SignDate" w="98.806mm" x="98.806mm" y="17.348mm"
+><assist
+><toolTip
+>The date you sign this form</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="4.572mm"
+><font typeface="Arial" baselineShift="0pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Date (dd/mm/yyyy)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>date{DD/MM/YYYY}|date{DDMMYYYY}</picture
+><dateTimeEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></dateTimeEdit
+></ui
+><bind
+><picture
+>date{DD/MM/YYYY}</picture
+></bind
+><format
+><picture
+>date{DD/MM/YYYY}</picture
+></format
+><value
+><date
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+    var dd,mm,yy,len;
+    len = this.rawValue.length;
+    if (len == 10 &amp;&amp; this.rawValue.substring(4,5) == "-" &amp;&amp; this.rawValue.substring(7,8) == "-" )
+    {
+        dd = this.rawValue.substring(8,10);
+       	mm = this.rawValue.substring(5,7);
+       	yy = this.rawValue.substring(0,4);
+    } else {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);
+        this.rawValue="";    
+        exit();        
+    }
+
+    var d = new Date(yy,mm-1,dd);
+    if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+    {
+        app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+        //app.alert("Le champ Date n'a pu être validé. Veuillez utiliser le format jj/mm/aaaa.");
+        xfa.host.setFocus(this);    
+    }
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+	var dd,mm,yy,len;
+	len = this.rawValue.length;
+	dd = this.rawValue.substring(8,10);
+	mm = this.rawValue.substring(5,7);
+	yy = this.rawValue.substring(0,4);
+	
+	var d = new Date(yy,mm-1,dd);
+	
+	if (d.getFullYear()!= yy || d.getMonth() != mm-1 || d.getDate() != dd)
+	{
+    	//app.alert("Date field failed validation. Please use format dd/mm/yyyy.");
+    	xfa.host.setFocus(this);	
+    }
+</script
+></event
+></field
+></subform
+><draw name="Text25" w="85.264mm" h="7.62mm" y="163.305mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Representative Information (if applicable)</text
+></value
+><font typeface="Verdana" weight="bold" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para vAlign="middle" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt"
+/><?renderCache.bounds 238859 18766 0 0 1417 1417 0 0?><?renderCache.textRun 42 Representative Information (if applicable) 0 1417 13735 0 0 0 "Verdana" 1 0 10000 ISO-8859-1?></draw
+><subform x="0in" y="170.925mm" locale="en_CA" name="Agent_Information_for_Notice"
+><?templateDesigner expand 0?><bind match="none"
+/><?designerFragmentSource CjxzdWJmb3JtIHVzZWhyZWY9Ii4uXEZyYWdtZW50XEFnZW50IEluZm9ybWF0aW9uIC0gTm90aWNl
+cy54ZHAjc29tKCR0ZW1wbGF0ZS5mb3JtMS5BZ2VudF9JbmZvcm1hdGlvbl9mb3JfTm90aWNlKSIg
+eD0iMGluIiB5PSIxNzAuOTI1bW0iIHhtbG5zPSJodHRwOi8vd3d3LnhmYS5vcmcvc2NoZW1hL3hm
+YS10ZW1wbGF0ZS8zLjAvIgo+PD90ZW1wbGF0ZURlc2lnbmVyIGV4cGFuZCAwPz48YmluZAovPjwv
+c3ViZm9ybQo+?><field locale="en_CA" h="12.7mm" name="AgentName" w="86.36mm" x="0.001mm"
+><assist
+><toolTip
+>Representative’s Name</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Name</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentLSUC" w="25.4mm" x="86.361mm" y="0mm"
+><assist
+><toolTip
+>Representative’s Law Society of Upper Canada (LSUC) Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>LSUC #</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><value
+><text maxChars="6"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentCompany" w="85.852mm" x="111.761mm"
+><assist
+><toolTip
+>Representative’s Company Name (if applicable)</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Company Name (if applicable)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentAddress" w="134.112mm" x="0.001mm" y="12.7mm"
+><assist
+><toolTip
+>Representative’s Mailing Address</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Mailing Address</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentPhoneNum" w="63.5mm" x="134.112mm" y="12.7mm"
+><assist
+><toolTip
+>Representative’s Phone Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Phone Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')' 999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+><field locale="en_CA" h="12.7mm" name="AgentMunicipality" w="71.882mm" x="0.001mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Municipality (City, Town, etc.)</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Municipality (City, Town, etc.)</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit hScrollPolicy="off" multiLine="1" vScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+></field
+><field locale="en_CA" h="12.7mm" name="AgentProvince" w="27.94mm" x="71.883mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Province</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Province</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><value
+><text maxChars="2"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+this.rawValue = this.rawValue.toUpperCase();
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentPostCode" w="34.29mm" x="99.823mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Postal Code</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Postal Code</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{A9A 9A9}|text{A9A9A9}</picture
+><textEdit
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{A9A 9A9}</picture
+></bind
+><format
+><picture
+>text{A9A 9A9}</picture
+></format
+><value
+><text maxChars="7"
+/></value
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");  ///Le champ Code postal n'a pu être validé. Veuillez utiliser le format L1L 1N1.
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+else
+{
+	this.rawValue = this.rawValue.toUpperCase();
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePostCode(this.rawValue))
+{
+    //app.alert("Postal Code field failed validation. Please use the format L1L 1N1.");
+    xfa.host.setFocus(this);
+}
+function validatePostCode(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PostCodePattern1 = /[a-zA-Y]\d[a-zA-Z]( )?\d[a-zA-Z]\d{1}$/;  
+    return((PostCodePattern1.test(elementValue)));
+}
+</script
+></event
+></field
+><field locale="en_CA" h="12.7mm" name="AgentFaxNum" w="63.5mm" x="134.112mm" y="25.4mm"
+><assist
+><toolTip
+>Representative’s Fax Number</toolTip
+></assist
+><border
+><corner
+><color
+/></corner
+><edge
+><color
+/></edge
+><margin
+/></border
+><caption placement="top" reserve="3.556mm"
+><font typeface="Arial" baselineShift="0pt" size="9pt"
+><fill
+><color
+/></fill
+></font
+><para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"
+/><value
+><text
+>Fax Number</text
+></value
+></caption
+><font typeface="Arial" size="12pt"
+><fill
+><color value="0,0,255"
+/></fill
+></font
+><margin bottomInset="0.5002mm" leftInset="1mm" rightInset="1mm" topInset="0.5002mm"
+/><para vAlign="middle"
+/><ui
+><picture
+>text{'('999')'999-9999}|text{999 999 9999}|text{999-999-9999}|text{'('999')'999 9999}|text{999-999 9999}|text{999-9999999}|text{999999 9999}|text{999999-9999}|text{999 999-9999}|text{'('999')'9999999}</picture
+><textEdit hScrollPolicy="off"
+><border presence="hidden"
+><margin
+/></border
+><margin
+/></textEdit
+></ui
+><bind
+><picture
+>text{'('999')' 999-9999}</picture
+></bind
+><format
+><picture
+>text{'('999')' 999-9999}</picture
+></format
+><event activity="enter" name="event__enter"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    //app.alert("Day Phone Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><event activity="exit" name="event__exit"
+><script contentType="application/x-javascript"
+>
+if (!validatePhoneNumber(this.rawValue))
+{
+    app.alert("Fax Number field failed validation. Please use the format 111-111-1111.");
+    xfa.host.setFocus(this);
+    this.rawValue="";
+}
+function validatePhoneNumber(elementValue)
+{  
+	if (elementValue  == null) return true;
+    var PhoneNumberPattern1 =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;  
+	return((PhoneNumberPattern1.test(elementValue)));
+}
+</script
+></event
+><value
+><text
+/></value
+></field
+></subform
+><draw name="PageFoot2" y="242.417mm" x="166.37mm" w="31.75mm" h="5.2331mm" locale="en_CA"
+><ui
+><textEdit
+/></ui
+><value
+><text
+>Page 2 of 2</text
+></value
+><font size="9pt" typeface="Arial" baselineShift="0pt"
+/><margin topInset="0.5mm" bottomInset="0mm" leftInset="0.5mm" rightInset="0.5mm"
+/><para hAlign="right" lineHeight="16.8pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" marginLeft="0pt" marginRight="0pt" vAlign="bottom"
+/><?renderCache.bounds 87166 13417 0 0 1417 1417 0 0?><?renderCache.textRun 11 Page 2 of 2 0 42546 12940 0 0 0 "Arial" 0 0 9000 ISO-8859-1?></draw
+><?templateDesigner expand 0?><breakBefore targetType="pageArea" target="Page1"
+/></subform
+><proto
+/><desc
+><text name="title"
+>Form N1</text
+></desc
+><?templateDesigner Hyphenation excludeInitialCap:1, excludeAllCaps:1, wordCharCnt:7, remainCharCnt:3, pushCharCnt:3?><?templateDesigner expand 1?><?renderCache.subset "Adobe Pi Std" 0 0 UTF-16 2 4 004F?><?renderCache.subset "Arial" 0 0 ISO-8859-1 4 184 47 000300060007000B000C000F0011001200130014001500170024002600270029002F003000310033003600370038004400450046004700480049004A004B004C004F005000510052005300550056005700580059005A005B005C006F #$(),./0124ACDFLMNPSTUabcdefghilmnoprstuvwxyç?><?renderCache.subset "Arial" 1 0 ISO-8859-1 4 104 28 000300110014002C00310035004400450046004700480049004A004B004C004F00500051005200530055005600570058005C0087 .1INRabcdefghilmnoprstuy•?><?renderCache.subset "Verdana" 0 0 ISO-8859-1 4 212 53 000300050008000A000B000C000F00100011001300140015001600170019001B001C001D0024002500280029002A002C002F0031003200350037004400450046004700480049004A004B004C004E004F0050005100520053005400550056005700580059005A005B005C "%'(),-.01234689:ABEFGILNORTabcdefghiklmnopqrstuvwxy?><?renderCache.subset "Verdana" 1 0 ISO-8859-1 4 192 48 0003000B000C0010001100120013001400150016001700180019001B001D002400280029002C002F003100320035003600370038003C004400450046004700480049004A004B004C004F005000510052005300550056005700580059005A005B ()-./01234568:AEFILNORSTUYabcdefghilmnoprstuvwx?><?renderCache.subset "Verdana" 0 1 ISO-8859-1 4 72 18 0003000F00110013001500190024003500370044004600470048004C004F005100560057 ,.026ARTacdeilnst?></subform
+><?originalXFAVersion http://www.xfa.org/schema/xfa-template/2.1/ LegacyPositioning:0 LegacyEventModel:0?><?templateDesigner Grid show:0, snap:0, units:0, color:ff8080, origin:(0,0), interval:(125000,125000), objsnap:1, guidesnap:0, pagecentersnap:911042199?><?templateDesigner Rulers horizontal:1, vertical:1, guidelines:0, crosshairs:0?><?templateDesigner Guidelines v:1258268;v:908346;v:941732;v:1508346;v:1424882;v:1441575;v:93701;v:20866;v:962520;h:5839606?><?templateDesigner Zoom 133?><?templateDesigner SaveTaggedPDF 1?><?templateDesigner SavePDFWithEmbeddedFonts 1?><?templateDesigner FormTargetVersion 30?><?templateDesigner DefaultLanguage JavaScript?><?templateDesigner DefaultRunAt client?><?acrobat JavaScript strictScoping?><?PDFPrintOptions embedViewerPrefs 0?><?PDFPrintOptions embedPrintOnFormOpen 0?><?PDFPrintOptions scalingPrefs 0?><?PDFPrintOptions enforceScalingPrefs 0?><?PDFPrintOptions paperSource 0?><?PDFPrintOptions duplexMode 0?><?templateDesigner DefaultPreviewType interactive?><?templateDesigner DefaultPreviewPagination simplex?><?templateDesigner XDPPreviewFormat 19?><?templateDesigner DefaultCaptionFontSettings face:Myriad Pro;size:10;weight:normal;style:normal?><?templateDesigner DefaultValueFontSettings face:Myriad Pro;size:10;weight:normal;style:normal?></template
+>

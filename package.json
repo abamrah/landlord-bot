@@ -23,6 +23,7 @@
     "fast-xml-parser": "^5.3.7",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "pdf-lib": "^1.17.1",
     "pdfkit": "^0.17.2",
     "puppeteer": "^23.11.0",
     "puppeteer-extra": "^3.3.6",
