@@ -251,8 +251,7 @@ export async function alertLandlord(landlordId: string, text: string, extra?: { 
         : notifType === "MAINTENANCE_NEW" ? "New Maintenance Request"
           : notifType === "CONTRACTOR_MESSAGE" ? "Contractor Message"
             : "Tenant Message";
-      await createNotification({
-        landlordId,
+      await createNotification(landlordId, {
         type: notifType,
         title,
         body: text.substring(0, 500),

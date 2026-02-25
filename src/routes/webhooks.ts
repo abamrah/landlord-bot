@@ -10,9 +10,34 @@ import { processMedia, buildMediaEnrichedMessage, ExtractedMedia } from "../serv
 import conversationMemory from "../services/conversationMemory";
 import { webhookRateLimit } from "../services/rateLimiter";
 import { checkPlanLimit, incrementMessageCount } from "../services/planService";
+import { broadcastToLandlord } from "../services/websocketService";
 import { db } from "../config/database";
 
 const AGENTIC_MODE = process.env.AGENTIC_MODE === "true";
+
+/**
+ * Broadcast auto-reply processing status to the landlord's dashboard in real time.
+ * Stages: received → processing → generated → sent | failed | held | disabled | skipped
+ */
+function broadcastAutoReplyStatus(
+  landlordId: string,
+  maintenanceId: string | undefined,
+  tenantId: string,
+  stage: "received" | "processing" | "generated" | "sent" | "failed" | "held" | "disabled" | "skipped",
+  extra?: { tenantName?: string; unitLabel?: string; severity?: string; reason?: string },
+) {
+  if (!landlordId) return;
+  try {
+    broadcastToLandlord(landlordId, {
+      type: "auto_reply_status",
+      maintenanceId: maintenanceId || null,
+      tenantId,
+      stage,
+      timestamp: new Date().toISOString(),
+      ...extra,
+    });
+  } catch (_) { /* non-critical */ }
+}
 
 /**
  * Resolve the tenant's primary unit ID from the UnitTenant join table.
@@ -500,11 +525,30 @@ async function flushTenantReply(params: { tenantId: string }) {
   const globalAutoReply = await repo.getGlobalAutoReplyEnabled(landlordId);
   const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
 
+  // eslint-disable-next-line no-console
+  console.info("flushTenantReply: processing", {
+    tenantId: params.tenantId,
+    tenantName: tenant.name,
+    replyTo: bucket.replyTo,
+    isGroup: bucket.isGroup,
+    messageCount: bucket.messages.length,
+    canAutoReply,
+    globalEnabled: globalAutoReply.enabled,
+    tenantAutoReply: tenant.autoReplyEnabled,
+    channel: bucket.isGroup ? "whatsapp_group" : "whatsapp_dm",
+  });
+
   const combinedMessage = bucket.messages.map((m) => m.content).join("\n---\n").trim();
 
   // ── AGENTIC PATH ──
   if (AGENTIC_MODE && landlordId) {
     try {
+      // ── Auto-reply status: processing (agentic batch) ──
+      const latestRecordForStatus = await repo.findLatestMaintenanceForTenantId(tenant.id);
+      broadcastAutoReplyStatus(landlordId, latestRecordForStatus?.id, tenant.id, "processing", {
+        tenantName: tenant.name,
+      });
+
       // Save tenant message to conversation memory
       await conversationMemory.saveMessage({
         phone: tenant.phone || bucket.replyTo,
@@ -597,11 +641,19 @@ async function flushTenantReply(params: { tenantId: string }) {
       const batchSeverity = ((latestRecord?.triageJson as any)?.classification?.severity || "normal").toString().toLowerCase();
       const isHighCriticalBatch = batchSeverity === "high" || batchSeverity === "critical";
 
+      // ── Auto-reply status: generated (agentic batch) ──
+      if (draftText) {
+        broadcastAutoReplyStatus(landlordId, latestRecord?.id, tenant.id, "generated", {
+          tenantName: tenant.name, severity: batchSeverity,
+        });
+      }
+
       if (draftText && canAutoReply && !isHighCriticalBatch) {
         const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
         if (!sendResult.ok) {
           // eslint-disable-next-line no-console
           console.error("auto-reply send FAILED (agentic batch)", { tenantId: tenant.id, replyTo: bucket.replyTo, error: sendResult.error, response: sendResult.response });
+          broadcastAutoReplyStatus(landlordId, latestRecord?.id, tenant.id, "failed", { tenantName: tenant.name });
         } else {
           lastReplySentAt.set(tenant.id, Date.now());
           // Save AI reply to conversation memory
@@ -613,6 +665,7 @@ async function flushTenantReply(params: { tenantId: string }) {
           });
           // eslint-disable-next-line no-console
           console.info("auto-reply sent (agentic batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
+          broadcastAutoReplyStatus(landlordId, latestRecord?.id, tenant.id, "sent", { tenantName: tenant.name });
         }
       } else if (isHighCriticalBatch && draftText) {
         // HIGH/CRITICAL: Hold the auto-reply for landlord approval
@@ -622,9 +675,11 @@ async function flushTenantReply(params: { tenantId: string }) {
         if (latestRecord?.id) {
           await repo.updateMaintenanceAnalysis({ id: latestRecord.id, aiDraft: { draft: draftText } as any });
         }
+        broadcastAutoReplyStatus(landlordId, latestRecord?.id, tenant.id, "held", { tenantName: tenant.name, severity: batchSeverity });
       } else {
         // eslint-disable-next-line no-console
         console.info("auto-reply skipped (agentic batch)", { tenantId: tenant.id, hasDraft: Boolean(draftText), canAutoReply });
+        broadcastAutoReplyStatus(landlordId, latestRecord?.id, tenant.id, canAutoReply ? "skipped" : "disabled", { tenantName: tenant.name });
       }
 
       // Notify landlord about tenant message (batched agentic path)
@@ -654,6 +709,11 @@ async function flushTenantReply(params: { tenantId: string }) {
   }
 
   // ── LINEAR PATH (original) ──
+  // ── Auto-reply status: processing (linear batch) ──
+  broadcastAutoReplyStatus(landlordId, undefined, tenant.id, "processing", {
+    tenantName: tenant.name,
+  });
+
   const existing = await repo.findLatestMaintenanceForTenantId(tenant.id);
   const conversationLog = Array.isArray(existing?.chatLog) ? (existing?.chatLog as any[]) : [];
 
@@ -721,11 +781,19 @@ async function flushTenantReply(params: { tenantId: string }) {
   const linearBatchSeverity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
   const isHighCriticalLinearBatch = linearBatchSeverity === "high" || linearBatchSeverity === "critical";
 
+  // ── Auto-reply status: generated (linear batch) ──
+  if (draftText) {
+    broadcastAutoReplyStatus(landlordId, record?.id, tenant.id, "generated", {
+      tenantName: tenant.name, severity: linearBatchSeverity,
+    });
+  }
+
   if (draftText && canAutoReply && !isHighCriticalLinearBatch) {
     const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
     if (!sendResult.ok) {
       // eslint-disable-next-line no-console
       console.error("auto-reply send FAILED (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo, error: sendResult.error, response: sendResult.response });
+      broadcastAutoReplyStatus(landlordId, record?.id, tenant.id, "failed", { tenantName: tenant.name });
     } else {
       if (record?.id) {
         await repo.appendChatMessage({
@@ -738,6 +806,7 @@ async function flushTenantReply(params: { tenantId: string }) {
       lastReplySentAt.set(tenant.id, Date.now());
       // eslint-disable-next-line no-console
       console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
+      broadcastAutoReplyStatus(landlordId, record?.id, tenant.id, "sent", { tenantName: tenant.name });
     }
   } else if (isHighCriticalLinearBatch && draftText) {
     // HIGH/CRITICAL: Hold the auto-reply for landlord approval
@@ -745,9 +814,11 @@ async function flushTenantReply(params: { tenantId: string }) {
     if (record?.id) {
       await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: draftText } as any });
     }
+    broadcastAutoReplyStatus(landlordId, record?.id, tenant.id, "held", { tenantName: tenant.name, severity: linearBatchSeverity });
   } else if (draftText && !canAutoReply) {
     // eslint-disable-next-line no-console
     console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
+    broadcastAutoReplyStatus(landlordId, record?.id, tenant.id, "disabled", { tenantName: tenant.name });
   }
   const severity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
   const draft = aiDraft?.draft || "(no draft yet)";
@@ -861,9 +932,18 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       if (isGroup) {
         return res.json({ ok: true, ignored: "from_me_group_echo" });
       }
-      if (!instanceLandlord && !isLandlordNumber(sender)) return res.json({ ok: true, ignored: "from_me" });
       if (text?.startsWith("AI Assistance:")) return res.json({ ok: true, ignored: "from_me_ai_echo" });
-      // landlord self-test allowed to proceed
+      // On per-landlord instances, fromMe in DMs means the connected WhatsApp device
+      // sent the message (bot auto-reply or landlord manual reply). Filter out to
+      // prevent the echo being re-processed as a new inbound tenant message, which
+      // would cause infinite reply loops.
+      if (instanceLandlord) {
+        // eslint-disable-next-line no-console
+        console.info("fromMe DM filtered on instance", { sender, remoteJid, instance: instanceName });
+        return res.json({ ok: true, ignored: "from_me_instance_echo" });
+      }
+      if (!isLandlordNumber(sender)) return res.json({ ok: true, ignored: "from_me" });
+      // landlord self-test allowed to proceed (legacy single-instance mode)
     }
 
     // ── Multi-landlord resolution ──
@@ -1172,6 +1252,17 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     // Standard phone-based lookup for 1:1 chats or if group resolution failed
     if (!tenant) {
       tenant = await repo.findTenantByPhone(sender, landlordId || undefined);
+      if (tenant && !isGroup) {
+        // eslint-disable-next-line no-console
+        console.info("1-to-1 tenant resolved via phone lookup", {
+          tenantId: tenant.id,
+          tenantName: tenant.name,
+          sender,
+          storedPhone: tenant.phone,
+          replyTo,
+          landlordId,
+        });
+      }
     }
     if (!tenant) {
       const contractor = await repo.findContractorByPhone(sender);
@@ -1213,6 +1304,12 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const baseConversationLog = Array.isArray(record?.chatLog) ? (record?.chatLog as any[]) : [];
     // Instance-resolved landlordId takes priority to prevent cross-tenant routing
     const tenantLandlordId = landlordId || tenant.landlordId || "";
+
+    // ── Auto-reply status: received ──
+    broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "received", {
+      tenantName: tenant.name,
+      unitLabel: (record as any)?.unit?.label,
+    });
 
     // ── Plan limit check for tenant messages ──
     // Re-check against the tenant's landlord (may differ from initially resolved landlordId)
@@ -1314,6 +1411,15 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     if (!isImmediate) {
+      // eslint-disable-next-line no-console
+      console.info("tenant message QUEUED for delayed reply", {
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        replyTo,
+        isGroup,
+        delayMs,
+        channel: isGroup ? "whatsapp_group" : "whatsapp_dm",
+      });
       queueTenantReply({
         tenantId: tenant.id,
         replyTo,
@@ -1325,6 +1431,11 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         mediaResult,
       });
       autoReplyReason = "queued_delay";
+      // ── Auto-reply status: queued (delayed) ──
+      broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "processing", {
+        tenantName: tenant.name,
+        reason: `Queued — replying in ${Math.round(delayMs / 1000)}s`,
+      });
       return respond({ ok: true, routed: "tenant_queued", delayMs, llmInvoked, autoReplySent, autoReplyReason });
     }
 
@@ -1333,6 +1444,11 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     // ── AGENTIC IMMEDIATE PATH ──
     if (AGENTIC_MODE && tenantLandlordId) {
       try {
+        // ── Auto-reply status: processing (agentic immediate) ──
+        broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "processing", {
+          tenantName: tenant.name,
+        });
+
         // Build multimodal parts for agent (raw base64 images/audio/video)
         const mediaParts = mediaResult?.base64
           ? [{ base64: mediaResult.base64, mimeType: mediaResult.mimeType }]
@@ -1391,16 +1507,25 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         const agentSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
         const isHighCriticalImm = agentSeverity === "high" || agentSeverity === "critical";
 
+        // ── Auto-reply status: generated (agentic immediate) ──
+        if (agentDraft) {
+          broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "generated", {
+            tenantName: tenant.name, severity: agentSeverity,
+          });
+        }
+
         if (agentDraft && canAutoReply && !isHighCriticalImm) {
           const sendResult = await whatsappService.sendWhatsAppText({ to: replyTo, text: agentDraft, landlordId: tenantLandlordId });
           if (!sendResult.ok) {
             // eslint-disable-next-line no-console
             console.error("auto-reply send FAILED (agentic immediate)", { tenantId: tenant.id, replyTo, error: sendResult.error, response: sendResult.response });
             autoReplyReason = "send_failed";
+            broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "failed", { tenantName: tenant.name });
           } else {
             lastReplySentAt.set(tenant.id, Date.now());
             autoReplySent = true;
             autoReplyReason = "agentic_draft_sent";
+            broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "sent", { tenantName: tenant.name });
           }
         } else if (isHighCriticalImm && agentDraft) {
           // HIGH/CRITICAL: Hold the auto-reply for landlord approval
@@ -1411,10 +1536,13 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: agentDraft } as any });
           }
           autoReplyReason = "held_for_approval";
+          broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "held", { tenantName: tenant.name, severity: agentSeverity });
         } else if (!canAutoReply) {
           autoReplyReason = "auto_reply_disabled";
+          broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "disabled", { tenantName: tenant.name });
         } else {
           autoReplyReason = "no_agentic_draft";
+          broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "skipped", { tenantName: tenant.name, reason: "No valid draft" });
         }
 
         // eslint-disable-next-line no-console
@@ -1454,6 +1582,11 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     // ── LINEAR IMMEDIATE PATH (original) ──
+    // ── Auto-reply status: processing (linear immediate) ──
+    broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "processing", {
+      tenantName: tenant.name,
+    });
+
     const utilityCheck = await agentService.checkUtilityAnomaly({ tenantId: tenant.id, unitId: immediateUnitId });
 
     const draftResponse = await agentService.draftRtaResponse({
@@ -1482,6 +1615,13 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const linearImmSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
     const isHighCriticalLinearImm = linearImmSeverity === "high" || linearImmSeverity === "critical";
 
+    // ── Auto-reply status: generated (linear immediate) ──
+    if (draftText) {
+      broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "generated", {
+        tenantName: tenant.name, severity: linearImmSeverity,
+      });
+    }
+
     if (draftText && canAutoReply && !isHighCriticalLinearImm) {
       const sendResult = await whatsappService.sendWhatsAppText({
         to: replyTo,
@@ -1492,10 +1632,12 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         // eslint-disable-next-line no-console
         console.error("auto-reply send FAILED (linear immediate)", { tenantId: tenant.id, replyTo, error: sendResult.error, response: sendResult.response });
         autoReplyReason = "send_failed";
+        broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "failed", { tenantName: tenant.name });
       } else {
         lastReplySentAt.set(tenant.id, Date.now());
         autoReplySent = true;
         autoReplyReason = "draft_sent";
+        broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "sent", { tenantName: tenant.name });
       }
     } else if (isHighCriticalLinearImm && draftText) {
       // HIGH/CRITICAL: Hold the auto-reply for landlord approval
@@ -1504,14 +1646,17 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: draftText } as any });
       }
       autoReplyReason = "held_for_approval";
+      broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "held", { tenantName: tenant.name, severity: linearImmSeverity });
     } else if (draftText && !canAutoReply) {
       // eslint-disable-next-line no-console
       console.info("auto-reply disabled for tenant", { tenantId: tenant.id });
       autoReplyReason = "auto_reply_disabled";
+      broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "disabled", { tenantName: tenant.name });
     } else if (!draftText) {
       // eslint-disable-next-line no-console
       console.warn("auto-reply skipped: AI returned empty draft (immediate)", { tenantId: tenant.id });
       autoReplyReason = "no_draft";
+      broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "skipped", { tenantName: tenant.name, reason: "No valid draft" });
     }
 
     const triageJson: any = record?.triageJson || triage || {};

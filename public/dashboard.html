@@ -613,6 +613,58 @@
       border-color: rgba(0, 200, 150, .15);
     }
 
+    /* ── Auto-Reply Status Badge ── */
+    .auto-reply-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      white-space: nowrap;
+      transition: all .3s ease;
+      border: 1px solid transparent;
+    }
+    .auto-reply-badge .ar-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    /* received */
+    .ar-received { background: rgba(99,102,241,.12); color: #818cf8; border-color: rgba(99,102,241,.2); }
+    .ar-received .ar-dot { background: #818cf8; }
+    /* processing — animated pulse */
+    .ar-processing { background: rgba(251,191,36,.12); color: #f59e0b; border-color: rgba(251,191,36,.2); }
+    .ar-processing .ar-dot { background: #f59e0b; animation: ar-pulse 1.2s ease-in-out infinite; }
+    @keyframes ar-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.6)} }
+    /* generated */
+    .ar-generated { background: rgba(56,189,248,.12); color: #38bdf8; border-color: rgba(56,189,248,.2); }
+    .ar-generated .ar-dot { background: #38bdf8; }
+    /* sent */
+    .ar-sent { background: rgba(34,197,94,.12); color: #22c55e; border-color: rgba(34,197,94,.2); }
+    .ar-sent .ar-dot { background: #22c55e; }
+    /* failed */
+    .ar-failed { background: rgba(239,68,68,.12); color: #ef4444; border-color: rgba(239,68,68,.2); }
+    .ar-failed .ar-dot { background: #ef4444; }
+    /* held for approval */
+    .ar-held { background: rgba(249,115,22,.12); color: #f97316; border-color: rgba(249,115,22,.2); }
+    .ar-held .ar-dot { background: #f97316; }
+    /* disabled */
+    .ar-disabled { background: rgba(107,114,128,.1); color: #9ca3af; border-color: rgba(107,114,128,.15); }
+    .ar-disabled .ar-dot { background: #9ca3af; }
+    /* skipped */
+    .ar-skipped { background: rgba(107,114,128,.1); color: #9ca3af; border-color: rgba(107,114,128,.15); }
+    .ar-skipped .ar-dot { background: #9ca3af; }
+
+    /* mobile adjustments for auto-reply badges */
+    @media (max-width: 768px) {
+      .auto-reply-badge { font-size: 10px; padding: 2px 7px; }
+      .auto-reply-badge .ar-dot { width: 5px; height: 5px; }
+    }
+
     /* ── stat connectors ── */
     .connector-row {
       display: flex;
@@ -1767,8 +1819,9 @@
         font-size: 11px;
         color: var(--text-muted);
         display: flex;
-        gap: 8px;
+        gap: 6px;
         align-items: center;
+        flex-wrap: wrap;
       }
 
       .mobile-ticket-status {
@@ -4087,6 +4140,23 @@
       return text ? (text.length > 120 ? text.slice(0, 117) + '...' : text) : 'Awaiting triage.';
     }
 
+    // ── AUTO-REPLY STATUS TRACKING ──
+    const _arStatusMap = {}; // key: maintenanceId or tenantId → { stage, timestamp, tenantName, ... }
+    const AR_LABELS = {
+      received: 'Received', processing: 'AI Processing', generated: 'Reply Ready',
+      sent: 'Reply Sent', failed: 'Send Failed', held: 'Held for Approval',
+      disabled: 'Auto-Reply Off', skipped: 'Skipped',
+    };
+    function autoReplyBadge(maintenanceId, tenantId) {
+      const info = _arStatusMap[maintenanceId] || _arStatusMap[tenantId];
+      if (!info) return '';
+      // Auto-clear "sent" badges after 30 seconds so they don't linger forever
+      if ((info.stage === 'sent' || info.stage === 'failed' || info.stage === 'disabled' || info.stage === 'skipped') &&
+          Date.now() - new Date(info.timestamp).getTime() > 30000) return '';
+      return '<span class="auto-reply-badge ar-' + info.stage + '" data-ar-mid="' + (maintenanceId || '') + '" data-ar-tid="' + (tenantId || '') + '">'
+        + '<span class="ar-dot"></span>' + AR_LABELS[info.stage] + '</span>';
+    }
+
     // ── LOADERS ──
     async function loadProperties() { const { items } = await fetchJson('/admin/properties'); state.properties = items || []; fillPropertySelects(); }
     async function loadUnits() { const { items } = await fetchJson('/admin/units'); state.units = items || []; renderUnits(); fillUnitSelects(); }
@@ -4257,7 +4327,7 @@
           var tenant = resolveTenant(m); var unit = resolveUnit(m); var sev = severityOf(m);
           return '<div class="kanban-card" data-id="' + m.id + '" onclick="openMaintDrawer(\'' + m.id + '\')">' +
             '<div class="kanban-card-title">' + (unit.label || 'No unit') + ' \u2014 ' + (tenant.name || 'Unknown') + '</div>' +
-            '<div class="kanban-card-meta">' + severityChip(sev) + '<span>' + new Date(m.updatedAt || m.createdAt).toLocaleDateString() + '</span></div>' +
+            '<div class="kanban-card-meta">' + severityChip(sev) + autoReplyBadge(m.id, m.tenantId) + '<span>' + new Date(m.updatedAt || m.createdAt).toLocaleDateString() + '</span></div>' +
             '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">' + summarizeActions(m) + '</div>' +
             '</div>';
         }).join('');
@@ -4278,7 +4348,7 @@
         var tenant = resolveTenant(m); var unit = resolveUnit(m); var sev = severityOf(m);
         return '<tr style="cursor:pointer" onclick="openMaintDrawer(\'' + m.id + '\')">' +
           '<td style="font-weight:600;color:var(--text)">' + (unit.label || '\u2014') + '</td><td>' + (tenant.name || '\u2014') + '</td>' +
-          '<td>' + statusChip(m.status) + '</td><td>' + severityChip(sev) + '</td>' +
+          '<td>' + statusChip(m.status) + '</td><td>' + severityChip(sev) + ' ' + autoReplyBadge(m.id, m.tenantId) + '</td>' +
           '<td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + summarizeActions(m) + '</td>' +
           '<td>' + new Date(m.updatedAt || m.createdAt).toLocaleDateString() + '</td>' +
           '<td><button class="btn btn-ghost btn-sm maint-delete" data-id="' + m.id + '" onclick="event.stopPropagation()">Delete</button></td>' +
@@ -4301,7 +4371,7 @@
       document.getElementById('drawerTitle').textContent = (unit.label || 'Ticket') + ' \u2014 ' + (tenant.name || 'Unknown');
       document.getElementById('drawerContent').innerHTML =
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
-        statusChip(m.status) + ' ' + severityChip(sev) +
+        statusChip(m.status) + ' ' + severityChip(sev) + ' ' + autoReplyBadge(m.id, m.tenantId) +
         ' <span class="chip chip-muted">' + (m.autopilotEnabled ? 'Autopilot On' : 'Autopilot Off') + '</span>' +
         '</div>' +
         '<div class="panel panel-sm" style="margin-bottom:12px;">' +
@@ -4454,7 +4524,7 @@
         if (summary.length > 120) summary = summary.substring(0, 120) + '\u2026';
         var isActive = ACTIVE_STATUSES.includes(m.status);
         var sevColor = { low: '#3b82f6', normal: '#71717a', high: '#f59e0b', critical: '#ef4444' }[sev] || '#52525b';
-        return '<div onclick="openDrawer(\'' + m.id + '\')" style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'var(--surface-2)\'" onmouseleave="this.style.background=\'transparent\'">' +
+        return '<div onclick="openMaintDrawer(\'' + m.id + '\')" style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'var(--surface-2)\'" onmouseleave="this.style.background=\'transparent\'">' +
           '<div style="width:10px;height:10px;border-radius:50%;background:' + (isActive ? 'var(--accent)' : 'var(--text-muted)') + ';margin-top:5px;flex-shrink:0;' + (isActive ? 'box-shadow:0 0 6px rgba(0,200,150,.4);' : '') + '"></div>' +
           '<div style="flex:1;min-width:0;">' +
           '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
@@ -4462,9 +4532,10 @@
           '<span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">' + timeAgo(m.updatedAt || m.createdAt) + '</span>' +
           '</div>' +
           '<div style="font-size:13px;color:var(--text-secondary);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (summary || 'No details') + '</div>' +
-          '<div style="display:flex;gap:6px;margin-top:4px;align-items:center;">' +
+          '<div style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap;">' +
           '<span class="chip ' + (isActive ? 'chip-accent' : 'chip-muted') + '" style="font-size:10px;padding:2px 8px;">' + formatStatus(m.status) + '</span>' +
           '<span style="font-size:10px;font-weight:600;color:' + sevColor + ';background:' + sevColor + '18;padding:2px 8px;border-radius:100px;">' + sev + '</span>' +
+          autoReplyBadge(m.id, m.tenantId) +
           '</div>' +
           '</div>' +
           '</div>';
@@ -6112,6 +6183,33 @@
             updateNotifBadge();
             // Show toast for new notifications
             toast('🔔 ' + (msg.notification.title || 'New notification'));
+          } else if (msg.type === 'auto_reply_status') {
+            // ── Live auto-reply pipeline status ──
+            var key = msg.maintenanceId || msg.tenantId;
+            _arStatusMap[msg.maintenanceId || '_none'] = msg;
+            _arStatusMap[msg.tenantId || '_none'] = msg;
+            // Update all matching DOM badges in place (avoids full re-render)
+            document.querySelectorAll('[data-ar-mid="' + (msg.maintenanceId || '') + '"], [data-ar-tid="' + (msg.tenantId || '') + '"]').forEach(function (el) {
+              el.className = 'auto-reply-badge ar-' + msg.stage;
+              el.innerHTML = '<span class="ar-dot"></span>' + (AR_LABELS[msg.stage] || msg.stage);
+            });
+            // If no badges exist yet (first status), re-render the maintenance views
+            if (!document.querySelector('[data-ar-mid="' + (msg.maintenanceId || '') + '"]') &&
+                !document.querySelector('[data-ar-tid="' + (msg.tenantId || '') + '"]')) {
+              renderMaintenance();
+              // Also re-render mobile mission panel tickets
+              if (typeof _renderMobileKPIs === 'function') _renderMobileKPIs();
+            }
+            // Auto-clear terminal statuses after 30s
+            if (['sent', 'failed', 'disabled', 'skipped'].includes(msg.stage)) {
+              setTimeout(function () {
+                delete _arStatusMap[msg.maintenanceId || '_none'];
+                delete _arStatusMap[msg.tenantId || '_none'];
+                document.querySelectorAll('[data-ar-mid="' + (msg.maintenanceId || '') + '"], [data-ar-tid="' + (msg.tenantId || '') + '"]').forEach(function (el) {
+                  el.remove();
+                });
+              }, 30000);
+            }
           } else if (msg.type === 'connected') {
             // Load existing notifications
             loadNotifications();
@@ -6490,6 +6588,7 @@
             '<div class="mobile-ticket-title">' + (unit.label || 'No unit') + ' — ' + (tenant.name || 'Unknown') + '</div>' +
             '<div class="mobile-ticket-meta">' +
             '<span class="mobile-ticket-status" style="background:' + sColor + ';color:#000;">' + formatStatus(m.status) + '</span>' +
+            autoReplyBadge(m.id, m.tenantId) +
             '<span>' + timeAgo(m.updatedAt || m.createdAt) + '</span>' +
             '</div></div>';
         }).join('');
