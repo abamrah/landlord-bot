@@ -2232,6 +2232,7 @@
     <a class="nav-item" data-target="units">🏢 <span>Units</span></a>
     <a class="nav-item" data-target="contractors">🧰 <span>Contractors</span></a>
     <a class="nav-item" data-target="utilities">💡 <span>Utilities</span></a>
+    <a class="nav-item" data-target="financials">💰 <span>Financials</span></a>
     <div class="nav-title">AI</div>
     <a class="nav-item" data-target="agent">🧠 <span>AI Agent</span></a>
     <a class="nav-item" data-target="usage">📈 <span>AI Usage</span></a>
@@ -2906,6 +2907,117 @@
               <div id="gbUploadStatus" style="font-size:12px;color:var(--text-muted);margin-top:6px;"></div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ FINANCIALS ═══════════════════ -->
+      <section id="financials" class="section">
+        <div class="section-header">
+          <h2>Financials</h2>
+          <button class="btn btn-secondary btn-sm" id="refreshFinancials" onclick="loadFinancialRecords()">↻</button>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="panel panel-sm">
+          <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+            <div class="kpi" style="--kpi-accent:#22c55e;">
+              <div class="kpi-top">
+                <div class="kpi-label">Total Income</div>
+                <div class="kpi-icon" style="background:rgba(34,197,94,.1);color:#22c55e;">📈</div>
+              </div>
+              <div class="kpi-value" id="finPageIncome" style="color:#22c55e;">$0</div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#ef4444;">
+              <div class="kpi-top">
+                <div class="kpi-label">Total Expenses</div>
+                <div class="kpi-icon" style="background:rgba(239,68,68,.1);color:#ef4444;">📉</div>
+              </div>
+              <div class="kpi-value" id="finPageExpenses" style="color:#ef4444;">$0</div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#3b82f6;">
+              <div class="kpi-top">
+                <div class="kpi-label">Net Cash Flow</div>
+                <div class="kpi-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;">💵</div>
+              </div>
+              <div class="kpi-value" id="finPageNet" style="color:#3b82f6;">$0</div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#7c5cff;">
+              <div class="kpi-top">
+                <div class="kpi-label">Total Records</div>
+                <div class="kpi-icon" style="background:rgba(124,92,255,.1);color:#7c5cff;">📋</div>
+              </div>
+              <div class="kpi-value" id="finPageCount" style="color:#7c5cff;">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADD RECORD FORM -->
+        <div class="panel panel-sm">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">➕ Add Financial Record</h3>
+          <div class="form-row" style="flex-wrap:wrap;">
+            <div class="form-field">
+              <label>Type</label>
+              <select id="finType">
+                <option value="RENT_PAYMENT">Rent Payment</option>
+                <option value="EXPENSE">Expense</option>
+                <option value="DEPOSIT">Deposit</option>
+                <option value="REFUND">Refund</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Amount ($)</label>
+              <input id="finAmount" type="number" step="0.01" min="0" placeholder="0.00" />
+            </div>
+            <div class="form-field">
+              <label>Tenant Name</label>
+              <input id="finTenantName" placeholder="Optional" />
+            </div>
+            <div class="form-field">
+              <label>Unit</label>
+              <input id="finUnitLabel" placeholder="Optional" />
+            </div>
+            <div class="form-field">
+              <label>Date</label>
+              <input id="finDate" type="date" />
+            </div>
+            <div class="form-field" style="flex:2;min-width:200px;">
+              <label>Description</label>
+              <input id="finDescription" placeholder="Rent for Feb 2026, plumber repair, etc." />
+            </div>
+            <button class="btn btn-primary" id="addFinRecordBtn" style="align-self:end;">+ Add Record</button>
+          </div>
+          <div id="finFormStatus" style="font-size:12px;margin-top:6px;display:none;"></div>
+        </div>
+
+        <!-- FILTER TABS -->
+        <div class="tab-row" style="margin-bottom:0;">
+          <button class="tab-btn active" data-fin-filter="ALL" onclick="filterFinancials('ALL', this)">All</button>
+          <button class="tab-btn" data-fin-filter="RENT_PAYMENT" onclick="filterFinancials('RENT_PAYMENT', this)">Rent</button>
+          <button class="tab-btn" data-fin-filter="EXPENSE" onclick="filterFinancials('EXPENSE', this)">Expenses</button>
+          <button class="tab-btn" data-fin-filter="DEPOSIT" onclick="filterFinancials('DEPOSIT', this)">Deposits</button>
+          <button class="tab-btn" data-fin-filter="REFUND" onclick="filterFinancials('REFUND', this)">Refunds</button>
+          <button class="tab-btn" data-fin-filter="OTHER" onclick="filterFinancials('OTHER', this)">Other</button>
+        </div>
+
+        <!-- RECORDS TABLE -->
+        <div class="table-wrap">
+          <table class="data-table" id="financialTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Tenant</th>
+                <th>Unit</th>
+                <th>Description</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="7" style="color:var(--text-muted)">Loading...</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -3641,6 +3753,7 @@
         <a class="mobile-nav-item" data-section="units"><span class="nav-emoji">🏢</span> Units</a>
         <a class="mobile-nav-item" data-section="contractors"><span class="nav-emoji">🧰</span> Contractors</a>
         <a class="mobile-nav-item" data-section="utilities"><span class="nav-emoji">💡</span> Utilities</a>
+        <a class="mobile-nav-item" data-section="financials"><span class="nav-emoji">💰</span> Financials</a>
         <div class="mobile-nav-title">AI</div>
         <a class="mobile-nav-item" data-section="agent"><span class="nav-emoji">🧠</span> AI Agent</a>
         <a class="mobile-nav-item" data-section="usage"><span class="nav-emoji">📈</span> AI Usage</a>
@@ -5668,7 +5781,7 @@
       loadContractors(); loadMaintenance(); loadUtilities(); loadUtilCreds(); loadGreenButtonData();
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();
-      loadAgentChatHistory(); loadFinancialSummary();
+      loadAgentChatHistory(); loadFinancialSummary(); loadFinancialRecords();
     }
 
     async function loadFinancialSummary() {
@@ -5697,6 +5810,118 @@
         }
       } catch (e) { console.warn('Financial summary load failed', e); }
     }
+
+    // ── FINANCIALS SECTION ──
+    var _finFilter = 'ALL';
+    var _finRecords = [];
+
+    async function loadFinancialRecords() {
+      try {
+        var data = await fetchJson('/admin/financial/records?limit=200');
+        _finRecords = (data && data.records) || [];
+        renderFinancialRecords();
+        updateFinancialPageSummary();
+      } catch (e) { console.warn('Financial records load failed', e); }
+    }
+
+    function updateFinancialPageSummary() {
+      var totalIncome = 0, totalExpenses = 0;
+      _finRecords.forEach(function (r) {
+        if (r.type === 'RENT_PAYMENT' || r.type === 'DEPOSIT') totalIncome += r.amount;
+        if (r.type === 'EXPENSE' || r.type === 'REFUND') totalExpenses += r.amount;
+      });
+      var net = totalIncome - totalExpenses;
+      var fmt = function (v) { return '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+      document.getElementById('finPageIncome').textContent = fmt(totalIncome);
+      document.getElementById('finPageExpenses').textContent = fmt(totalExpenses);
+      var netEl = document.getElementById('finPageNet');
+      netEl.textContent = (net >= 0 ? '+' : '-') + fmt(net);
+      netEl.style.color = net >= 0 ? '#22c55e' : '#ef4444';
+      document.getElementById('finPageCount').textContent = _finRecords.length;
+    }
+
+    function renderFinancialRecords() {
+      var tbody = document.querySelector('#financialTable tbody');
+      var filtered = _finFilter === 'ALL' ? _finRecords : _finRecords.filter(function (r) { return r.type === _finFilter; });
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted)">No records found</td></tr>';
+        return;
+      }
+      var typeColors = { RENT_PAYMENT: '#22c55e', EXPENSE: '#ef4444', DEPOSIT: '#3b82f6', REFUND: '#f59e0b', OTHER: '#71717a' };
+      var typeLabels = { RENT_PAYMENT: 'Rent', EXPENSE: 'Expense', DEPOSIT: 'Deposit', REFUND: 'Refund', OTHER: 'Other' };
+      tbody.innerHTML = filtered.map(function (r) {
+        var d = new Date(r.date);
+        var dateStr = d.toLocaleDateString('en-CA');
+        var isIncome = r.type === 'RENT_PAYMENT' || r.type === 'DEPOSIT';
+        var amtColor = isIncome ? '#22c55e' : '#ef4444';
+        var amtPrefix = isIncome ? '+' : '-';
+        return '<tr>' +
+          '<td style="white-space:nowrap;">' + dateStr + '</td>' +
+          '<td><span class="chip" style="background:' + (typeColors[r.type] || '#71717a') + '22;color:' + (typeColors[r.type] || '#71717a') + ';font-size:11px;">' + (typeLabels[r.type] || r.type) + '</span></td>' +
+          '<td style="font-weight:600;color:' + amtColor + ';">' + amtPrefix + '$' + r.amount.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</td>' +
+          '<td>' + (r.tenantName || '\u2014') + '</td>' +
+          '<td>' + (r.unitLabel || '\u2014') + '</td>' +
+          '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (r.description || '') + '">' + (r.description || '\u2014') + '</td>' +
+          '<td><button class="btn btn-danger btn-sm" onclick="deleteFinRecord(\'' + r.id + '\')" title="Delete">🗑️</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    window.filterFinancials = function (type, btn) {
+      _finFilter = type;
+      document.querySelectorAll('[data-fin-filter]').forEach(function (b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      renderFinancialRecords();
+    };
+
+    window.deleteFinRecord = async function (id) {
+      if (!confirm('Delete this financial record?')) return;
+      try {
+        await fetchJson('/admin/financial/records/' + id, { method: 'DELETE' });
+        loadFinancialRecords();
+        loadFinancialSummary();
+      } catch (e) { alert('Failed to delete: ' + e.message); }
+    };
+
+    // Add financial record form
+    document.getElementById('addFinRecordBtn').addEventListener('click', async function () {
+      var type = document.getElementById('finType').value;
+      var amount = parseFloat(document.getElementById('finAmount').value);
+      if (!amount || amount <= 0) { alert('Enter a valid amount'); return; }
+      var body = {
+        type: type,
+        amount: amount,
+        tenantName: document.getElementById('finTenantName').value || undefined,
+        unitLabel: document.getElementById('finUnitLabel').value || undefined,
+        description: document.getElementById('finDescription').value || undefined,
+        date: document.getElementById('finDate').value || undefined,
+      };
+      var statusEl = document.getElementById('finFormStatus');
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--text-muted)';
+      statusEl.textContent = 'Saving...';
+      try {
+        await fetchJson('/admin/financial/records', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        statusEl.style.color = 'var(--success)';
+        statusEl.textContent = '✓ Record added';
+        // Clear form
+        document.getElementById('finAmount').value = '';
+        document.getElementById('finTenantName').value = '';
+        document.getElementById('finUnitLabel').value = '';
+        document.getElementById('finDescription').value = '';
+        document.getElementById('finDate').value = '';
+        loadFinancialRecords();
+        loadFinancialSummary();
+        setTimeout(function () { statusEl.style.display = 'none'; }, 3000);
+      } catch (e) {
+        statusEl.style.color = 'var(--danger)';
+        statusEl.textContent = 'Failed: ' + e.message;
+      }
+    });
 
     async function loadAccount() {
       try {
@@ -6344,7 +6569,7 @@
       // Section title mapping
       var titles = {
         mission: 'Dashboard', maintenance: 'Maintenance', tenants: 'Tenants',
-        units: 'Units', contractors: 'Contractors', utilities: 'Utilities',
+        units: 'Units', contractors: 'Contractors', utilities: 'Utilities', financials: 'Financials',
         agent: 'AI Agent', usage: 'AI Usage', whatsapp: 'WhatsApp',
         reminders: 'Reminders', leases: 'Leases', guides: 'Tips & Guides', account: 'Account'
       };

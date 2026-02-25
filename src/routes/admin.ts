@@ -2500,6 +2500,21 @@ router.get("/financial/records", async (req, res) => {
   }
 });
 
+/** DELETE /admin/financial/records/:id — Delete a financial record */
+router.delete("/financial/records/:id", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const record = await db.financialRecord.findFirst({
+      where: { id: req.params.id, landlordId: authReq.landlordId },
+    });
+    if (!record) return res.status(404).json({ error: "not_found" });
+    await db.financialRecord.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 /** GET /admin/financial/summary — Financial summary */
 router.get("/financial/summary", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
