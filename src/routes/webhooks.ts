@@ -16,7 +16,8 @@ import { db } from "../config/database";
 const AGENTIC_MODE = process.env.AGENTIC_MODE === "true";
 
 /**
- * Broadcast auto-reply processing status to the landlord's dashboard in real time.
+ * Broadcast auto-reply processing status to the landlord's dashboard in real time
+ * AND persist it to the MaintenanceRequest record so it's visible on page load.
  * Stages: received → processing → generated → sent | failed | held | disabled | skipped
  */
 function broadcastAutoReplyStatus(
@@ -37,6 +38,13 @@ function broadcastAutoReplyStatus(
       ...extra,
     });
   } catch (_) { /* non-critical */ }
+  // Persist to DB so the badge shows on dashboard reload
+  if (maintenanceId) {
+    db.maintenanceRequest.update({
+      where: { id: maintenanceId },
+      data: { autoReplyStatus: stage, autoReplyStatusAt: new Date() },
+    }).catch(() => { /* non-critical */ });
+  }
 }
 
 /**
@@ -478,7 +486,10 @@ function queueTenantReply(params: {
   /** Extracted media payload to carry through to flush */
   mediaResult?: ExtractedMedia | null;
 }) {
-  const bucket = pendingTenantReplies.get(params.tenantId);
+  // Use composite key so DM and group messages from the same tenant
+  // are never mixed — each channel gets its own bucket/timer.
+  const bucketKey = `${params.tenantId}::${params.replyTo}`;
+  const bucket = pendingTenantReplies.get(bucketKey);
   const messages = bucket?.messages || [];
   const updatedMessages = [...messages, { content: params.tenantMessage, at: Date.now(), media: params.media }];
   const mediaResults = bucket?.mediaResults || [];
@@ -491,13 +502,13 @@ function queueTenantReply(params: {
   }
 
   const timer = setTimeout(() => {
-    flushTenantReply({ tenantId: params.tenantId }).catch((err) => {
+    flushTenantReply({ bucketKey, tenantId: params.tenantId }).catch((err) => {
       // eslint-disable-next-line no-console
       console.error("flush tenant reply failed", err);
     });
   }, params.delayMs);
 
-  pendingTenantReplies.set(params.tenantId, {
+  pendingTenantReplies.set(bucketKey, {
     messages: updatedMessages,
     timer,
     replyTo: params.replyTo,
@@ -507,17 +518,17 @@ function queueTenantReply(params: {
   });
 }
 
-async function flushTenantReply(params: { tenantId: string }) {
+async function flushTenantReply(params: { bucketKey: string; tenantId: string }) {
   // eslint-disable-next-line no-console
-  console.info("flushTenantReply TRIGGERED", { tenantId: params.tenantId });
-  const bucket = pendingTenantReplies.get(params.tenantId);
+  console.info("flushTenantReply TRIGGERED", { tenantId: params.tenantId, bucketKey: params.bucketKey });
+  const bucket = pendingTenantReplies.get(params.bucketKey);
   if (!bucket) {
     // eslint-disable-next-line no-console
-    console.warn("flushTenantReply: no bucket found", { tenantId: params.tenantId });
+    console.warn("flushTenantReply: no bucket found", { tenantId: params.tenantId, bucketKey: params.bucketKey });
     return null;
   }
   clearTimeout(bucket.timer);
-  pendingTenantReplies.delete(params.tenantId);
+  pendingTenantReplies.delete(params.bucketKey);
 
   const tenant = await repo.getTenantById(params.tenantId);
   if (!tenant) return null;

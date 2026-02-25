@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Outer hexagon -->
+  <polygon fill="#fff" points="256,24 472,148 472,364 256,488 40,364 40,148"/>
+  <!-- Inner cutout -->
+  <polygon fill="#000" points="256,52 450,164 450,348 256,460 62,348 62,164"/>
+  <!-- Hex stroke ring -->
+  <polygon fill="none" stroke="#fff" stroke-width="16" points="256,52 450,164 450,348 256,460 62,348 62,164"/>
+  <!-- Roof chevron -->
+  <path fill="#fff" d="M256,115 L390,200 L362,200 L256,142 L150,200 L122,200 Z"/>
+  <!-- N letter -->
+  <path fill="#fff" d="M128,390 L128,235 L164,235 L238,345 L238,235 L270,235 L270,390 L236,390 L162,280 L162,390 Z"/>
+  <!-- A letter with house door -->
+  <path fill="#fff" d="M285,390 L336,235 L376,235 L426,390 L392,390 L380,352 L332,352 L320,390 Z M340,324 L372,324 L356,270 Z"/>
+  <!-- Door dot in A -->
+  <circle fill="#000" cx="356" cy="340" r="8"/>
+</svg>

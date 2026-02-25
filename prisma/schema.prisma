@@ -219,6 +219,8 @@ model MaintenanceRequest {
 	autopilotLog  Json?
 	chatLog        Json?
 	landlordReply  String?
+	autoReplyStatus String?
+	autoReplyStatusAt DateTime?
 	utilityAnomaly Boolean           @default(false)
 	utilityNotes   String?
 	mcpTaskId      String?

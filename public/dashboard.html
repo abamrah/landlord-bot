@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NestMind AI — Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="apple-touch-icon" href="/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -104,12 +106,16 @@
       width: 32px;
       height: 32px;
       border-radius: 8px;
-      background: var(--gradient);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
       flex-shrink: 0;
+    }
+
+    .brand-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .brand strong {
@@ -1462,6 +1468,9 @@
         background: var(--surface);
         border-bottom: 1px solid var(--border);
         z-index: 10;
+        position: sticky;
+        top: 0;
+        flex-shrink: 0;
       }
 
       .mobile-brand {
@@ -1474,7 +1483,14 @@
       }
 
       .mobile-brand-icon {
-        font-size: 20px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .mobile-brand-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
 
       .mobile-header-actions {
@@ -1900,6 +1916,10 @@
         min-height: 52px;
         background: var(--surface);
         border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 101;
+        flex-shrink: 0;
       }
 
       .mobile-overlay-back {
@@ -2275,7 +2295,7 @@
   <!-- ═══ SIDEBAR ═══ -->
   <nav class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-icon">🏠</div><strong>NestMind AI</strong>
+      <div class="brand-icon"><img src="/logo.svg" alt="NestMind AI"></div><strong>NestMind AI</strong>
     </div>
     <div class="nav-title">Overview</div>
     <a class="nav-item active" data-target="mission">📊 <span>Dashboard</span></a>
@@ -3781,7 +3801,7 @@
     <!-- Mobile Header -->
     <div class="mobile-header">
       <div class="mobile-brand">
-        <span class="mobile-brand-icon">🏠</span>
+        <span class="mobile-brand-icon"><img src="/logo.svg" alt="NestMind AI"></span>
         <span>NestMind AI</span>
       </div>
       <div class="mobile-header-actions">
@@ -4147,14 +4167,33 @@
       sent: 'Reply Sent', failed: 'Send Failed', held: 'Held for Approval',
       disabled: 'Auto-Reply Off', skipped: 'Skipped',
     };
+    var AR_PERSIST_TTL = 5 * 60 * 1000; // Terminal badges fade after 5 min
     function autoReplyBadge(maintenanceId, tenantId) {
-      const info = _arStatusMap[maintenanceId] || _arStatusMap[tenantId];
-      if (!info) return '';
-      // Auto-clear "sent" badges after 30 seconds so they don't linger forever
-      if ((info.stage === 'sent' || info.stage === 'failed' || info.stage === 'disabled' || info.stage === 'skipped') &&
-          Date.now() - new Date(info.timestamp).getTime() > 30000) return '';
+      var info = _arStatusMap[maintenanceId] || _arStatusMap[tenantId];
+      // Fallback: check the maintenance record's persisted autoReplyStatus
+      if (!info) {
+        var m = maintenanceId ? state.maintenance.find(function(x){ return x.id === maintenanceId; }) : null;
+        if (!m && tenantId) m = state.maintenance.find(function(x){ return x.tenantId === tenantId; });
+        if (m && m.autoReplyStatus) {
+          info = { stage: m.autoReplyStatus, timestamp: m.autoReplyStatusAt || m.updatedAt };
+        }
+      }
+      if (!info || !info.stage) return '';
+      var elapsed = Date.now() - new Date(info.timestamp).getTime();
+      var isTerminal = ['sent', 'failed', 'disabled', 'skipped'].indexOf(info.stage) >= 0;
+      if (isTerminal && elapsed > AR_PERSIST_TTL) return '';
       return '<span class="auto-reply-badge ar-' + info.stage + '" data-ar-mid="' + (maintenanceId || '') + '" data-ar-tid="' + (tenantId || '') + '">'
         + '<span class="ar-dot"></span>' + AR_LABELS[info.stage] + '</span>';
+    }
+    // Seed _arStatusMap from persisted maintenance data on load
+    function seedAutoReplyStatuses() {
+      state.maintenance.forEach(function(m) {
+        if (m.autoReplyStatus) {
+          var info = { stage: m.autoReplyStatus, timestamp: m.autoReplyStatusAt || m.updatedAt };
+          _arStatusMap[m.id] = info;
+          if (m.tenantId) _arStatusMap[m.tenantId] = info;
+        }
+      });
     }
 
     // ── LOADERS ──
@@ -4173,6 +4212,7 @@
       const r = await fetchJson(url);
       state.dbEnabled = r.dbEnabled !== false;
       state.maintenance = r.items || [];
+      seedAutoReplyStatuses();
       renderMaintenance(); renderMissionCards(); renderCharts();
     }
     async function loadUtilities() { const { items } = await fetchJson('/admin/utilities/bills'); state.utilityBills = items || []; renderUtilities(); }

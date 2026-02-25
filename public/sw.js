@@ -17,8 +17,8 @@ self.addEventListener("push", function (event) {
   var title = data.title || "AI Agent Notification";
   var options = {
     body: data.body || "",
-    icon: "/favicon.ico",
-    badge: "/favicon.ico",
+    icon: "/logo.svg",
+    badge: "/logo.svg",
     tag: data.type || "general",
     data: data.data || {},
     actions: [

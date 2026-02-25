@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NestMind AI — AI Property Management for Landlords</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
@@ -82,11 +84,15 @@
             width: 36px;
             height: 36px;
             border-radius: 10px;
-            background: var(--gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+        }
+
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .nav-logo-text {
@@ -923,7 +929,7 @@
     <nav>
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <div class="nav-logo-icon">🏠</div>
+                <div class="nav-logo-icon"><img src="/logo.svg" alt="NestMind AI"></div>
                 <span class="nav-logo-text">NestMind AI</span>
             </a>
             <div class="nav-links">
@@ -1252,7 +1258,7 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <a href="/" class="nav-logo" style="margin-bottom:8px">
-                    <div class="nav-logo-icon">🏠</div>
+                    <div class="nav-logo-icon"><img src="/logo.svg" alt="NestMind AI"></div>
                     <span class="nav-logo-text">NestMind AI</span>
                 </a>
                 <p>AI-powered property management that handles tenant communication, maintenance, utilities, and
