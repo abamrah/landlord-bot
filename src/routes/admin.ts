@@ -2903,6 +2903,92 @@ router.get("/leases/:unitTenantId", async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+//  STANDARD ONTARIO LEASE GENERATION
+// ═══════════════════════════════════════════════════════════
+
+/** POST /admin/leases/generate — Generate a pre-filled Standard Ontario Lease PDF */
+router.post("/leases/generate", async (req, res) => {
+  const authReq = req as AuthRequest;
+  const schema = z.object({
+    landlordName: z.string().min(1),
+    landlordStreetNo: z.string().min(1),
+    landlordStreetName: z.string().min(1),
+    landlordUnit: z.string().optional(),
+    landlordCity: z.string().min(1),
+    landlordPostalCode: z.string().min(1),
+    tenantName: z.string().min(1),
+    additionalTenants: z.array(z.string()).optional(),
+    propertyStreetNo: z.string().min(1),
+    propertyStreetName: z.string().min(1),
+    propertyUnit: z.string().optional(),
+    propertyCity: z.string().min(1),
+    propertyProvince: z.string().default("Ontario"),
+    propertyPostalCode: z.string().min(1),
+    email: z.string().optional(),
+    leaseStartDate: z.string().min(1),
+    leaseEndDate: z.string().optional(),
+    termType: z.enum(["fixed", "monthly"]).default("fixed"),
+    rentAmount: z.number().positive(),
+    rentDueDay: z.string().optional(),
+    parkingCost: z.number().optional(),
+    lastMonthDeposit: z.number().optional(),
+    keyDeposit: z.number().optional(),
+    smokingRules: z.string().optional(),
+    additionalTerms: z.string().optional(),
+    signDate: z.string().optional(),
+  });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  try {
+    const noticeService = await import("../services/noticeService");
+    const d = parsed.data;
+    const pdfBuffer = await noticeService.generateStandardLease({
+      landlordName: d.landlordName,
+      landlordAddress: {
+        streetNo: d.landlordStreetNo,
+        streetName: d.landlordStreetName,
+        unitNo: d.landlordUnit,
+        city: d.landlordCity,
+        postalCode: d.landlordPostalCode,
+      },
+      tenantName: d.tenantName,
+      additionalTenants: d.additionalTenants,
+      propertyAddress: {
+        streetNo: d.propertyStreetNo,
+        streetName: d.propertyStreetName,
+        unitNo: d.propertyUnit,
+        city: d.propertyCity,
+        province: d.propertyProvince,
+        postalCode: d.propertyPostalCode,
+      },
+      email: d.email,
+      leaseStartDate: d.leaseStartDate,
+      leaseEndDate: d.leaseEndDate,
+      termType: d.termType,
+      rentAmount: d.rentAmount,
+      rentDueDay: d.rentDueDay,
+      parkingCost: d.parkingCost,
+      lastMonthDeposit: d.lastMonthDeposit,
+      keyDeposit: d.keyDeposit,
+      smokingRules: d.smokingRules,
+      additionalTerms: d.additionalTerms,
+      signDate: d.signDate,
+    });
+
+    const base64 = pdfBuffer.toString("base64");
+    res.json({
+      ok: true,
+      pdf: base64,
+      fileName: `Standard-Lease-${d.tenantName.replace(/\s+/g, "_")}.pdf`,
+    });
+  } catch (err) {
+    console.error("Lease generation error:", err);
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 /** GET /admin/portfolio — Get full landlord portfolio summary */
 router.get("/portfolio", async (req, res) => {
   const authReq = req as AuthRequest;

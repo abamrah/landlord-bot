@@ -109,47 +109,45 @@ def inject_fields_into_datasets(datasets_xml: str, fields: dict) -> str:
 
 
 def _set_nested_field(xml: str, parts: list, value: str) -> str:
-    """Set a value for a nested field path like ['Table1', 'Row1', 'ArrearFrom1']."""
-    field_name = parts[-1]
-    
-    # Find the innermost container and the field within it
-    container = parts[-2] if len(parts) > 1 else None
-    
-    if container:
-        # XFA XML uses newlines inside tags like <Row1\n> and </Row1\n>
-        # so we need \s* after the tag name and before >
-        container_pattern = re.compile(
-            r'(<' + re.escape(container) + r'[^>]*>)(.*?)(</' + re.escape(container) + r'\s*>)',
-            re.DOTALL
-        )
-        
-        def replace_in_container(match):
-            prefix = match.group(1)
-            content = match.group(2)
-            suffix = match.group(3)
-            
-            # Self-closing: <FieldName\n/> or <FieldName/>
-            empty_pat = re.compile(r'(<' + re.escape(field_name) + r')(\s*/\s*>)')
-            if empty_pat.search(content):
-                content = empty_pat.sub(
-                    r'\g<1>>' + value + '</' + field_name + r'>',
-                    content, count=1
-                )
-            else:
-                # Has content: <FieldName>old</FieldName> or <FieldName\n>old</FieldName\n>
-                filled_pat = re.compile(
-                    r'(<' + re.escape(field_name) + r'\s*>)[^<]*(</\s*' + re.escape(field_name) + r'\s*>)'
-                )
-                content = filled_pat.sub(
-                    r'\g<1>' + value + r'\g<2>',
-                    content, count=1
-                )
-            
-            return prefix + content + suffix
-        
-        xml = container_pattern.sub(replace_in_container, xml, count=1)
-    
-    return xml
+    """
+    Set a value for a nested field path like ['Table1', 'Row1', 'ArrearFrom1'].
+    Recursively walks the full path to find the correct context.
+    """
+    if len(parts) == 1:
+        # Leaf field — do the actual replacement
+        field_name = parts[0]
+        empty_pat = re.compile(r'(<' + re.escape(field_name) + r')(\s*/\s*>)')
+        if empty_pat.search(xml):
+            return empty_pat.sub(
+                r'\g<1>>' + value + '</' + field_name + r'>',
+                xml, count=1
+            )
+        else:
+            filled_pat = re.compile(
+                r'(<' + re.escape(field_name) + r'\s*>)[^<]*(</\s*' + re.escape(field_name) + r'\s*>)'
+            )
+            return filled_pat.sub(
+                r'\g<1>' + value + r'\g<2>',
+                xml, count=1
+            )
+
+    # Walk deeper: find the container, recurse into it
+    container = parts[0]
+    remaining = parts[1:]
+
+    container_pattern = re.compile(
+        r'(<' + re.escape(container) + r'[^>]*>)(.*?)(</' + re.escape(container) + r'\s*>)',
+        re.DOTALL
+    )
+
+    def replace_in_container(match):
+        prefix = match.group(1)
+        content = match.group(2)
+        suffix = match.group(3)
+        content = _set_nested_field(content, remaining, value)
+        return prefix + content + suffix
+
+    return container_pattern.sub(replace_in_container, xml, count=1)
 
 
 def main():

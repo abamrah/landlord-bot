@@ -373,6 +373,10 @@ function getTemplatePath(formNumber: string): string {
         const n14 = fs.readdirSync(FORMS_DIR).find(f => f.startsWith("N14") && f.endsWith(".pdf"));
         if (n14) return path.join(FORMS_DIR, n14);
     }
+    // Handle Standard Lease
+    if (formNumber === "Standard-lease-Ontario") {
+        return path.join(FORMS_DIR, "Standard-lease-Ontario.pdf");
+    }
     return path.join(FORMS_DIR, `${formNumber}.pdf`);
 }
 
@@ -1288,6 +1292,136 @@ export async function generateN14Notice(data: N14Data): Promise<Buffer> {
 export const VALID_NOTICE_TYPES = ["N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12", "N13", "N14"] as const;
 export type NoticeType = typeof VALID_NOTICE_TYPES[number];
 
+// ═══════════════════════════════════════════════════════════
+//  STANDARD ONTARIO LEASE (Form 2229E)
+// ═══════════════════════════════════════════════════════════
+
+export interface StandardLeaseAddress {
+    streetNo: string;
+    streetName: string;
+    unitNo?: string;
+    city: string;
+    province?: string;
+    postalCode: string;
+}
+
+export interface StandardLeaseData {
+    /** Landlord's legal name */
+    landlordName: string;
+    /** Landlord's address for service (business address) */
+    landlordAddress: StandardLeaseAddress;
+    /** Primary tenant full name */
+    tenantName: string;
+    /** Additional tenant names (up to 3 more) */
+    additionalTenants?: string[];
+    /** Rental unit address */
+    propertyAddress: StandardLeaseAddress;
+    /** Contact email for the property */
+    email?: string;
+    /** Lease start date (YYYY-MM-DD or readable date) */
+    leaseStartDate: string;
+    /** Lease end date (YYYY-MM-DD or readable date), omit for month-to-month */
+    leaseEndDate?: string;
+    /** "fixed" | "monthly" */
+    termType?: string;
+    /** Monthly rent amount (base rent) */
+    rentAmount: number;
+    /** Day of month rent is due (e.g. "1") */
+    rentDueDay?: string;
+    /** Parking cost per month */
+    parkingCost?: number;
+    /** Last month's rent deposit amount */
+    lastMonthDeposit?: number;
+    /** Key deposit amount */
+    keyDeposit?: number;
+    /** Smoking rules text */
+    smokingRules?: string;
+    /** Additional terms / comments */
+    additionalTerms?: string;
+    /** Date the lease is signed (YYYY-MM-DD) */
+    signDate?: string;
+}
+
+export async function generateStandardLease(data: StandardLeaseData): Promise<Buffer> {
+    const fields: Record<string, string> = {};
+
+    // ── Section 1: Parties ──
+    fields["landlord.instrName"] = data.landlordName;
+    // First tenant (inside tenantsnames container)
+    fields["tenantsnames.tenant.instructorInfo.instructorName.instrName"] = data.tenantName;
+
+    // Additional tenants — handled via a special "nth" approach below
+
+    // ── Section 2: Landlord's Address for Service ──
+    fields["section2.busStreetNo"] = data.landlordAddress.streetNo;
+    fields["section2.busStreetName"] = data.landlordAddress.streetName;
+    fields["section2.busCity"] = data.landlordAddress.city;
+    fields["section2.busPostalCode"] = data.landlordAddress.postalCode;
+    if (data.landlordAddress.unitNo) {
+        fields["section2.busUnitNo"] = data.landlordAddress.unitNo;
+    }
+
+    // ── Section 3: Rental Unit ──
+    fields["section3.streetNo"] = data.propertyAddress.streetNo;
+    fields["section3.streetName"] = data.propertyAddress.streetName;
+    fields["section3.city"] = data.propertyAddress.city;
+    fields["section3.province"] = data.propertyAddress.province || "Ontario";
+    fields["section3.postalCode"] = data.propertyAddress.postalCode;
+    if (data.propertyAddress.unitNo) {
+        fields["section3.unitNo"] = data.propertyAddress.unitNo;
+    }
+    if (data.email) {
+        fields["section3.question1.email"] = data.email;
+    }
+
+    // ── Section 4: Term of Tenancy ──
+    fields["section4.question1.date"] = data.leaseStartDate;
+    if (data.leaseEndDate) {
+        fields["section4.question2.date"] = data.leaseEndDate;
+    }
+
+    // ── Section 5: Rent ──
+    fields["section5.Table1.Row1.cost"] = data.rentAmount.toFixed(2);
+
+    // Parking
+    if (data.parkingCost != null && data.parkingCost > 0) {
+        fields["section5.Table1.Row2.cost"] = data.parkingCost.toFixed(2);
+    }
+
+    // Total rent (base + parking + extras)
+    const total = data.rentAmount + (data.parkingCost || 0);
+    fields["section5.Table1.Row6.totalcost"] = total.toFixed(2);
+
+    if (data.rentDueDay) {
+        fields["section5.questionf.day"] = data.rentDueDay;
+    }
+
+    // ── Section 8: Last Month's Rent Deposit ──
+    if (data.lastMonthDeposit != null && data.lastMonthDeposit > 0) {
+        fields["section8.question2.deposit"] = data.lastMonthDeposit.toFixed(2);
+    }
+
+    // ── Section 9: Key Deposit ──
+    if (data.keyDeposit != null && data.keyDeposit > 0) {
+        fields["section9.question2.deposit"] = data.keyDeposit.toFixed(2);
+    }
+
+    // ── Section 10: Smoking Rules ──
+    if (data.smokingRules) {
+        fields["section10.comment"] = data.smokingRules;
+    }
+
+    // ── Section 17: Signatures ──
+    fields["section17.landlords.signature1.name"] = data.landlordName;
+    fields["section17.tenants.signature1.name"] = data.tenantName;
+    if (data.signDate) {
+        fields["section17.landlords.signature1.date"] = data.signDate;
+        fields["section17.tenants.signature1.date"] = data.signDate;
+    }
+
+    return fillTemplate("Standard-lease-Ontario", fields);
+}
+
 export default {
     generateN1Notice,
     generateN2Notice,
@@ -1303,5 +1437,6 @@ export default {
     generateN12Notice,
     generateN13Notice,
     generateN14Notice,
+    generateStandardLease,
     VALID_NOTICE_TYPES,
 };

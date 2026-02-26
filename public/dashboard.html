@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>NestMind AI — Dashboard</title>
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="apple-touch-icon" href="/logo.svg" />
@@ -893,7 +893,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
       padding: 10px 12px;
-      font-size: 15px;
+      font-size: 16px;
       font-family: inherit;
       background: var(--bg);
       color: var(--text);
@@ -1809,10 +1809,16 @@
 
       .mobile-chat-messages .chat-msg.user {
         align-self: flex-end;
+        background: none;
+        border: none;
+        padding: 0;
       }
 
       .mobile-chat-messages .chat-msg.ai {
         align-self: flex-start;
+        background: none;
+        border: none;
+        padding: 0;
       }
 
       .mobile-chat-messages .chat-msg>div:first-child {
@@ -1848,8 +1854,10 @@
         align-items: flex-end;
         gap: 8px;
         padding: 10px 14px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
         border-top: 1px solid var(--border);
         background: var(--surface);
+        flex-shrink: 0;
       }
 
       .mobile-chat-input textarea {
@@ -1858,7 +1866,7 @@
         border: 1px solid var(--border);
         border-radius: 20px;
         padding: 10px 16px;
-        font-size: 15px;
+        font-size: 16px;
         font-family: inherit;
         background: var(--bg);
         color: var(--text);
@@ -2468,22 +2476,23 @@
     </div>
     <div class="nav-title">Overview</div>
     <a class="nav-item active" data-target="mission">📊 <span>Dashboard</span></a>
-    <a class="nav-item" data-target="maintenance">🛠️ <span>Maintenance</span></a>
-    <div class="nav-title">Manage</div>
-    <a class="nav-item" data-target="tenants">👥 <span>Tenants</span></a>
+    <div class="nav-title">Properties</div>
     <a class="nav-item" data-target="units">🏢 <span>Units</span></a>
+    <a class="nav-item" data-target="tenants">👥 <span>Tenants</span></a>
+    <a class="nav-item" data-target="leases">📋 <span>Leases</span></a>
+    <div class="nav-title">Operations</div>
+    <a class="nav-item" data-target="maintenance">🛠️ <span>Maintenance</span></a>
     <a class="nav-item" data-target="contractors">🧰 <span>Contractors</span></a>
-    <a class="nav-item" data-target="utilities">💡 <span>Utilities</span></a>
-    <a class="nav-item" data-target="financials">💰 <span>Financials</span></a>
     <a class="nav-item" data-target="rent-collection">🏦 <span>Rent Collection</span></a>
     <a class="nav-item" data-target="screening">🔍 <span>Screening</span></a>
-    <div class="nav-title">AI</div>
+    <div class="nav-title">Finance</div>
+    <a class="nav-item" data-target="financials">💰 <span>Financials</span></a>
+    <a class="nav-item" data-target="utilities">💡 <span>Utilities</span></a>
+    <div class="nav-title">AI & Settings</div>
     <a class="nav-item" data-target="agent">🧠 <span>AI Agent</span></a>
-    <a class="nav-item" data-target="usage">📈 <span>AI Usage</span></a>
-    <div class="nav-title">Settings</div>
     <a class="nav-item" data-target="whatsapp">💬 <span>WhatsApp</span></a>
     <a class="nav-item" data-target="reminders">⏰ <span>Reminders</span></a>
-    <a class="nav-item" data-target="leases">📋 <span>Leases</span></a>
+    <a class="nav-item" data-target="usage">📈 <span>AI Usage</span></a>
     <div class="nav-title">Help</div>
     <a class="nav-item" data-target="guides">📖 <span>Tips & Guides</span></a>
     <div class="nav-spacer"></div>
@@ -3768,6 +3777,7 @@
           <div style="display:flex;gap:8px">
             <button class="btn btn-secondary" onclick="loadExpiringLeases()">Refresh</button>
             <button class="btn btn-primary" onclick="sendLeaseAlerts()">Send Alerts Now</button>
+            <button class="btn btn-primary" onclick="openCreateLease()">+ Create Lease</button>
           </div>
         </div>
         <div class="panel">
@@ -3775,6 +3785,88 @@
             <h3>Expiring Soon (next 60 days)</h3>
           </div>
           <div id="leasesList" style="color:var(--text-secondary)">Loading...</div>
+        </div>
+
+        <!-- CREATE LEASE MODAL -->
+        <div id="createLeaseModal" class="modal-overlay" style="display:none;">
+          <div class="modal" style="max-width:680px;">
+            <div class="modal-header">
+              <h3>Create Standard Ontario Lease</h3>
+              <button class="modal-close" onclick="closeCreateLease()">×</button>
+            </div>
+            <div class="modal-body" style="max-height:65vh;overflow-y:auto;">
+              <form id="createLeaseForm" onsubmit="submitCreateLease(event)">
+                <!-- Landlord Info -->
+                <h4 style="margin:0 0 12px;color:var(--accent);">Landlord Information</h4>
+                <div class="grid-2" style="gap:10px;margin-bottom:16px;">
+                  <div><label class="label">Landlord Legal Name *</label><input class="input" id="leaseLandlordName" required></div>
+                  <div><label class="label">Email</label><input class="input" id="leaseEmail" type="email"></div>
+                  <div><label class="label">Street No *</label><input class="input" id="leaseLLStreetNo" required></div>
+                  <div><label class="label">Street Name *</label><input class="input" id="leaseLLStreetName" required></div>
+                  <div><label class="label">Unit #</label><input class="input" id="leaseLLUnit"></div>
+                  <div><label class="label">City *</label><input class="input" id="leaseLLCity" required></div>
+                  <div><label class="label">Postal Code *</label><input class="input" id="leaseLLPostal" required></div>
+                </div>
+
+                <!-- Tenant Info -->
+                <h4 style="margin:0 0 12px;color:var(--accent);">Tenant Information</h4>
+                <div class="grid-2" style="gap:10px;margin-bottom:8px;">
+                  <div><label class="label">Tenant Name *</label><input class="input" id="leaseTenantName" required></div>
+                  <div><label class="label">Additional Tenant 2</label><input class="input" id="leaseTenant2"></div>
+                  <div><label class="label">Additional Tenant 3</label><input class="input" id="leaseTenant3"></div>
+                  <div><label class="label">Additional Tenant 4</label><input class="input" id="leaseTenant4"></div>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 16px;">Select an existing tenant to auto-fill:</p>
+                <select class="input" id="leaseTenantSelect" onchange="leaseAutoFillTenant()" style="margin-bottom:16px;">
+                  <option value="">— Choose tenant —</option>
+                </select>
+
+                <!-- Property Address -->
+                <h4 style="margin:0 0 12px;color:var(--accent);">Rental Unit Address</h4>
+                <div class="grid-2" style="gap:10px;margin-bottom:16px;">
+                  <div><label class="label">Street No *</label><input class="input" id="leasePropStreetNo" required></div>
+                  <div><label class="label">Street Name *</label><input class="input" id="leasePropStreetName" required></div>
+                  <div><label class="label">Unit # *</label><input class="input" id="leasePropUnit" required></div>
+                  <div><label class="label">City *</label><input class="input" id="leasePropCity" required></div>
+                  <div><label class="label">Province</label><input class="input" id="leasePropProvince" value="Ontario"></div>
+                  <div><label class="label">Postal Code *</label><input class="input" id="leasePropPostal" required></div>
+                </div>
+
+                <!-- Lease Terms -->
+                <h4 style="margin:0 0 12px;color:var(--accent);">Lease Terms</h4>
+                <div class="grid-2" style="gap:10px;margin-bottom:16px;">
+                  <div><label class="label">Term Type</label>
+                    <select class="input" id="leaseTermType"><option value="fixed">Fixed Term</option><option value="monthly">Month-to-Month</option></select>
+                  </div>
+                  <div><label class="label">Start Date *</label><input class="input" id="leaseStartDate" type="date" required></div>
+                  <div><label class="label">End Date</label><input class="input" id="leaseEndDate" type="date"></div>
+                  <div><label class="label">Rent Due Day</label><input class="input" id="leaseRentDueDay" type="number" min="1" max="31" value="1"></div>
+                </div>
+
+                <!-- Rent / Deposits -->
+                <h4 style="margin:0 0 12px;color:var(--accent);">Rent & Deposits</h4>
+                <div class="grid-2" style="gap:10px;margin-bottom:16px;">
+                  <div><label class="label">Monthly Rent ($) *</label><input class="input" id="leaseRentAmount" type="number" step="0.01" min="0" required></div>
+                  <div><label class="label">Parking ($)</label><input class="input" id="leaseParkingCost" type="number" step="0.01" min="0"></div>
+                  <div><label class="label">Last Month Deposit ($)</label><input class="input" id="leaseLastMonthDeposit" type="number" step="0.01" min="0"></div>
+                  <div><label class="label">Key Deposit ($)</label><input class="input" id="leaseKeyDeposit" type="number" step="0.01" min="0"></div>
+                </div>
+
+                <!-- Additional -->
+                <h4 style="margin:0 0 12px;color:var(--accent);">Additional Clauses</h4>
+                <div style="margin-bottom:16px;">
+                  <label class="label">Smoking Rules</label>
+                  <input class="input" id="leaseSmokingRules" placeholder="e.g. No smoking in the unit or on the balcony">
+                  <label class="label" style="margin-top:10px;">Additional Terms</label>
+                  <textarea class="input" id="leaseAdditionalTerms" rows="3" placeholder="Any extra conditions..."></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" onclick="closeCreateLease()">Cancel</button>
+              <button class="btn btn-primary" id="leaseGenBtn" onclick="submitCreateLease(event)">Generate Lease PDF</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -4161,22 +4253,23 @@
       <div class="mobile-panel mobile-nav-panel" id="mobileNavPanel">
         <div class="mobile-nav-title">Overview</div>
         <a class="mobile-nav-item" data-section="mission"><span class="nav-emoji">📊</span> Dashboard</a>
-        <a class="mobile-nav-item" data-section="maintenance"><span class="nav-emoji">🛠️</span> Maintenance</a>
-        <div class="mobile-nav-title">Manage</div>
-        <a class="mobile-nav-item" data-section="tenants"><span class="nav-emoji">👥</span> Tenants</a>
+        <div class="mobile-nav-title">Properties</div>
         <a class="mobile-nav-item" data-section="units"><span class="nav-emoji">🏢</span> Units</a>
+        <a class="mobile-nav-item" data-section="tenants"><span class="nav-emoji">👥</span> Tenants</a>
+        <a class="mobile-nav-item" data-section="leases"><span class="nav-emoji">📋</span> Leases</a>
+        <div class="mobile-nav-title">Operations</div>
+        <a class="mobile-nav-item" data-section="maintenance"><span class="nav-emoji">🛠️</span> Maintenance</a>
         <a class="mobile-nav-item" data-section="contractors"><span class="nav-emoji">🧰</span> Contractors</a>
-        <a class="mobile-nav-item" data-section="utilities"><span class="nav-emoji">💡</span> Utilities</a>
-        <a class="mobile-nav-item" data-section="financials"><span class="nav-emoji">💰</span> Financials</a>
         <a class="mobile-nav-item" data-section="rent-collection"><span class="nav-emoji">🏦</span> Rent Collection</a>
         <a class="mobile-nav-item" data-section="screening"><span class="nav-emoji">🔍</span> Screening</a>
-        <div class="mobile-nav-title">AI</div>
+        <div class="mobile-nav-title">Finance</div>
+        <a class="mobile-nav-item" data-section="financials"><span class="nav-emoji">💰</span> Financials</a>
+        <a class="mobile-nav-item" data-section="utilities"><span class="nav-emoji">💡</span> Utilities</a>
+        <div class="mobile-nav-title">AI & Settings</div>
         <a class="mobile-nav-item" data-section="agent"><span class="nav-emoji">🧠</span> AI Agent</a>
-        <a class="mobile-nav-item" data-section="usage"><span class="nav-emoji">📈</span> AI Usage</a>
-        <div class="mobile-nav-title">Settings</div>
         <a class="mobile-nav-item" data-section="whatsapp"><span class="nav-emoji">💬</span> WhatsApp</a>
         <a class="mobile-nav-item" data-section="reminders"><span class="nav-emoji">⏰</span> Reminders</a>
-        <a class="mobile-nav-item" data-section="leases"><span class="nav-emoji">📋</span> Leases</a>
+        <a class="mobile-nav-item" data-section="usage"><span class="nav-emoji">📈</span> AI Usage</a>
         <a class="mobile-nav-item" data-section="guides"><span class="nav-emoji">📖</span> Tips & Guides</a>
         <a class="mobile-nav-item" data-section="account"><span class="nav-emoji">👤</span> Account</a>
         <div style="height:16px;"></div>
@@ -6906,6 +6999,99 @@
       }
     }
 
+    /* ── Create Lease Modal ── */
+    function openCreateLease() {
+      document.getElementById('createLeaseModal').style.display = 'flex';
+      // Populate tenant dropdown from cached data
+      const sel = document.getElementById('leaseTenantSelect');
+      sel.innerHTML = '<option value="">— Choose tenant —</option>';
+      (state.tenants || []).forEach(t => {
+        const unitLabel = t.unitLabel || t.unit?.label || '';
+        const unitAddr = t.unitAddress || t.unit?.address || '';
+        sel.innerHTML += `<option value="${t.id}" data-name="${t.name}" data-unit="${unitLabel}" data-address="${unitAddr}">${t.name} — ${unitLabel || 'No unit'}</option>`;
+      });
+    }
+    function closeCreateLease() {
+      document.getElementById('createLeaseModal').style.display = 'none';
+    }
+    function leaseAutoFillTenant() {
+      const sel = document.getElementById('leaseTenantSelect');
+      const opt = sel.options[sel.selectedIndex];
+      if (!opt || !opt.value) return;
+      document.getElementById('leaseTenantName').value = opt.dataset.name || '';
+      // Try to parse address into parts
+      const addr = opt.dataset.address || '';
+      const parts = addr.match(/^(\d+)\s+(.+?)(?:,\s*(.+?))?(?:,\s*([A-Z]\d[A-Z]\s?\d[A-Z]\d))?$/i);
+      if (parts) {
+        document.getElementById('leasePropStreetNo').value = parts[1] || '';
+        document.getElementById('leasePropStreetName').value = parts[2] || '';
+        if (parts[3]) document.getElementById('leasePropCity').value = parts[3];
+      }
+      if (opt.dataset.unit) document.getElementById('leasePropUnit').value = opt.dataset.unit;
+    }
+
+    async function submitCreateLease(e) {
+      if (e) e.preventDefault();
+      const btn = document.getElementById('leaseGenBtn');
+      btn.disabled = true; btn.textContent = 'Generating...';
+      const additionalTenants = [
+        document.getElementById('leaseTenant2').value,
+        document.getElementById('leaseTenant3').value,
+        document.getElementById('leaseTenant4').value,
+      ].filter(Boolean);
+      const body = {
+        landlordName: document.getElementById('leaseLandlordName').value,
+        landlordStreetNo: document.getElementById('leaseLLStreetNo').value,
+        landlordStreetName: document.getElementById('leaseLLStreetName').value,
+        landlordUnit: document.getElementById('leaseLLUnit').value || undefined,
+        landlordCity: document.getElementById('leaseLLCity').value,
+        landlordPostalCode: document.getElementById('leaseLLPostal').value,
+        tenantName: document.getElementById('leaseTenantName').value,
+        additionalTenants: additionalTenants.length ? additionalTenants : undefined,
+        propertyStreetNo: document.getElementById('leasePropStreetNo').value,
+        propertyStreetName: document.getElementById('leasePropStreetName').value,
+        propertyUnit: document.getElementById('leasePropUnit').value || undefined,
+        propertyCity: document.getElementById('leasePropCity').value,
+        propertyProvince: document.getElementById('leasePropProvince').value || 'Ontario',
+        propertyPostalCode: document.getElementById('leasePropPostal').value,
+        email: document.getElementById('leaseEmail').value || undefined,
+        leaseStartDate: document.getElementById('leaseStartDate').value,
+        leaseEndDate: document.getElementById('leaseEndDate').value || undefined,
+        termType: document.getElementById('leaseTermType').value,
+        rentAmount: parseFloat(document.getElementById('leaseRentAmount').value) || 0,
+        rentDueDay: document.getElementById('leaseRentDueDay').value || undefined,
+        parkingCost: parseFloat(document.getElementById('leaseParkingCost').value) || undefined,
+        lastMonthDeposit: parseFloat(document.getElementById('leaseLastMonthDeposit').value) || undefined,
+        keyDeposit: parseFloat(document.getElementById('leaseKeyDeposit').value) || undefined,
+        smokingRules: document.getElementById('leaseSmokingRules').value || undefined,
+        additionalTerms: document.getElementById('leaseAdditionalTerms').value || undefined,
+        signDate: new Date().toISOString().split('T')[0],
+      };
+      try {
+        const data = await fetchJson('/admin/leases/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (data.pdf) {
+          const blob = new Blob([Uint8Array.from(atob(data.pdf), c => c.charCodeAt(0))], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = data.fileName || 'Standard-Lease.pdf';
+          document.body.appendChild(a); a.click(); a.remove();
+          URL.revokeObjectURL(url);
+          toast('Lease PDF generated & downloaded!');
+          closeCreateLease();
+        } else {
+          toast('Error: ' + (data.error || 'Unknown'));
+        }
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Generate Lease PDF';
+      }
+    }
+
     // ═══════════════════════════════════════════════════════════
     //  WEBSOCKET — Real-time notifications
     // ═══════════════════════════════════════════════════════════
@@ -7203,6 +7389,29 @@
       var mobileLog = document.getElementById('mobileAgentChatLog');
       var mobileAgentMediaData = null; // { base64, mimeType, name }
       var mobileAgentFileInput = document.getElementById('mobileAgentFileInput');
+
+      // ── Fix mobile keyboard pushing chat input halfway up ──
+      // Use VisualViewport API to keep chat input pinned at bottom when keyboard opens
+      (function fixMobileKeyboard() {
+        var chatPanel = document.getElementById('mobileChatPanel');
+        var chatInput = chatPanel ? chatPanel.querySelector('.mobile-chat-input') : null;
+        if (!chatInput || !window.visualViewport) return;
+
+        function onViewportResize() {
+          // When keyboard opens, visualViewport.height shrinks
+          var offset = window.innerHeight - window.visualViewport.height;
+          if (offset > 50) {
+            // Keyboard is open — adjust the shell height so chat input stays visible
+            document.getElementById('mobileShell').style.height = window.visualViewport.height + 'px';
+          } else {
+            document.getElementById('mobileShell').style.height = '100dvh';
+          }
+          // Scroll chat to bottom
+          mobileLog.scrollTop = mobileLog.scrollHeight;
+        }
+        window.visualViewport.addEventListener('resize', onViewportResize);
+        window.visualViewport.addEventListener('scroll', onViewportResize);
+      })();
 
       // Mobile media upload handler
       mobileAgentFileInput.addEventListener('change', function () {
