@@ -12,6 +12,8 @@ import maintenanceRouter from "./routes/maintenance";
 import maintenanceListRouter from "./routes/maintenance-list";
 import { runDueReminders, runFollowUpNudges } from "./services/reminderService";
 import { handleWebhook as handleStripeWebhook } from "./services/stripeService";
+import { handleRentWebhookEvent } from "./services/rentCollectionService";
+import { handleCertnWebhook, handleSingleKeyWebhook } from "./services/screeningService";
 import { registerPlugin, initializePlugins } from "./services/verticalPlugin";
 import { propertyManagementPlugin } from "./verticals/property-management";
 import { apiRateLimit, authRateLimit } from "./services/rateLimiter";
@@ -35,6 +37,15 @@ initWebSocket(server);
 app.post("/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
   const signature = req.headers["stripe-signature"] as string || "";
   const result = await handleStripeWebhook(req.body, signature);
+
+  // Also pass to rent collection handler for Connect events
+  try {
+    const Stripe = require("stripe");
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-12-18.acacia" });
+    const event = stripe.webhooks.constructEvent(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET || "");
+    await handleRentWebhookEvent(event);
+  } catch { /* rent handler is best-effort */ }
+
   res.json(result);
 });
 
@@ -56,6 +67,32 @@ app.get("/signup", (_req, res) => {
 });
 app.get("/onboarding", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "onboarding.html"));
+});
+
+// ── Public tenant payment pages (no auth) ──
+app.get("/pay/success", (_req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "pay-success.html"));
+});
+app.get("/pay/cancelled", (_req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "pay-cancelled.html"));
+});
+
+// ── Screening webhooks (no auth — signed by providers) ──
+app.post("/webhooks/certn", express.json(), async (req, res) => {
+  try {
+    const result = await handleCertnWebhook(req.body);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+app.post("/webhooks/singlekey", express.json(), async (req, res) => {
+  try {
+    const result = await handleSingleKeyWebhook(req.body);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
 });
 
 // API routes

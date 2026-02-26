@@ -2393,6 +2393,8 @@
     <a class="nav-item" data-target="contractors">🧰 <span>Contractors</span></a>
     <a class="nav-item" data-target="utilities">💡 <span>Utilities</span></a>
     <a class="nav-item" data-target="financials">💰 <span>Financials</span></a>
+    <a class="nav-item" data-target="rent-collection">🏦 <span>Rent Collection</span></a>
+    <a class="nav-item" data-target="screening">🔍 <span>Screening</span></a>
     <div class="nav-title">AI</div>
     <a class="nav-item" data-target="agent">🧠 <span>AI Agent</span></a>
     <a class="nav-item" data-target="usage">📈 <span>AI Usage</span></a>
@@ -3186,6 +3188,220 @@
         </div>
       </section>
 
+      <!-- ═══════════════════ RENT COLLECTION ═══════════════════ -->
+      <section id="rent-collection" class="section">
+        <div class="section-header">
+          <h2>Rent Collection</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadRentData()">↻</button>
+        </div>
+
+        <!-- STRIPE CONNECT ONBOARDING -->
+        <div class="panel panel-sm" id="connectOnboardPanel">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:220px;">
+              <h3 style="font-size:15px;font-weight:600;margin-bottom:6px;">🏦 Stripe Connect</h3>
+              <p style="font-size:13px;color:var(--text-muted);margin:0;">Connect your bank account to receive rent payments directly via Stripe.</p>
+            </div>
+            <div id="connectStatusBadge" style="display:flex;align-items:center;gap:8px;">
+              <span class="chip" id="connectChip" style="background:#fef3c7;color:#92400e;">Not Connected</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="connectOnboardBtn" onclick="startConnectOnboarding()">Connect Bank Account</button>
+            <button class="btn btn-secondary btn-sm" id="connectDashboardBtn" onclick="openConnectDashboard()" style="display:none;">Stripe Dashboard</button>
+          </div>
+        </div>
+
+        <!-- RENT STATS -->
+        <div class="panel panel-sm" id="rentStatsPanel" style="display:none;">
+          <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">
+            <div class="kpi" style="--kpi-accent:#22c55e;">
+              <div class="kpi-top">
+                <div class="kpi-label">Collected This Month</div>
+                <div class="kpi-icon" style="background:rgba(34,197,94,.1);color:#22c55e;">✓</div>
+              </div>
+              <div class="kpi-value" id="rentCollected" style="color:#22c55e;">$0</div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#f59e0b;">
+              <div class="kpi-top">
+                <div class="kpi-label">Pending</div>
+                <div class="kpi-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;">⏳</div>
+              </div>
+              <div class="kpi-value" id="rentPending" style="color:#f59e0b;">$0</div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#ef4444;">
+              <div class="kpi-top">
+                <div class="kpi-label">Overdue</div>
+                <div class="kpi-icon" style="background:rgba(239,68,68,.1);color:#ef4444;">⚠️</div>
+              </div>
+              <div class="kpi-value" id="rentOverdue" style="color:#ef4444;">$0</div>
+            </div>
+            <div class="kpi" style="--kpi-accent:#3b82f6;">
+              <div class="kpi-top">
+                <div class="kpi-label">Total Collected (All Time)</div>
+                <div class="kpi-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;">💰</div>
+              </div>
+              <div class="kpi-value" id="rentAllTime" style="color:#3b82f6;">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GENERATE MONTHLY RENT LINKS -->
+        <div class="panel panel-sm" id="rentGeneratePanel" style="display:none;">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">📤 Generate Monthly Rent Links</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+            Create payment links for all tenants who have rent configured. Links can be sent via WhatsApp.
+            <br><em>Ontario RTA s.108: Tenants must voluntarily consent — you cannot force this payment method.</em>
+          </p>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Month</label>
+              <input id="rentMonth" type="month" />
+            </div>
+            <button class="btn btn-primary btn-sm" id="generateRentBtn" onclick="generateMonthlyRent()">Generate Payment Links</button>
+          </div>
+          <div id="rentGenResults" style="margin-top:12px;display:none;"></div>
+        </div>
+
+        <!-- INDIVIDUAL PAYMENT CREATION -->
+        <div class="panel panel-sm" id="rentCreatePanel" style="display:none;">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">➕ Create Single Payment Request</h3>
+          <div class="form-row" style="flex-wrap:wrap;">
+            <div class="form-field">
+              <label>Tenant</label>
+              <select id="rentTenantSelect"><option value="">Select tenant...</option></select>
+            </div>
+            <div class="form-field">
+              <label>Amount ($)</label>
+              <input id="rentAmountInput" type="number" step="0.01" min="0" placeholder="0.00" />
+            </div>
+            <div class="form-field">
+              <label>Due Date</label>
+              <input id="rentDueDate" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Period Start</label>
+              <input id="rentPeriodStart" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Period End</label>
+              <input id="rentPeriodEnd" type="date" />
+            </div>
+            <button class="btn btn-primary btn-sm" style="align-self:end;" onclick="createSingleRentPayment()">Create Payment Link</button>
+          </div>
+          <div id="rentCreateResult" style="margin-top:8px;font-size:13px;display:none;"></div>
+        </div>
+
+        <!-- PAYMENT HISTORY TABLE -->
+        <div class="panel panel-sm" id="rentHistoryPanel" style="display:none;">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">📋 Payment History</h3>
+          <div class="table-wrap">
+            <table class="data-table" id="rentPaymentsTable">
+              <thead>
+                <tr>
+                  <th>Due Date</th>
+                  <th>Tenant</th>
+                  <th>Unit</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Paid At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="7" style="color:var(--text-muted);">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ TENANT SCREENING ═══════════════════ -->
+      <section id="screening" class="section">
+        <div class="section-header">
+          <h2>Tenant Screening</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadScreenings()">↻</button>
+        </div>
+
+        <!-- PROVIDER INFO -->
+        <div class="panel panel-sm">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:220px;">
+              <h3 style="font-size:15px;font-weight:600;margin-bottom:6px;">🔍 Tenant Screening</h3>
+              <p style="font-size:13px;color:var(--text-muted);margin:0;">
+                Run credit checks, criminal background checks, and identity verification on prospective tenants.
+                Supports <strong>Certn</strong>, <strong>SingleKey</strong>, or manual entry.
+              </p>
+            </div>
+            <span class="chip" id="screeningProviderChip" style="background:#e0e7ff;color:#3730a3;">Manual Mode</span>
+          </div>
+        </div>
+
+        <!-- REQUEST A NEW SCREENING -->
+        <div class="panel panel-sm">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">➕ Request Screening</h3>
+          <div class="form-row" style="flex-wrap:wrap;">
+            <div class="form-field">
+              <label>Applicant Name *</label>
+              <input id="screenName" placeholder="John Smith" />
+            </div>
+            <div class="form-field">
+              <label>Email</label>
+              <input id="screenEmail" type="email" placeholder="john@example.com" />
+            </div>
+            <div class="form-field">
+              <label>Phone</label>
+              <input id="screenPhone" placeholder="+1..." />
+            </div>
+            <div class="form-field">
+              <label>Unit (optional)</label>
+              <select id="screenUnitSelect"><option value="">Select unit...</option></select>
+            </div>
+            <button class="btn btn-primary btn-sm" style="align-self:end;" onclick="requestNewScreening()">Request Screening</button>
+          </div>
+          <div id="screenRequestResult" style="margin-top:8px;font-size:13px;display:none;"></div>
+        </div>
+
+        <!-- SCREENINGS TABLE -->
+        <div class="panel panel-sm">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">📋 Screening Reports</h3>
+          <div class="table-wrap">
+            <table class="data-table" id="screeningsTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Applicant</th>
+                  <th>Provider</th>
+                  <th>Status</th>
+                  <th>Credit</th>
+                  <th>Criminal</th>
+                  <th>Risk</th>
+                  <th>Recommendation</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="9" style="color:var(--text-muted);">No screenings yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SCREENING DETAIL MODAL -->
+        <div id="screeningDetailModal" class="modal-overlay" style="display:none;">
+          <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+              <h3 id="screeningDetailTitle">Screening Details</h3>
+              <button class="modal-close" onclick="closeScreeningDetail()">×</button>
+            </div>
+            <div class="modal-body" id="screeningDetailBody">
+              Loading...
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" onclick="closeScreeningDetail()">Close</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ═══════════════════ AI AGENT (unified) ═══════════════════ -->
       <section id="agent" class="section">
         <div class="section-header">
@@ -3867,6 +4083,8 @@
         <a class="mobile-nav-item" data-section="contractors"><span class="nav-emoji">🧰</span> Contractors</a>
         <a class="mobile-nav-item" data-section="utilities"><span class="nav-emoji">💡</span> Utilities</a>
         <a class="mobile-nav-item" data-section="financials"><span class="nav-emoji">💰</span> Financials</a>
+        <a class="mobile-nav-item" data-section="rent-collection"><span class="nav-emoji">🏦</span> Rent Collection</a>
+        <a class="mobile-nav-item" data-section="screening"><span class="nav-emoji">🔍</span> Screening</a>
         <div class="mobile-nav-title">AI</div>
         <a class="mobile-nav-item" data-section="agent"><span class="nav-emoji">🧠</span> AI Agent</a>
         <a class="mobile-nav-item" data-section="usage"><span class="nav-emoji">📈</span> AI Usage</a>
@@ -5886,6 +6104,7 @@
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();
       loadAgentChatHistory(); loadFinancialSummary(); loadFinancialRecords();
+      loadRentData(); loadScreenings();
     }
 
     async function loadFinancialSummary() {
@@ -6098,6 +6317,354 @@
         }
       });
     })();
+
+    // ═══════════════════════════════════════════════════════
+    // RENT COLLECTION FUNCTIONS
+    // ═══════════════════════════════════════════════════════
+
+    async function loadRentData() {
+      await loadConnectStatus();
+      await loadRentStats();
+      await loadRentPayments();
+      fillRentTenantSelect();
+    }
+
+    async function loadConnectStatus() {
+      try {
+        var data = await fetchJson('/admin/rent/connect/status');
+        var chip = document.getElementById('connectChip');
+        var onboardBtn = document.getElementById('connectOnboardBtn');
+        var dashBtn = document.getElementById('connectDashboardBtn');
+        if (data.status === 'active') {
+          chip.textContent = 'Connected';
+          chip.style.background = '#dcfce7'; chip.style.color = '#15803d';
+          onboardBtn.style.display = 'none';
+          dashBtn.style.display = '';
+          // Show panels
+          document.getElementById('rentStatsPanel').style.display = '';
+          document.getElementById('rentGeneratePanel').style.display = '';
+          document.getElementById('rentCreatePanel').style.display = '';
+          document.getElementById('rentHistoryPanel').style.display = '';
+        } else if (data.status === 'pending') {
+          chip.textContent = 'Onboarding Incomplete';
+          chip.style.background = '#fef3c7'; chip.style.color = '#92400e';
+          onboardBtn.textContent = 'Continue Onboarding';
+        } else {
+          chip.textContent = 'Not Connected';
+          chip.style.background = '#fef3c7'; chip.style.color = '#92400e';
+        }
+      } catch (e) { console.warn('Connect status load failed', e); }
+    }
+
+    window.startConnectOnboarding = async function() {
+      try {
+        var r = await fetchJson('/admin/rent/connect/onboard', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        if (r.url) window.open(r.url, '_blank');
+        else toast(r.error || 'Failed to start onboarding');
+      } catch (e) { toast('Error: ' + e.message); }
+    };
+
+    window.openConnectDashboard = async function() {
+      try {
+        var r = await fetchJson('/admin/rent/connect/login', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        if (r.url) window.open(r.url, '_blank');
+        else toast(r.error || 'Could not open dashboard');
+      } catch (e) { toast('Error: ' + e.message); }
+    };
+
+    async function loadRentStats() {
+      try {
+        var data = await fetchJson('/admin/rent/stats');
+        var fmt = function(cents) { return '$' + (cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+        document.getElementById('rentCollected').textContent = fmt(data.thisMonth?.collectedCents || 0);
+        document.getElementById('rentPending').textContent = fmt(data.pending?.amountCents || 0);
+        document.getElementById('rentOverdue').textContent = fmt(data.overdue?.amountCents || 0);
+        document.getElementById('rentAllTime').textContent = fmt(data.allTime?.collectedCents || 0);
+      } catch (e) { console.warn('Rent stats load failed', e); }
+    }
+
+    async function loadRentPayments() {
+      try {
+        var data = await fetchJson('/admin/rent/payments?limit=50');
+        var payments = data.payments || [];
+        var tbody = document.querySelector('#rentPaymentsTable tbody');
+        if (!payments.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted);">No rent payments yet</td></tr>';
+          return;
+        }
+        var statusColors = { SUCCEEDED: '#22c55e', PENDING: '#f59e0b', PROCESSING: '#3b82f6', FAILED: '#ef4444', REFUNDED: '#8b5cf6', CANCELLED: '#71717a' };
+        tbody.innerHTML = payments.map(function(p) {
+          var due = new Date(p.dueDate).toLocaleDateString('en-CA');
+          var paid = p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-CA') : '\u2014';
+          var amt = '$' + (p.amountCents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 });
+          var sc = statusColors[p.status] || '#71717a';
+          var tenantName = p.tenant?.name || '\u2014';
+          var unitLabel = p.unitTenant?.unit?.label || '\u2014';
+          return '<tr>' +
+            '<td>' + due + '</td>' +
+            '<td>' + tenantName + '</td>' +
+            '<td>' + unitLabel + '</td>' +
+            '<td style="font-weight:600;">' + amt + '</td>' +
+            '<td><span class="chip" style="background:' + sc + '22;color:' + sc + ';font-size:11px;">' + p.status + '</span></td>' +
+            '<td>' + paid + '</td>' +
+            '<td>' + (p.receiptUrl ? '<a href="' + p.receiptUrl + '" target="_blank" class="btn btn-secondary btn-sm">Receipt</a>' : '\u2014') + '</td>' +
+            '</tr>';
+        }).join('');
+      } catch (e) { console.warn('Rent payments load failed', e); }
+    }
+
+    function fillRentTenantSelect() {
+      var sel = document.getElementById('rentTenantSelect');
+      sel.innerHTML = '<option value="">Select tenant...</option>';
+      (state.tenants || []).forEach(function(t) {
+        var units = t.units || [];
+        units.forEach(function(ut) {
+          var opt = document.createElement('option');
+          opt.value = JSON.stringify({ tenantId: t.id, unitTenantId: ut.id, rent: ut.rentAmountCents });
+          opt.textContent = t.name + (ut.unit ? ' — ' + ut.unit.label : '');
+          sel.appendChild(opt);
+        });
+      });
+      // Auto-fill rent amount when tenant selected
+      sel.addEventListener('change', function() {
+        if (sel.value) {
+          try {
+            var d = JSON.parse(sel.value);
+            if (d.rent) document.getElementById('rentAmountInput').value = (d.rent / 100).toFixed(2);
+          } catch {}
+        }
+      });
+      // Set default month
+      var now = new Date();
+      document.getElementById('rentMonth').value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      document.getElementById('rentDueDate').value = now.toISOString().slice(0, 10);
+      document.getElementById('rentPeriodStart').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+      document.getElementById('rentPeriodEnd').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+    }
+
+    window.generateMonthlyRent = async function() {
+      var month = document.getElementById('rentMonth').value;
+      if (!month) { toast('Select a month'); return; }
+      var btn = document.getElementById('generateRentBtn');
+      btn.disabled = true; btn.textContent = 'Generating...';
+      try {
+        var r = await fetchJson('/admin/rent/generate-monthly', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ month: month + '-01' })
+        });
+        btn.disabled = false; btn.textContent = 'Generate Payment Links';
+        var results = r.results || [];
+        var el = document.getElementById('rentGenResults');
+        el.style.display = 'block';
+        if (!results.length) {
+          el.innerHTML = '<p style="color:var(--text-muted);">No tenants with rent configured found.</p>';
+          return;
+        }
+        el.innerHTML = '<div style="font-size:13px;">' + results.map(function(r) {
+          var icon = r.url ? '✅' : (r.error === 'already_created' ? 'ℹ️' : '❌');
+          var link = r.url ? ' — <a href="' + r.url + '" target="_blank">Payment Link</a>' : '';
+          var err = r.error && r.error !== 'already_created' ? ' — <span style="color:var(--danger);">' + r.error + '</span>' : '';
+          var note = r.error === 'already_created' ? ' — <span style="color:var(--text-muted);">Already created</span>' : '';
+          return '<div style="margin-bottom:4px;">' + icon + ' <strong>' + r.tenantName + '</strong> (' + r.unitLabel + ')' + link + err + note + '</div>';
+        }).join('') + '</div>';
+        loadRentPayments();
+      } catch (e) {
+        btn.disabled = false; btn.textContent = 'Generate Payment Links';
+        toast('Error: ' + e.message);
+      }
+    };
+
+    window.createSingleRentPayment = async function() {
+      var sel = document.getElementById('rentTenantSelect');
+      if (!sel.value) { toast('Select a tenant'); return; }
+      var d = JSON.parse(sel.value);
+      var amt = parseFloat(document.getElementById('rentAmountInput').value);
+      if (!amt || amt <= 0) { toast('Enter a valid amount'); return; }
+      var body = {
+        tenantId: d.tenantId,
+        unitTenantId: d.unitTenantId,
+        amountCents: Math.round(amt * 100),
+        dueDate: document.getElementById('rentDueDate').value,
+        periodStart: document.getElementById('rentPeriodStart').value,
+        periodEnd: document.getElementById('rentPeriodEnd').value,
+      };
+      var el = document.getElementById('rentCreateResult');
+      el.style.display = 'block'; el.style.color = 'var(--text-muted)'; el.textContent = 'Creating...';
+      try {
+        var r = await fetchJson('/admin/rent/create-payment', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (r.url) {
+          el.style.color = 'var(--success)';
+          el.innerHTML = '✅ Payment link created: <a href="' + r.url + '" target="_blank">Open Link</a>';
+          loadRentPayments();
+        } else {
+          el.style.color = 'var(--danger)';
+          el.textContent = '❌ ' + (r.error || r.message || 'Failed');
+        }
+      } catch (e) {
+        el.style.color = 'var(--danger)'; el.textContent = '❌ ' + e.message;
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // TENANT SCREENING FUNCTIONS
+    // ═══════════════════════════════════════════════════════
+
+    async function loadScreenings() {
+      fillScreeningUnitSelect();
+      try {
+        var data = await fetchJson('/admin/screening');
+        var screenings = data.screenings || [];
+        var tbody = document.querySelector('#screeningsTable tbody');
+        if (!screenings.length) {
+          tbody.innerHTML = '<tr><td colspan="9" style="color:var(--text-muted);">No screenings yet</td></tr>';
+          return;
+        }
+        var statusColors = { REQUESTED: '#3b82f6', PENDING_CONSENT: '#f59e0b', IN_PROGRESS: '#8b5cf6', COMPLETED: '#22c55e', FAILED: '#ef4444', EXPIRED: '#71717a' };
+        var riskColors = { low: '#22c55e', medium: '#f59e0b', high: '#ef4444' };
+        var recColors = { approve: '#22c55e', conditional: '#f59e0b', decline: '#ef4444' };
+        tbody.innerHTML = screenings.map(function(s) {
+          var date = new Date(s.createdAt).toLocaleDateString('en-CA');
+          var sc = statusColors[s.status] || '#71717a';
+          var rc = riskColors[s.riskScore] || '#71717a';
+          var recc = recColors[s.recommendation] || '#71717a';
+          return '<tr>' +
+            '<td>' + date + '</td>' +
+            '<td><strong>' + s.applicantName + '</strong>' + (s.applicantEmail ? '<br><small style="color:var(--text-muted)">' + s.applicantEmail + '</small>' : '') + '</td>' +
+            '<td>' + s.provider + '</td>' +
+            '<td><span class="chip" style="background:' + sc + '22;color:' + sc + ';font-size:11px;">' + s.status.replace('_', ' ') + '</span></td>' +
+            '<td>' + (s.creditScore ? s.creditScore : '\u2014') + '</td>' +
+            '<td>' + (s.criminalClear === true ? '<span style="color:#22c55e">Clear</span>' : s.criminalClear === false ? '<span style="color:#ef4444">Record</span>' : '\u2014') + '</td>' +
+            '<td>' + (s.riskScore ? '<span style="color:' + rc + ';font-weight:600;">' + s.riskScore + '</span>' : '\u2014') + '</td>' +
+            '<td>' + (s.recommendation ? '<span style="color:' + recc + ';font-weight:600;text-transform:capitalize;">' + s.recommendation + '</span>' : '\u2014') + '</td>' +
+            '<td>' +
+              '<button class="btn btn-secondary btn-sm" onclick="viewScreening(\'' + s.id + '\')" title="Details">📋</button>' +
+              (s.status !== 'COMPLETED' && s.status !== 'FAILED' ? ' <button class="btn btn-secondary btn-sm" onclick="refreshScreening(\'' + s.id + '\')" title="Refresh">↻</button>' : '') +
+            '</td>' +
+            '</tr>';
+        }).join('');
+      } catch (e) { console.warn('Screenings load failed', e); }
+    }
+
+    function fillScreeningUnitSelect() {
+      var sel = document.getElementById('screenUnitSelect');
+      sel.innerHTML = '<option value="">Select unit...</option>';
+      (state.units || []).forEach(function(u) {
+        var opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = u.label + (u.address ? ' — ' + u.address : '');
+        sel.appendChild(opt);
+      });
+    }
+
+    window.requestNewScreening = async function() {
+      var name = document.getElementById('screenName').value.trim();
+      if (!name) { toast('Enter applicant name'); return; }
+      var body = {
+        applicantName: name,
+        applicantEmail: document.getElementById('screenEmail').value.trim() || undefined,
+        applicantPhone: document.getElementById('screenPhone').value.trim() || undefined,
+        unitId: document.getElementById('screenUnitSelect').value || undefined,
+      };
+      var el = document.getElementById('screenRequestResult');
+      el.style.display = 'block'; el.style.color = 'var(--text-muted)'; el.textContent = 'Requesting...';
+      try {
+        var r = await fetchJson('/admin/screening/request', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        el.style.color = 'var(--success)';
+        el.innerHTML = '✅ Screening requested (ID: ' + r.id + ')' + (r.consentUrl ? ' — <a href="' + r.consentUrl + '" target="_blank">Consent Link</a>' : '');
+        document.getElementById('screenName').value = '';
+        document.getElementById('screenEmail').value = '';
+        document.getElementById('screenPhone').value = '';
+        loadScreenings();
+      } catch (e) {
+        el.style.color = 'var(--danger)'; el.textContent = '❌ ' + e.message;
+      }
+    };
+
+    window.viewScreening = async function(id) {
+      try {
+        var s = await fetchJson('/admin/screening/' + id);
+        document.getElementById('screeningDetailTitle').textContent = 'Screening: ' + s.applicantName;
+        var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">';
+        html += '<div><strong>Applicant:</strong> ' + s.applicantName + '</div>';
+        html += '<div><strong>Email:</strong> ' + (s.applicantEmail || '\u2014') + '</div>';
+        html += '<div><strong>Phone:</strong> ' + (s.applicantPhone || '\u2014') + '</div>';
+        html += '<div><strong>Provider:</strong> ' + s.provider + '</div>';
+        html += '<div><strong>Status:</strong> ' + s.status + '</div>';
+        html += '<div><strong>Requested:</strong> ' + new Date(s.requestedAt).toLocaleDateString('en-CA') + '</div>';
+        if (s.status === 'COMPLETED') {
+          html += '<div><strong>Credit Score:</strong> ' + (s.creditScore || '\u2014') + ' (' + (s.creditRating || '\u2014') + ')</div>';
+          html += '<div><strong>Criminal:</strong> ' + (s.criminalClear === true ? 'Clear ✅' : s.criminalClear === false ? 'Record found ⚠️' : '\u2014') + '</div>';
+          html += '<div><strong>Identity Verified:</strong> ' + (s.identityVerified === true ? 'Yes ✅' : s.identityVerified === false ? 'No ❌' : '\u2014') + '</div>';
+          html += '<div><strong>Eviction History:</strong> ' + (s.evictionHistory === true ? 'Yes ⚠️' : s.evictionHistory === false ? 'None ✅' : '\u2014') + '</div>';
+          html += '<div><strong>Income Verified:</strong> ' + (s.incomeVerified === true ? 'Yes' : '\u2014') + '</div>';
+          html += '<div><strong>Monthly Income:</strong> ' + (s.monthlyIncome ? '$' + (s.monthlyIncome / 100).toLocaleString() : '\u2014') + '</div>';
+          html += '<div style="grid-column:1/-1;"><strong>Risk:</strong> <span style="font-weight:700;text-transform:uppercase;">' + (s.riskScore || '\u2014') + '</span></div>';
+          html += '<div style="grid-column:1/-1;"><strong>Recommendation:</strong> <span style="font-weight:700;text-transform:uppercase;">' + (s.recommendation || '\u2014') + '</span></div>';
+          if (s.reportSummary) html += '<div style="grid-column:1/-1;background:var(--surface-2);padding:12px;border-radius:8px;"><strong>Summary:</strong><br>' + s.reportSummary + '</div>';
+        }
+        // Manual entry form for updating results
+        if (s.provider === 'manual' || s.status !== 'COMPLETED') {
+          html += '<div style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:12px;margin-top:8px;">';
+          html += '<h4 style="margin-bottom:8px;">✏️ Enter Screening Results Manually</h4>';
+          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+          html += '<div><label style="font-size:12px;">Credit Score</label><input id="manualCreditScore" type="number" min="0" max="900" value="' + (s.creditScore || '') + '" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;"></div>';
+          html += '<div><label style="font-size:12px;">Recommendation</label><select id="manualRecommendation" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;">' +
+            '<option value="">Select...</option><option value="approve"' + (s.recommendation === 'approve' ? ' selected' : '') + '>Approve</option><option value="conditional"' + (s.recommendation === 'conditional' ? ' selected' : '') + '>Conditional</option><option value="decline"' + (s.recommendation === 'decline' ? ' selected' : '') + '>Decline</option></select></div>';
+          html += '<div><label style="font-size:12px;">Criminal Clear?</label><select id="manualCriminal" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;"><option value="">Unknown</option><option value="true"' + (s.criminalClear === true ? ' selected' : '') + '>Clear</option><option value="false"' + (s.criminalClear === false ? ' selected' : '') + '>Record Found</option></select></div>';
+          html += '<div><label style="font-size:12px;">ID Verified?</label><select id="manualIdVerified" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;"><option value="">Unknown</option><option value="true"' + (s.identityVerified === true ? ' selected' : '') + '>Yes</option><option value="false"' + (s.identityVerified === false ? ' selected' : '') + '>No</option></select></div>';
+          html += '<div style="grid-column:1/-1;"><label style="font-size:12px;">Notes</label><textarea id="manualNotes" rows="2" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;">' + (s.reportSummary || '') + '</textarea></div>';
+          html += '</div>';
+          html += '<button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="saveManualScreening(\'' + s.id + '\')">Save Results</button>';
+          html += '</div>';
+        }
+        html += '</div>';
+        document.getElementById('screeningDetailBody').innerHTML = html;
+        document.getElementById('screeningDetailModal').style.display = 'flex';
+      } catch (e) { toast('Error loading screening: ' + e.message); }
+    };
+
+    window.closeScreeningDetail = function() {
+      document.getElementById('screeningDetailModal').style.display = 'none';
+    };
+
+    window.saveManualScreening = async function(id) {
+      var body = {};
+      var cs = document.getElementById('manualCreditScore').value;
+      if (cs) body.creditScore = parseInt(cs);
+      var rec = document.getElementById('manualRecommendation').value;
+      if (rec) body.recommendation = rec;
+      var crim = document.getElementById('manualCriminal').value;
+      if (crim !== '') body.criminalClear = crim === 'true';
+      var idv = document.getElementById('manualIdVerified').value;
+      if (idv !== '') body.identityVerified = idv === 'true';
+      var notes = document.getElementById('manualNotes').value;
+      if (notes) body.notes = notes;
+
+      try {
+        await fetchJson('/admin/screening/' + id, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        toast('Screening results saved');
+        closeScreeningDetail();
+        loadScreenings();
+      } catch (e) { toast('Save failed: ' + e.message); }
+    };
+
+    window.refreshScreening = async function(id) {
+      try {
+        var r = await fetchJson('/admin/screening/' + id + '/check', { method: 'POST' });
+        if (r.screening?.status === 'COMPLETED') toast('Screening completed!');
+        else toast('Status: ' + (r.providerStatus || r.screening?.status || 'unchanged'));
+        loadScreenings();
+      } catch (e) { toast('Refresh failed: ' + e.message); }
+    };
 
     loadAll();
 

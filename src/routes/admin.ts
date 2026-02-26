@@ -18,6 +18,22 @@ import { findExpiringLeases, sendLeaseExpiryAlerts } from "../services/leaseExpi
 import { agentRateLimit } from "../services/rateLimiter";
 import { validateInput } from "../services/llmGuardrails";
 import greenButton from "../services/greenButtonService";
+import {
+  createConnectAccount,
+  getConnectAccountStatus,
+  createConnectLoginLink,
+  createRentPaymentSession,
+  generateMonthlyRentLinks,
+  getRentPayments,
+  getRentPaymentStats,
+} from "../services/rentCollectionService";
+import {
+  requestScreening,
+  checkScreeningResult,
+  updateScreeningManually,
+  getScreenings,
+  getScreeningById,
+} from "../services/screeningService";
 
 const router = express.Router();
 
@@ -1247,6 +1263,214 @@ router.post("/billing/portal", async (req, res) => {
 /** GET /admin/billing/status — Check Stripe configuration status */
 router.get("/billing/status", (_req, res) => {
   res.json(getStripeStatus());
+});
+
+// ═══════════════════════════════════════════════════════════
+//  RENT COLLECTION (Stripe Connect)
+// ═══════════════════════════════════════════════════════════
+
+/** POST /admin/rent/connect/onboard — Start Stripe Connect Express onboarding */
+router.post("/rent/connect/onboard", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const result = await createConnectAccount(authReq.landlordId);
+    if (result.error) return res.status(400).json(result);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/rent/connect/status — Get Stripe Connect account status */
+router.get("/rent/connect/status", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const status = await getConnectAccountStatus(authReq.landlordId);
+    res.json(status);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** POST /admin/rent/connect/login — Get Stripe Express Dashboard link */
+router.post("/rent/connect/login", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const result = await createConnectLoginLink(authReq.landlordId);
+    if (result.error) return res.status(400).json(result);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** POST /admin/rent/create-payment — Create a rent payment link for a tenant */
+router.post("/rent/create-payment", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({
+    tenantId: z.string().min(1),
+    unitTenantId: z.string().min(1),
+    amountCents: z.number().int().positive(),
+    dueDate: z.string(),
+    periodStart: z.string(),
+    periodEnd: z.string(),
+  });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  try {
+    const result = await createRentPaymentSession({
+      landlordId: authReq.landlordId,
+      tenantId: parsed.data.tenantId,
+      unitTenantId: parsed.data.unitTenantId,
+      amountCents: parsed.data.amountCents,
+      dueDate: new Date(parsed.data.dueDate),
+      periodStart: new Date(parsed.data.periodStart),
+      periodEnd: new Date(parsed.data.periodEnd),
+    });
+    if (result.error) return res.status(400).json(result);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** POST /admin/rent/generate-monthly — Generate rent links for all active tenants */
+router.post("/rent/generate-monthly", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ month: z.string().optional() });
+  const parsed = schema.safeParse(req.body || {});
+  const month = parsed.data?.month ? new Date(parsed.data.month) : new Date();
+
+  try {
+    const result = await generateMonthlyRentLinks(authReq.landlordId, month);
+    if (result.error) return res.status(400).json(result);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/rent/payments — List rent payments */
+router.get("/rent/payments", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const filters = {
+      tenantId: req.query.tenantId as string | undefined,
+      status: req.query.status as string | undefined,
+      limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+      offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
+    };
+    const result = await getRentPayments(authReq.landlordId, filters);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/rent/stats — Rent payment statistics for the dashboard */
+router.get("/rent/stats", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const stats = await getRentPaymentStats(authReq.landlordId);
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  TENANT SCREENING
+// ═══════════════════════════════════════════════════════════
+
+/** POST /admin/screening/request — Initiate a tenant screening */
+router.post("/screening/request", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({
+    applicantName: z.string().min(1),
+    applicantEmail: z.string().email().optional(),
+    applicantPhone: z.string().optional(),
+    unitId: z.string().optional(),
+  });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  try {
+    const result = await requestScreening({
+      landlordId: authReq.landlordId,
+      ...parsed.data,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/screening — List all screenings */
+router.get("/screening", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const filters = {
+      status: req.query.status as string | undefined,
+      limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+      offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
+    };
+    const result = await getScreenings(authReq.landlordId, filters);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** GET /admin/screening/:id — Get screening details */
+router.get("/screening/:id", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const screening = await getScreeningById(req.params.id, authReq.landlordId);
+    if (!screening) return res.status(404).json({ error: "not_found" });
+    res.json(screening);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** POST /admin/screening/:id/check — Poll provider for updated results */
+router.post("/screening/:id/check", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const screening = await getScreeningById(req.params.id, authReq.landlordId);
+    if (!screening) return res.status(404).json({ error: "not_found" });
+    const result = await checkScreeningResult(req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** PUT /admin/screening/:id — Manually update screening results */
+router.put("/screening/:id", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({
+    creditScore: z.number().int().min(0).max(900).optional(),
+    creditRating: z.enum(["excellent", "good", "fair", "poor"]).optional(),
+    identityVerified: z.boolean().optional(),
+    criminalClear: z.boolean().optional(),
+    evictionHistory: z.boolean().optional(),
+    incomeVerified: z.boolean().optional(),
+    monthlyIncome: z.number().positive().optional(),
+    recommendation: z.enum(["approve", "conditional", "decline"]).optional(),
+    notes: z.string().optional(),
+  });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  try {
+    const result = await updateScreeningManually(req.params.id, authReq.landlordId, parsed.data);
+    if (result.error) return res.status(404).json(result);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
 });
 
 // ── Profile ──────────────────────────────────────────────────

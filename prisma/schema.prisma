@@ -62,6 +62,8 @@ model Landlord {
 	evolutionInstanceName  String?
 	plan             Plan     @default(FREE)
 	stripeCustomerId String?
+	stripeConnectAccountId  String?  // Stripe Connect Express account ID
+	stripeConnectOnboarded  Boolean  @default(false)
 	province         String   @default("ON")
 	timezone         String   @default("America/Toronto")
 	messageCountThisMonth Int @default(0)
@@ -82,6 +84,8 @@ model Landlord {
 	appSettings      AppSetting[]
 	notifications    Notification[]
 	pushSubscriptions PushSubscription[]
+	rentPayments     RentPayment[]
+	screenings       TenantScreening[]
 }
 
 model LandlordSettings {
@@ -106,11 +110,13 @@ model Tenant {
 	phone       String?
 	email       String?
 	autoReplyEnabled Boolean          @default(true)
+	stripeCustomerId String?          // Stripe customer ID for rent payments
 	landlord    Landlord?            @relation(fields: [landlordId], references: [id])
 	landlordId  String?
 	units       UnitTenant[]
 	requests    MaintenanceRequest[]
 	utilityBills UtilityBill[]
+	rentPayments RentPayment[]
 	createdAt   DateTime             @default(now())
 	updatedAt   DateTime             @updatedAt
 
@@ -180,6 +186,7 @@ model UnitTenant {
 	startDate           DateTime @default(now())
 	endDate             DateTime?
 	leaseDocuments      LeaseDocument[]
+	rentPayments        RentPayment[]
 }
 
 // ── Lease Documents ─────────────────────────────────────
@@ -435,4 +442,96 @@ model FinancialRecord {
 	@@index([landlordId])
 	@@index([landlordId, type])
 	@@index([landlordId, date])
+}
+
+// ── Rent Payments (Stripe Connect) ──────────────────────
+
+enum RentPaymentStatus {
+	PENDING
+	PROCESSING
+	SUCCEEDED
+	FAILED
+	REFUNDED
+	CANCELLED
+}
+
+model RentPayment {
+	id                  String            @id @default(cuid())
+	landlord            Landlord          @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+	landlordId          String
+	tenant              Tenant            @relation(fields: [tenantId], references: [id])
+	tenantId            String
+	unitTenant          UnitTenant        @relation(fields: [unitTenantId], references: [id])
+	unitTenantId        String
+	amountCents         Int               // Rent amount in cents
+	currency            String            @default("CAD")
+	status              RentPaymentStatus @default(PENDING)
+	stripePaymentIntentId String?         // Stripe PaymentIntent ID
+	stripeChargeId      String?           // Stripe Charge ID
+	stripeTransferId    String?           // Stripe Transfer to landlord's connected account
+	platformFeeCents    Int               @default(0) // NestMind platform fee
+	receiptUrl          String?           // Stripe receipt URL
+	failureReason       String?
+	dueDate             DateTime          // When the rent is due
+	paidAt              DateTime?         // When the payment was completed
+	periodStart         DateTime          // Billing period start
+	periodEnd           DateTime          // Billing period end
+	metadata            Json?
+	createdAt           DateTime          @default(now())
+	updatedAt           DateTime          @updatedAt
+
+	@@index([landlordId])
+	@@index([tenantId])
+	@@index([status])
+	@@index([dueDate])
+}
+
+// ── Tenant Screening ────────────────────────────────────
+
+enum ScreeningStatus {
+	REQUESTED
+	PENDING_CONSENT
+	IN_PROGRESS
+	COMPLETED
+	FAILED
+	EXPIRED
+}
+
+model TenantScreening {
+	id                String          @id @default(cuid())
+	landlord          Landlord        @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+	landlordId        String
+	// Applicant info (may not be an existing tenant yet)
+	applicantName     String
+	applicantEmail    String?
+	applicantPhone    String?
+	unitId            String?         // The unit they're applying for
+	// Screening details
+	provider          String          @default("certn") // "certn" | "singlekey" | "manual"
+	status            ScreeningStatus @default(REQUESTED)
+	consentUrl        String?         // URL sent to applicant to consent to screening
+	externalId        String?         // Provider's reference ID
+	// Results (stored after completion)
+	creditScore       Int?
+	creditRating      String?         // "excellent" | "good" | "fair" | "poor"
+	identityVerified  Boolean?
+	criminalClear     Boolean?
+	evictionHistory   Boolean?        // true = has eviction history
+	incomeVerified    Boolean?
+	monthlyIncome     Int?            // in cents
+	riskScore         String?         // "low" | "medium" | "high"
+	recommendation    String?         // "approve" | "conditional" | "decline"
+	reportSummary     String?         // AI-generated summary of the screening result
+	rawReport         Json?           // Full provider response
+	// Timestamps
+	requestedAt       DateTime        @default(now())
+	consentedAt       DateTime?
+	completedAt       DateTime?
+	expiresAt         DateTime?       // Reports typically expire after 30 days
+	createdAt         DateTime        @default(now())
+	updatedAt         DateTime        @updatedAt
+
+	@@index([landlordId])
+	@@index([status])
+	@@index([applicantEmail])
 }
