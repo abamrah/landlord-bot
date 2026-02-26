@@ -2080,6 +2080,164 @@ export function deleteContractorTool(): ToolDefinition {
     };
 }
 
+// ═══════════════════════════════════════════════════════════
+//  AGENT MEMORY TOOLS
+// ═══════════════════════════════════════════════════════════
+
+export function saveMemoryTool(): ToolDefinition {
+    return {
+        name: "save_memory",
+        description:
+            "Save an important fact, preference, or note to your persistent memory. " +
+            "Use this whenever you learn something worth remembering across conversations — " +
+            "e.g. landlord preferences ('always use Joe for plumbing'), tenant notes " +
+            "('Unit 3A tenant is elderly'), procedures ('snow removal is contracted to XYZ'), " +
+            "or any insight that would help you serve this landlord better in future chats. " +
+            "Each memory has a short key (topic label) and content. " +
+            "If a memory with the same key already exists, it will be updated.",
+        parameters: {
+            key: {
+                type: "string",
+                description: "Short topic label for the memory (e.g. 'preferred-plumber', 'unit-3a-tenant-note', 'snow-removal-procedure')",
+            },
+            content: {
+                type: "string",
+                description: "The actual information to remember",
+            },
+            category: {
+                type: "string",
+                description: "Category: 'preference', 'tenant-note', 'property-note', 'procedure', or 'general' (default: 'general')",
+            },
+        },
+        required: ["key", "content"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+
+                const key = String(args.key).toLowerCase().replace(/\s+/g, "-").slice(0, 100);
+                const content = String(args.content).slice(0, 2000);
+                const category = String(args.category || "general");
+
+                await db.agentMemory.upsert({
+                    where: { landlordId_key: { landlordId, key } },
+                    update: { content, category, source: "agent", updatedAt: new Date() },
+                    create: { landlordId, key, content, category, source: "agent" },
+                });
+
+                return { success: true, message: `Memory saved: "${key}"` };
+            } catch (err) {
+                return { error: `Failed to save memory: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function recallMemoryTool(): ToolDefinition {
+    return {
+        name: "recall_memory",
+        description:
+            "Search your persistent memory for saved facts, preferences, and notes. " +
+            "Use this to recall things you previously learned about this landlord's preferences, " +
+            "property details, tenant notes, or procedures. You can filter by category or search by keyword. " +
+            "Your memories are also automatically loaded at the start of each conversation.",
+        parameters: {
+            category: {
+                type: "string",
+                description: "Filter by category: 'preference', 'tenant-note', 'property-note', 'procedure', 'general', or omit for all",
+            },
+            search: {
+                type: "string",
+                description: "Optional keyword to search in memory keys and content",
+            },
+        },
+        required: [],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+
+                const where: any = { landlordId };
+                if (args.category) {
+                    where.category = String(args.category);
+                }
+
+                const memories = await db.agentMemory.findMany({
+                    where,
+                    orderBy: { updatedAt: "desc" },
+                    take: 50,
+                });
+
+                let results = memories;
+
+                // Client-side keyword search if provided
+                if (args.search) {
+                    const kw = String(args.search).toLowerCase();
+                    results = memories.filter(
+                        (m: any) =>
+                            m.key.toLowerCase().includes(kw) ||
+                            m.content.toLowerCase().includes(kw),
+                    );
+                }
+
+                if (!results.length) {
+                    return { memories: [], note: "No memories found matching your criteria." };
+                }
+
+                return {
+                    memories: results.map((m: any) => ({
+                        key: m.key,
+                        content: m.content,
+                        category: m.category,
+                        updatedAt: m.updatedAt.toISOString(),
+                    })),
+                    count: results.length,
+                };
+            } catch (err) {
+                return { error: `Failed to recall memory: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function deleteMemoryTool(): ToolDefinition {
+    return {
+        name: "delete_memory",
+        description: "Delete a specific memory by its key. Use this to remove outdated or incorrect information.",
+        parameters: {
+            key: { type: "string", description: "The key of the memory to delete" },
+        },
+        required: ["key"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+
+                const key = String(args.key).toLowerCase().replace(/\s+/g, "-");
+
+                const existing = await db.agentMemory.findUnique({
+                    where: { landlordId_key: { landlordId, key } },
+                });
+                if (!existing) return { error: `No memory found with key "${key}"` };
+
+                await db.agentMemory.delete({
+                    where: { landlordId_key: { landlordId, key } },
+                });
+
+                return { success: true, message: `Memory "${key}" deleted.` };
+            } catch (err) {
+                return { error: `Failed to delete memory: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
 /**
  * Register all built-in tools. Call this at startup.
  */
@@ -2146,6 +2304,10 @@ export function registerBuiltinTools(): ToolDefinition[] {
         // Contractor management
         updateContractorTool(),
         deleteContractorTool(),
+        // Agent memory
+        saveMemoryTool(),
+        recallMemoryTool(),
+        deleteMemoryTool(),
     ];
 }
 

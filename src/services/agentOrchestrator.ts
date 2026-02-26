@@ -17,6 +17,28 @@ import repo, { loadLandlordContext, LandlordPortfolio } from "./repository";
 import conversationMemory from "./conversationMemory";
 import guardrails from "./llmGuardrails";
 
+const isDbEnabled = Boolean(process.env.DATABASE_URL);
+
+/** Load persistent agent memories for a landlord, formatted as a text block */
+async function loadAgentMemories(landlordId: string): Promise<string | undefined> {
+    if (!isDbEnabled) return undefined;
+    try {
+        const memories = await db.agentMemory.findMany({
+            where: { landlordId },
+            orderBy: { updatedAt: "desc" },
+            take: 30,  // cap to control token usage
+        });
+        if (!memories.length) return undefined;
+
+        const lines = memories.map((m: any) =>
+            `• [${m.category}] ${m.key}: ${m.content}`
+        );
+        return lines.join("\n");
+    } catch {
+        return undefined;
+    }
+}
+
 /** Build a fully-loaded tool registry based on the account's plan */
 export function buildToolRegistry(plan: "FREE" | "PRO" | "ENTERPRISE" = "FREE"): ToolRegistry {
     const registry = new ToolRegistry();
@@ -283,6 +305,9 @@ export async function landlordAssistantAgent(opts: {
     const portfolio = await loadLandlordContext(opts.landlordId);
     const portfolioSummary = portfolio ? formatPortfolioSummary(portfolio) : undefined;
 
+    // Load persistent agent memories
+    const memoriesText = await loadAgentMemories(opts.landlordId);
+
     // Load recent conversation history for continuity (use sender phone for WhatsApp, dashboard-agent for dashboard)
     const historyPhone = opts.channel === "whatsapp" && opts.senderPhone ? opts.senderPhone : "dashboard-agent";
     const recentHistory = await conversationMemory.getHistory({
@@ -309,6 +334,14 @@ export async function landlordAssistantAgent(opts: {
         }
     } else {
         systemPrompt = buildFallbackAssistantPrompt(ctx, opts.maintenanceId);
+    }
+
+    // Inject persistent memories into prompt
+    if (memoriesText) {
+        systemPrompt += `\n\n═══ YOUR SAVED MEMORIES ═══\nThese are facts and notes you've saved from previous conversations. Reference them when relevant.\n${memoriesText}\n`;
+        systemPrompt += "Proactively save new important facts using save_memory as you learn them.\n";
+    } else {
+        systemPrompt += "\n\nYou have no saved memories yet. Use save_memory to remember important facts, preferences, and notes for future conversations.\n";
     }
 
     // Append security guardrail to system prompt

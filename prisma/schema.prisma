@@ -86,6 +86,7 @@ model Landlord {
 	pushSubscriptions PushSubscription[]
 	rentPayments     RentPayment[]
 	screenings       TenantScreening[]
+	agentMemories    AgentMemory[]
 }
 
 model LandlordSettings {
@@ -484,6 +485,23 @@ model RentPayment {
 	@@index([tenantId])
 	@@index([status])
 	@@index([dueDate])
+}
+
+// ── Agent Memory (persistent notes across conversations) ─
+
+model AgentMemory {
+	id         String   @id @default(cuid())
+	landlord   Landlord @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+	landlordId String
+	category   String   @default("general") // "preference", "tenant-note", "property-note", "procedure", "general"
+	key        String                         // short label / topic identifier
+	content    String                         // the actual memory content
+	source     String   @default("agent")    // "agent" | "landlord" | "system"
+	createdAt  DateTime @default(now())
+	updatedAt  DateTime @updatedAt
+
+	@@unique([landlordId, key])
+	@@index([landlordId, category])
 }
 
 // ── Tenant Screening ────────────────────────────────────
