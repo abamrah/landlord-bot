@@ -1,54 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NestMind AI — AI Property Management for Landlords</title>
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <link rel="apple-touch-icon" href="/logo.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NestMind AI — Autonomous AI Property Management</title>
+    <meta name="description"
+        content="NestMind AI is an autonomous property management agent that handles tenant communication, rent collection, screening, maintenance, utilities, and legal compliance — all through WhatsApp.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/logo.svg">
     <style>
-        :root {
-            --bg: #000000;
-            --bg-elevated: #0a0a0a;
-            --surface: #111111;
-            --surface-2: #1a1a1a;
-            --border: #222222;
-            --border-light: #333333;
-            --text: #ffffff;
-            --text-secondary: #999999;
-            --text-muted: #666666;
-            --accent: #00c896;
-            --accent-glow: rgba(0, 200, 150, 0.15);
-            --accent-2: #7c5cff;
-            --gradient: linear-gradient(135deg, #00c896, #7c5cff);
-            --gradient-text: linear-gradient(135deg, #00c896 0%, #7c5cff 100%);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
-        }
-
-        * {
+        /* ── RESET ── */
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
+        /* ── DARK THEME (default) ── */
+        :root,
+        [data-theme="dark"] {
+            --bg: #000000;
+            --bg-2: #050505;
+            --surface: #111111;
+            --surface-2: #1a1a1a;
+            --border: #222222;
+            --border-light: #333333;
+            --text: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent: #00c896;
+            --accent-hover: #00e6ad;
+            --accent-glow: rgba(0, 200, 150, .12);
+            --accent-2: #7c5cff;
+            --accent-2-glow: rgba(124, 92, 255, .10);
+            --gradient: linear-gradient(135deg, #00c896, #7c5cff);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 2px 20px rgba(0, 0, 0, .3);
+            --card-bg: #111111;
+            --card-hover: #161616;
+            --nav-bg: rgba(0, 0, 0, 0.7);
+            --code-bg: #0d0d0d;
+            --badge-bg: rgba(0, 200, 150, .08);
+            --badge-border: rgba(0, 200, 150, .25);
+            --pricing-popular-bg: linear-gradient(135deg, rgba(0, 200, 150, .08), rgba(124, 92, 255, .08));
+            --pricing-popular-border: rgba(0, 200, 150, .3);
+            --toggle-bg: #222;
+        }
+
+        /* ── LIGHT THEME ── */
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --bg-2: #fafafa;
+            --surface: #f4f4f5;
+            --surface-2: #e4e4e7;
+            --border: #d4d4d8;
+            --border-light: #a1a1aa;
+            --text: #09090b;
+            --text-secondary: #3f3f46;
+            --text-muted: #71717a;
+            --accent: #00a07a;
+            --accent-hover: #008f6d;
+            --accent-glow: rgba(0, 160, 122, .10);
+            --accent-2: #6d4de0;
+            --accent-2-glow: rgba(109, 77, 224, .08);
+            --gradient: linear-gradient(135deg, #00a07a, #6d4de0);
+            --shadow: 0 2px 20px rgba(0, 0, 0, .08);
+            --card-bg: #ffffff;
+            --card-hover: #f9f9fb;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --code-bg: #f0f0f2;
+            --badge-bg: rgba(0, 160, 122, .08);
+            --badge-border: rgba(0, 160, 122, .3);
+            --pricing-popular-bg: linear-gradient(135deg, rgba(0, 160, 122, .06), rgba(109, 77, 224, .06));
+            --pricing-popular-border: rgba(0, 160, 122, .4);
+            --toggle-bg: #e4e4e7;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            line-height: 1.7;
-            font-size: 16px;
+            transition: background-color .3s, color .3s;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
         }
 
         /* ── NAV ── */
@@ -58,101 +102,130 @@
             left: 0;
             right: 0;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
             padding: 0 40px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: background .3s;
         }
 
         .nav-inner {
             max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
         }
 
         .nav-logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
         }
 
         .nav-logo-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .nav-logo-icon img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-        }
-
-        .nav-logo-text {
-            font-weight: 700;
-            font-size: 18px;
-            color: #fff;
+            object-fit: cover;
         }
 
         .nav-links {
             display: flex;
-            gap: 32px;
             align-items: center;
+            gap: 32px;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
+            color: var(--text-secondary);
             transition: color 0.2s;
         }
 
         .nav-links a:hover {
-            color: #fff;
+            color: var(--text);
         }
 
         .nav-cta {
-            background: #fff;
-            color: #000;
-            padding: 12px 28px;
-            border-radius: 100px;
+            background: var(--accent);
+            color: #000 !important;
+            padding: 8px 20px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 16px;
-            text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 14px;
+            transition: background 0.2s;
         }
 
         .nav-cta:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.15);
+            background: var(--accent-hover);
         }
 
         .mobile-menu {
             display: none;
             background: none;
             border: none;
-            color: #fff;
+            color: var(--text);
             font-size: 24px;
             cursor: pointer;
+        }
+
+        /* ── THEME TOGGLE ── */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            background: var(--toggle-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px;
+            cursor: pointer;
+            gap: 0;
+            transition: background .3s, border-color .3s;
+        }
+
+        .theme-toggle-option {
+            width: 30px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            font-size: 14px;
+            transition: background .3s, transform .2s;
+            user-select: none;
+        }
+
+        .theme-toggle-option.active {
+            background: var(--accent);
+            transform: scale(1.05);
         }
 
         /* ── HERO ── */
         .hero {
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 120px 40px 80px;
+            text-align: center;
+            padding: 120px 24px 80px;
             position: relative;
-            overflow: hidden;
         }
 
         .hero::before {
@@ -168,42 +241,47 @@
         }
 
         .hero-content {
-            max-width: 900px;
-            text-align: center;
+            max-width: 800px;
             position: relative;
-            z-index: 1;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
+            padding: 6px 16px;
             border-radius: 100px;
             font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-
-        .hero-badge .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-        }
-
-        .hero h1 {
-            font-size: clamp(42px, 6vw, 72px);
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -2px;
+            font-weight: 500;
+            color: var(--accent);
+            background: var(--badge-bg);
+            border: 1px solid var(--badge-border);
             margin-bottom: 24px;
         }
 
-        .hero h1 .gradient {
-            background: var(--gradient-text);
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .gradient {
+            background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -211,15 +289,14 @@
 
         .hero-rotating {
             display: inline-block;
-            min-width: 280px;
-            text-align: left;
+            transition: opacity 0.3s, transform 0.3s;
         }
 
         .hero p {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--text-secondary);
-            max-width: 560px;
-            margin: 0 auto 40px;
+            max-width: 600px;
+            margin: 0 auto 32px;
             line-height: 1.7;
         }
 
@@ -230,141 +307,129 @@
             flex-wrap: wrap;
         }
 
-        .hero-qr-card {
-            margin-top: 36px;
-            display: inline-flex;
-            background: var(--surface);
+        .btn-lg {
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-filled {
+            background: var(--accent);
+            color: #000;
+            border: none;
+        }
+
+        .btn-filled:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 16px 24px;
-            gap: 16px;
-            align-items: center;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-secondary);
+            background: var(--surface);
+        }
+
+        .hero-qr-card {
+            margin-top: 40px;
+            display: inline-block;
         }
 
         .hero-qr-inner {
             display: flex;
             align-items: center;
             gap: 16px;
-        }
-
-        .hero-qr-inner canvas {
-            border-radius: 8px;
-            background: #fff;
-            padding: 6px;
+            padding: 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
         }
 
         .hero-qr-text {
             display: flex;
             flex-direction: column;
-            gap: 4px;
             text-align: left;
-        }
-
-        .btn-lg {
-            padding: 18px 40px;
-            border-radius: 100px;
-            font-size: 17px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-filled {
-            background: #fff;
-            color: #000;
-        }
-
-        .btn-filled:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #fff;
-            border: 1px solid var(--border-light);
-        }
-
-        .btn-outline:hover {
-            border-color: #fff;
         }
 
         /* ── MARQUEE ── */
         .marquee-wrap {
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            padding: 20px 0;
             overflow: hidden;
-            white-space: nowrap;
+            padding: 14px 0;
+            background: var(--surface);
         }
 
         .marquee {
-            display: inline-flex;
-            animation: marquee 25s linear infinite;
+            display: flex;
+            gap: 32px;
+            animation: scroll 30s linear infinite;
+            width: max-content;
+        }
+
+        @keyframes scroll {
+            to { transform: translateX(-50%); }
         }
 
         .marquee span {
             font-size: 14px;
             font-weight: 600;
-            letter-spacing: 2px;
             text-transform: uppercase;
+            letter-spacing: 2px;
             color: var(--text-muted);
-            padding: 0 24px;
+            white-space: nowrap;
         }
 
-        .marquee .dot-sep {
-            color: var(--accent);
-        }
-
-        @keyframes marquee {
-            0% {
-                transform: translateX(0);
-            }
-
-            100% {
-                transform: translateX(-50%);
-            }
+        .dot-sep {
+            color: var(--accent) !important;
         }
 
         /* ── SECTIONS ── */
         .section {
-            padding: 120px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 100px 40px;
         }
 
         .section-label {
             font-size: 13px;
             font-weight: 600;
-            letter-spacing: 3px;
             text-transform: uppercase;
+            letter-spacing: 2px;
             color: var(--accent);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .section-title {
-            font-size: clamp(32px, 4vw, 48px);
+            font-size: 40px;
             font-weight: 700;
             letter-spacing: -1px;
-            margin-bottom: 16px;
             line-height: 1.2;
+            margin-bottom: 12px;
         }
 
         .section-sub {
-            font-size: 18px;
+            font-size: 17px;
             color: var(--text-secondary);
-            max-width: 560px;
+            max-width: 600px;
             line-height: 1.7;
-            margin-bottom: 60px;
         }
 
-        /* ── NUMBERED FEATURES ── */
+        /* ── FEATURES ── */
         .features {
+            margin-top: 60px;
             display: flex;
             flex-direction: column;
-            gap: 100px;
+            gap: 80px;
         }
 
         .feature-row {
@@ -378,32 +443,33 @@
             direction: rtl;
         }
 
-        .feature-row.reverse>* {
+        .feature-row.reverse > * {
             direction: ltr;
         }
 
         .feature-number {
-            font-size: 80px;
+            font-size: 72px;
             font-weight: 800;
-            line-height: 1;
-            background: var(--gradient-text);
+            background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 16px;
+            line-height: 1;
+            margin-bottom: 12px;
+            opacity: .5;
         }
 
         .feature-title {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 12px;
         }
 
         .feature-desc {
-            font-size: 17px;
+            font-size: 16px;
             color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 20px;
+            line-height: 1.7;
+            margin-bottom: 16px;
         }
 
         .feature-tags {
@@ -413,43 +479,32 @@
         }
 
         .feature-tag {
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            border: 1px solid var(--badge-border);
         }
 
         .feature-visual {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 32px;
-            min-height: 320px;
+            padding: 24px;
+            min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-visual::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 60%, var(--bg) 100%);
-            pointer-events: none;
         }
 
         .feature-mock {
-            width: 100%;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
             font-size: 13px;
-            color: var(--text-secondary);
-            font-family: 'Courier New', monospace;
-            line-height: 1.7;
+            line-height: 1.8;
+            color: var(--text-muted);
+            width: 100%;
         }
 
         .feature-mock .hl {
@@ -459,185 +514,219 @@
         .feature-mock .hl2 {
             color: var(--accent-2);
         }
+        
+        .feature-mock .hl3 {
+            color: #f59e0b;
+        }
 
+        /* CHAT MOCK */
         .chat-mock {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
         }
 
         .chat-bubble {
             padding: 12px 16px;
             border-radius: 14px;
-            font-size: 13px;
-            max-width: 85%;
+            font-size: 14px;
             line-height: 1.5;
+            max-width: 90%;
         }
 
         .chat-tenant {
-            background: var(--surface-2);
-            align-self: flex-start;
-            border: 1px solid var(--border);
+            background: var(--accent-glow);
+            border: 1px solid var(--badge-border);
+            align-self: flex-end;
         }
 
         .chat-ai {
-            background: rgba(0, 200, 150, 0.1);
-            border: 1px solid rgba(0, 200, 150, 0.2);
-            align-self: flex-end;
-            color: var(--accent);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            align-self: flex-start;
         }
 
         .chat-label {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: .5px;
             color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        /* STATS MOCK */
+        .stats-mock {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .stat-card-mock {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-value.green { color: var(--accent); }
+        .stat-value.purple { color: var(--accent-2); }
+        .stat-value.amber { color: #f59e0b; }
+        .stat-value.blue { color: #3b82f6; }
+
+        .stat-label-mock {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
         }
 
         /* ── PRICING ── */
         .pricing-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 48px;
         }
 
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .price-card {
-            background: var(--surface);
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 36px;
             position: relative;
-            transition: transform 0.3s, border-color 0.3s;
+            transition: border-color .3s, background .3s;
         }
 
         .price-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-light);
+            background: var(--card-hover);
         }
 
         .price-card.popular {
-            border-color: var(--accent);
+            background: var(--pricing-popular-bg);
+            border-color: var(--pricing-popular-border);
         }
 
         .price-card.popular::before {
-            content: 'Popular';
+            content: 'Most Popular';
             position: absolute;
             top: -12px;
-            right: 24px;
-            background: var(--gradient);
-            color: #fff;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 16px;
             font-size: 12px;
-            font-weight: 600;
-            padding: 4px 14px;
+            font-weight: 700;
+            background: var(--accent);
+            color: #000;
             border-radius: 100px;
+            white-space: nowrap;
         }
 
         .price-tier {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
         }
 
         .price-amount {
             font-size: 48px;
             font-weight: 800;
-            margin-bottom: 8px;
-            line-height: 1;
+            letter-spacing: -2px;
+            margin-bottom: 4px;
         }
 
         .price-period {
             font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 24px;
+            margin-bottom: 12px;
         }
 
         .price-desc {
-            font-size: 16px;
+            font-size: 14px;
             color: var(--text-secondary);
-            margin-bottom: 28px;
             line-height: 1.6;
-            min-height: 48px;
+            margin-bottom: 24px;
         }
 
         .price-features {
             list-style: none;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .price-features li {
-            padding: 12px 0;
-            font-size: 16px;
+            padding: 6px 0;
+            font-size: 14px;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid var(--border);
+            gap: 8px;
         }
 
-        .price-features li:last-child {
-            border-bottom: none;
-        }
-
-        .price-features .check {
+        .check {
             color: var(--accent);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .price-btn {
             display: block;
-            width: 100%;
-            padding: 16px;
-            border-radius: 100px;
             text-align: center;
+            padding: 12px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
+            font-size: 14px;
             transition: all 0.2s;
-            border: none;
         }
 
         .price-btn-primary {
-            background: #fff;
+            background: var(--accent);
             color: #000;
         }
 
         .price-btn-primary:hover {
-            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.15);
+            background: var(--accent-hover);
         }
 
         .price-btn-outline {
-            background: transparent;
-            color: #fff;
-            border: 1px solid var(--border-light);
+            border: 1px solid var(--border);
+            color: var(--text);
         }
 
         .price-btn-outline:hover {
-            border-color: #fff;
+            border-color: var(--text-secondary);
+            background: var(--surface);
         }
 
         /* ── FAQ ── */
         .faq-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
         }
 
         .faq-label {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 12px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 8px;
         }
 
         .faq-list {
@@ -647,99 +736,46 @@
 
         .faq-item {
             border-bottom: 1px solid var(--border);
-            cursor: pointer;
         }
 
         .faq-q {
-            padding: 24px 0;
-            font-size: 18px;
+            padding: 20px 0;
+            font-size: 16px;
             font-weight: 600;
+            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
+            transition: color .2s;
+        }
+
+        .faq-q:hover {
+            color: var(--accent);
         }
 
         .faq-q .arrow {
-            transition: transform 0.3s;
             font-size: 20px;
             color: var(--text-muted);
-        }
-
-        .faq-item.open .arrow {
-            transform: rotate(45deg);
+            transition: transform .3s;
         }
 
         .faq-a {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease, padding 0.3s;
-            font-size: 16px;
+            font-size: 15px;
             color: var(--text-secondary);
-            line-height: 1.8;
+            line-height: 1.7;
+            transition: max-height .4s ease, padding .3s;
         }
 
         .faq-item.open .faq-a {
-            max-height: 200px;
-            padding-bottom: 24px;
+            max-height: 300px;
+            padding-bottom: 20px;
         }
 
-        /* ── FOOTER ── */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 60px 40px;
-        }
-
-        .footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        .footer-brand {
-            max-width: 300px;
-        }
-
-        .footer-brand p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 12px;
-            line-height: 1.7;
-        }
-
-        .footer-links h4 {
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-
-        .footer-links a {
-            display: block;
-            color: var(--text-muted);
-            font-size: 16px;
-            text-decoration: none;
-            padding: 5px 0;
-            transition: color 0.2s;
-        }
-
-        .footer-links a:hover {
-            color: #fff;
-        }
-
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 40px auto 0;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
+        .faq-item.open .arrow {
+            transform: rotate(45deg);
         }
 
         /* ── CTA BANNER ── */
@@ -782,6 +818,64 @@
             position: relative;
         }
 
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 40px;
+            background: var(--surface);
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            line-height: 1.7;
+        }
+
+        .footer-links h4 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-muted);
+            font-size: 16px;
+            text-decoration: none;
+            padding: 5px 0;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
             nav {
@@ -795,8 +889,9 @@
                 left: 0;
                 right: 0;
                 flex-direction: column;
-                background: rgba(0, 0, 0, 0.95);
+                background: var(--nav-bg);
                 backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
                 padding: 24px 20px;
                 gap: 16px;
                 border-bottom: 1px solid var(--border);
@@ -822,6 +917,11 @@
 
             .hero {
                 padding: 120px 20px 60px;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+                letter-spacing: -1px;
             }
 
             .hero p {
@@ -937,29 +1037,31 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#faq">FAQ</a>
                 <a href="/login">Login</a>
+                <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                    <span class="theme-toggle-option" data-theme-val="light">☀️</span>
+                    <span class="theme-toggle-option active" data-theme-val="dark">🌙</span>
+                </div>
                 <a href="/signup" class="nav-cta">Get Started</a>
             </div>
-            <button class="mobile-menu"
-                onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+            <button class="mobile-menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
         </div>
     </nav>
 
     <!-- HERO -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-badge"><span class="dot"></span> AI-Powered Property Management</div>
+            <div class="hero-badge"><span class="dot"></span> Autonomous AI Property Manager</div>
             <h1>
-                Smart AI Agent for<br />
-                <span class="gradient hero-rotating" id="rotatingText">Landlords</span>
+                Your AI Agent for<br />
+                <span class="gradient hero-rotating" id="rotatingText">Property Management</span>
             </h1>
-            <p>NestMind AI handles tenant communication, maintenance triage, utility monitoring, and legal compliance —
-                all through WhatsApp. Your AI property manager that never sleeps.</p>
+            <p>NestMind AI autonomously handles tenant communication, rent collection, screening, maintenance triage, utilities, and legal compliance — all through WhatsApp. It plans, uses 15+ tools, and takes action so you don't have to.</p>
             <div class="hero-buttons">
                 <a href="/signup" class="btn-lg btn-filled">Start Free →</a>
                 <a href="#features" class="btn-lg btn-outline">See How It Works</a>
             </div>
 
-            <!-- QR Code for Desktop — scan to sign up from phone -->
+            <!-- QR Code for Desktop -->
             <div class="hero-qr-card" id="heroQrCard">
                 <div class="hero-qr-inner">
                     <canvas id="heroQrCanvas" width="160" height="160"></canvas>
@@ -975,22 +1077,26 @@
     <!-- MARQUEE -->
     <div class="marquee-wrap">
         <div class="marquee">
-            <span>Maintenance</span><span class="dot-sep">·</span>
-            <span>Triage</span><span class="dot-sep">·</span>
-            <span>WhatsApp</span><span class="dot-sep">·</span>
-            <span>Compliance</span><span class="dot-sep">·</span>
-            <span>Utilities</span><span class="dot-sep">·</span>
-            <span>AI Agent</span><span class="dot-sep">·</span>
+            <span>Autonomous Agent</span><span class="dot-sep">·</span>
+            <span>WhatsApp AI</span><span class="dot-sep">·</span>
+            <span>Rent Collection</span><span class="dot-sep">·</span>
+            <span>Tenant Screening</span><span class="dot-sep">·</span>
+            <span>Maintenance Triage</span><span class="dot-sep">·</span>
+            <span>Utility Scraping</span><span class="dot-sep">·</span>
+            <span>Legal Compliance</span><span class="dot-sep">·</span>
+            <span>Lease Extraction</span><span class="dot-sep">·</span>
+            <span>Financials</span><span class="dot-sep">·</span>
             <span>Autopilot</span><span class="dot-sep">·</span>
-            <span>Web Scraping</span><span class="dot-sep">·</span>
-            <span>Maintenance</span><span class="dot-sep">·</span>
-            <span>Triage</span><span class="dot-sep">·</span>
-            <span>WhatsApp</span><span class="dot-sep">·</span>
-            <span>Compliance</span><span class="dot-sep">·</span>
-            <span>Utilities</span><span class="dot-sep">·</span>
-            <span>AI Agent</span><span class="dot-sep">·</span>
+            <span>Autonomous Agent</span><span class="dot-sep">·</span>
+            <span>WhatsApp AI</span><span class="dot-sep">·</span>
+            <span>Rent Collection</span><span class="dot-sep">·</span>
+            <span>Tenant Screening</span><span class="dot-sep">·</span>
+            <span>Maintenance Triage</span><span class="dot-sep">·</span>
+            <span>Utility Scraping</span><span class="dot-sep">·</span>
+            <span>Legal Compliance</span><span class="dot-sep">·</span>
+            <span>Lease Extraction</span><span class="dot-sep">·</span>
+            <span>Financials</span><span class="dot-sep">·</span>
             <span>Autopilot</span><span class="dot-sep">·</span>
-            <span>Web Scraping</span><span class="dot-sep">·</span>
         </div>
     </div>
 
@@ -998,116 +1104,179 @@
     <section class="section" id="features">
         <div class="section-label">How It Works</div>
         <h2 class="section-title">Everything your property<br />management needs</h2>
-        <p class="section-sub">NestMind AI uses an agentic framework — it plans, uses tools, and takes action
-            autonomously so you don't have to.</p>
+        <p class="section-sub">NestMind AI uses an agentic framework — it plans, uses tools, and takes action autonomously so you don't have to.</p>
 
         <div class="features">
 
-            <!-- Feature 1 -->
+            <!-- Feature 1: Autonomous Agent -->
             <div class="feature-row">
                 <div>
                     <div class="feature-number">1</div>
-                    <h3 class="feature-title">AI Tenant Communication</h3>
-                    <p class="feature-desc">Tenants message you on WhatsApp. NestMind AI triages their request,
-                        classifies severity, and drafts a legally-compliant reply — all before you even see it.</p>
+                    <h3 class="feature-title">Autonomous AI Agent</h3>
+                    <p class="feature-desc">The brain behind everything. NestMind AI plans multi-step actions, selects from 15+ built-in tools, executes autonomously then reports back. From drafting legal replies to scraping utility bills to dispatching contractors — all hands-free.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Agentic Framework</span>
+                        <span class="feature-tag">15+ Tools</span>
+                        <span class="feature-tag">Gemini AI</span>
+                        <span class="feature-tag">Autopilot Mode</span>
+                    </div>
+                </div>
+                <div class="feature-visual">
+                    <div class="feature-mock">
+                        <div><span class="hl">agent</span>.plan("Tenant sent a photo of a leak") → {</div>
+                        <div>&nbsp; steps: [</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">analyze_image</span>,</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">classify_severity</span> → <span class="hl3">"HIGH"</span>,</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">lookup_contractor</span>("plumber"),</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">draft_reply</span>("legal_compliant"),</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">alert_landlord</span>()</div>
+                        <div>&nbsp; ],</div>
+                        <div>&nbsp; status: <span class="hl">"autonomous"</span></div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2: WhatsApp Communication -->
+            <div class="feature-row reverse">
+                <div>
+                    <div class="feature-number">2</div>
+                    <h3 class="feature-title">WhatsApp Auto-Reply & Triage</h3>
+                    <p class="feature-desc">Tenants message on WhatsApp. NestMind AI triages the request, classifies severity, checks legal compliance, and sends a smart reply — all in seconds. Enable autopilot for routine issues, or review drafts first.</p>
                     <div class="feature-tags">
                         <span class="feature-tag">WhatsApp</span>
                         <span class="feature-tag">Auto-Reply</span>
                         <span class="feature-tag">Smart Triage</span>
+                        <span class="feature-tag">Severity Detection</span>
                     </div>
                 </div>
                 <div class="feature-visual">
                     <div class="chat-mock">
                         <div class="chat-bubble chat-tenant">
                             <div class="chat-label">Tenant</div>
-                            Hey, the kitchen faucet is leaking pretty badly. Water everywhere 😩
+                            Hey, the kitchen faucet is leaking badly. Water everywhere 😩
                         </div>
                         <div class="chat-bubble chat-ai">
                             <div class="chat-label">NestMind AI</div>
-                            Hi Sarah! I've logged this as urgent. A plumber has been notified. Please turn off the valve
-                            under the sink if possible. We'll follow up within 2 hours. 🔧
+                            Hi Sarah! I've classified this as <strong>urgent</strong>. A plumber has been notified and will be in touch within 2 hours. Please turn off the valve under your sink. 🔧
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Feature 2 -->
+            <!-- Feature 3: Rent Collection -->
+            <div class="feature-row">
+                <div>
+                    <div class="feature-number">3</div>
+                    <h3 class="feature-title">Rent Collection via Stripe</h3>
+                    <p class="feature-desc">Connect your Stripe account and collect rent from every tenant automatically. NestMind generates secure payment links, sends them via WhatsApp, and tracks every payment — with full Stripe Connect integration.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Stripe Connect</span>
+                        <span class="feature-tag">Payment Links</span>
+                        <span class="feature-tag">Auto Tracking</span>
+                        <span class="feature-tag">Revenue Stats</span>
+                    </div>
+                </div>
+                <div class="feature-visual">
+                    <div class="stats-mock">
+                        <div class="stat-card-mock">
+                            <div class="stat-value green">$12,450</div>
+                            <div class="stat-label-mock">Collected This Month</div>
+                        </div>
+                        <div class="stat-card-mock">
+                            <div class="stat-value purple">96%</div>
+                            <div class="stat-label-mock">Collection Rate</div>
+                        </div>
+                        <div class="stat-card-mock">
+                            <div class="stat-value amber">2</div>
+                            <div class="stat-label-mock">Pending Payments</div>
+                        </div>
+                        <div class="stat-card-mock">
+                            <div class="stat-value blue">18</div>
+                            <div class="stat-label-mock">Active Tenants</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 4: Tenant Screening -->
             <div class="feature-row reverse">
                 <div>
-                    <div class="feature-number">2</div>
-                    <h3 class="feature-title">Smart Maintenance Triage</h3>
-                    <p class="feature-desc">Every request is automatically classified by severity, category, and
-                        urgency. Critical issues trigger instant alerts. Routine requests are queued intelligently.</p>
+                    <div class="feature-number">4</div>
+                    <h3 class="feature-title">Tenant Screening</h3>
+                    <p class="feature-desc">Screen prospective tenants with credit checks, criminal background verification, and identity validation. Supports Certn, SingleKey, or manual entry. Get AI-powered risk scores and recommendations instantly.</p>
                     <div class="feature-tags">
-                        <span class="feature-tag">Severity Detection</span>
-                        <span class="feature-tag">Auto-Dispatch</span>
-                        <span class="feature-tag">Contractor Matching</span>
+                        <span class="feature-tag">Credit Check</span>
+                        <span class="feature-tag">Criminal Check</span>
+                        <span class="feature-tag">Identity Verification</span>
+                        <span class="feature-tag">Risk Scoring</span>
                     </div>
                 </div>
                 <div class="feature-visual">
                     <div class="feature-mock">
-                        <div><span class="hl">triage</span>.classify(message) → {</div>
-                        <div> severity: <span class="hl2">"HIGH"</span>,</div>
-                        <div> category: <span class="hl2">"plumbing"</span>,</div>
-                        <div> urgency: <span class="hl2">"immediate"</span>,</div>
-                        <div> actions: [</div>
-                        <div> <span class="hl">"dispatch_contractor"</span>,</div>
-                        <div> <span class="hl">"alert_landlord"</span>,</div>
-                        <div> <span class="hl">"draft_reply"</span></div>
-                        <div> ]</div>
+                        <div><span class="hl">screening</span>.evaluate(applicant) → {</div>
+                        <div>&nbsp; credit_score: <span class="hl2">742</span>,</div>
+                        <div>&nbsp; criminal: <span class="hl">"clear"</span>,</div>
+                        <div>&nbsp; identity: <span class="hl">"verified"</span>,</div>
+                        <div>&nbsp; risk_level: <span class="hl3">"LOW"</span>,</div>
+                        <div>&nbsp; recommendation: <span class="hl2">"APPROVE"</span>,</div>
+                        <div>&nbsp; confidence: <span class="hl">0.94</span></div>
                         <div>}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Feature 3 -->
+            <!-- Feature 5: Utility & Financial Intelligence -->
             <div class="feature-row">
                 <div>
-                    <div class="feature-number">3</div>
-                    <h3 class="feature-title">Utility Monitoring</h3>
-                    <p class="feature-desc">NestMind AI logs into utility portals, scrapes the latest bills, detects
-                        anomalies, and alerts you when something looks off — fully automated.</p>
+                    <div class="feature-number">5</div>
+                    <h3 class="feature-title">Utility & Financial Intelligence</h3>
+                    <p class="feature-desc">NestMind AI logs into utility portals, scrapes bills, detects anomalies, and gives you a real-time financial dashboard. Track revenue, expenses, net income, and utility costs across your entire portfolio.</p>
                     <div class="feature-tags">
                         <span class="feature-tag">Web Scraping</span>
                         <span class="feature-tag">Bill Tracking</span>
+                        <span class="feature-tag">Revenue Analytics</span>
                         <span class="feature-tag">Anomaly Detection</span>
                     </div>
                 </div>
                 <div class="feature-visual">
                     <div class="feature-mock">
-                        <div><span class="hl">agent</span>.run("Check hydro bill") → {</div>
-                        <div> tool_calls: [</div>
-                        <div> <span class="hl2">get_utility_credentials</span>,</div>
-                        <div> <span class="hl2">scrape_utility_bill</span>,</div>
-                        <div> <span class="hl2">lookup_utility_bills</span></div>
-                        <div> ],</div>
-                        <div> result: <span class="hl">"$127.45 — 23% ↑"</span></div>
+                        <div><span class="hl">agent</span>.run("Check all utility bills") → {</div>
+                        <div>&nbsp; tool_calls: [</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">get_utility_credentials</span>,</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">scrape_utility_bill</span>,</div>
+                        <div>&nbsp;&nbsp;&nbsp; <span class="hl2">detect_anomalies</span></div>
+                        <div>&nbsp; ],</div>
+                        <div>&nbsp; hydro: <span class="hl">"$127.45 — 23% ↑"</span>,</div>
+                        <div>&nbsp; gas: <span class="hl">"$84.20 — normal"</span>,</div>
+                        <div>&nbsp; water: <span class="hl3">"$210.00 — ⚠️ spike"</span></div>
                         <div>}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Feature 4 -->
+            <!-- Feature 6: Legal Compliance & Lease AI -->
             <div class="feature-row reverse">
                 <div>
-                    <div class="feature-number">4</div>
-                    <h3 class="feature-title">Legal Compliance Engine</h3>
-                    <p class="feature-desc">Built-in tenancy law profiles for 12 jurisdictions. Every auto-reply is
-                        reviewed against local RTA regulations. Never send a message that could get you in trouble.</p>
+                    <div class="feature-number">6</div>
+                    <h3 class="feature-title">Legal Compliance & Lease AI</h3>
+                    <p class="feature-desc">Built-in tenancy law profiles for 12 jurisdictions. Every auto-reply is reviewed against local RTA regulations. Upload lease PDFs and the AI extracts rent amounts, key dates, and terms automatically.</p>
                     <div class="feature-tags">
-                        <span class="feature-tag">Ontario RTA</span>
-                        <span class="feature-tag">BC RTBA</span>
-                        <span class="feature-tag">Multi-Province</span>
+                        <span class="feature-tag">12 Jurisdictions</span>
+                        <span class="feature-tag">RTA Compliance</span>
+                        <span class="feature-tag">Lease Extraction</span>
+                        <span class="feature-tag">PDF Parsing</span>
                     </div>
                 </div>
                 <div class="feature-visual">
                     <div class="feature-mock">
-                        <div><span class="hl">rta_info</span>("ON") → {</div>
-                        <div> legislation: <span class="hl2">"RTA 2006"</span>,</div>
-                        <div> notice_period: <span class="hl2">"24 hours"</span>,</div>
-                        <div> rent_increase: <span class="hl2">"guideline only"</span>,</div>
-                        <div> emergency: <span class="hl2">"immediate entry OK"</span>,</div>
-                        <div> tribunal: <span class="hl2">"LTB"</span></div>
+                        <div><span class="hl">lease</span>.extract("lease.pdf") → {</div>
+                        <div>&nbsp; tenant: <span class="hl2">"Sarah Johnson"</span>,</div>
+                        <div>&nbsp; rent: <span class="hl2">"$1,850/mo"</span>,</div>
+                        <div>&nbsp; start: <span class="hl">"2025-01-01"</span>,</div>
+                        <div>&nbsp; end: <span class="hl">"2025-12-31"</span>,</div>
+                        <div>&nbsp; province: <span class="hl3">"ON"</span>,</div>
+                        <div>&nbsp; rta_compliant: <span class="hl">true</span></div>
                         <div>}</div>
                     </div>
                 </div>
@@ -1121,8 +1290,7 @@
         <div class="pricing-header">
             <div class="section-label">Pricing</div>
             <h2 class="section-title">Built for you, priced to scale</h2>
-            <p class="section-sub" style="margin:12px auto 0">Choose a plan that fits your portfolio. Start free,
-                upgrade when you grow.</p>
+            <p class="section-sub" style="margin:12px auto 0">Choose a plan that fits your portfolio. Start free, upgrade when you grow.</p>
         </div>
 
         <div class="pricing-grid">
@@ -1131,14 +1299,14 @@
                 <div class="price-tier">Starter</div>
                 <div class="price-amount">Free</div>
                 <div class="price-period">Up to 3 units</div>
-                <div class="price-desc">Perfect for landlords starting out. Get AI tenant communication with zero cost.
-                </div>
+                <div class="price-desc">Perfect for landlords starting out. Get AI tenant communication with zero cost.</div>
                 <ul class="price-features">
                     <li><span class="check">✓</span> AI Tenant Triage</li>
                     <li><span class="check">✓</span> WhatsApp Auto-Reply</li>
                     <li><span class="check">✓</span> Maintenance Tracking</li>
                     <li><span class="check">✓</span> Legal Compliance (1 Province)</li>
                     <li><span class="check">✓</span> Dashboard Access</li>
+                    <li><span class="check">✓</span> Push Notifications</li>
                 </ul>
                 <a href="/signup" class="price-btn price-btn-outline">Get Started Free</a>
             </div>
@@ -1148,15 +1316,17 @@
                 <div class="price-tier">Professional</div>
                 <div class="price-amount">$29<span style="font-size:20px;font-weight:500">/mo</span></div>
                 <div class="price-period">Up to 25 units</div>
-                <div class="price-desc">For growing portfolios. Full agent tools, utility scraping, and contractor
-                    dispatch.</div>
+                <div class="price-desc">For growing portfolios. Full agent tools, rent collection, screening, and more.</div>
                 <ul class="price-features">
                     <li><span class="check">✓</span> Everything in Starter</li>
                     <li><span class="check">✓</span> AI Agent with 15+ Tools</li>
+                    <li><span class="check">✓</span> Rent Collection (Stripe)</li>
+                    <li><span class="check">✓</span> Tenant Screening</li>
                     <li><span class="check">✓</span> Utility Bill Scraping</li>
-                    <li><span class="check">✓</span> Contractor Auto-Dispatch</li>
+                    <li><span class="check">✓</span> Financial Dashboard</li>
+                    <li><span class="check">✓</span> Smart Lease Extraction</li>
                     <li><span class="check">✓</span> Multi-Province Compliance</li>
-                    <li><span class="check">✓</span> Priority WhatsApp Support</li>
+                    <li><span class="check">✓</span> Contractor Auto-Dispatch</li>
                 </ul>
                 <a href="/signup" class="price-btn price-btn-primary">Start Pro Trial</a>
             </div>
@@ -1164,19 +1334,20 @@
             <!-- Enterprise -->
             <div class="price-card">
                 <div class="price-tier">Enterprise</div>
-                <div class="price-amount">Custom</div>
+                <div class="price-amount">$79<span style="font-size:20px;font-weight:500">/mo</span></div>
                 <div class="price-period">Unlimited units</div>
-                <div class="price-desc">Full white-glove setup. Custom integrations, dedicated support, and workflow
-                    automation.</div>
+                <div class="price-desc">Full-scale property management. Unlimited AI, custom integrations, and priority support.</div>
                 <ul class="price-features">
                     <li><span class="check">✓</span> Everything in Professional</li>
+                    <li><span class="check">✓</span> Unlimited AI Messages</li>
+                    <li><span class="check">✓</span> Advanced Screening Providers</li>
                     <li><span class="check">✓</span> Custom AI Workflows</li>
                     <li><span class="check">✓</span> API Access</li>
                     <li><span class="check">✓</span> Dedicated Account Manager</li>
                     <li><span class="check">✓</span> SLA & Uptime Guarantee</li>
                     <li><span class="check">✓</span> Multi-Landlord Support</li>
                 </ul>
-                <a href="mailto:hello@nestmind.ai" class="price-btn price-btn-outline">Contact Sales</a>
+                <a href="/signup" class="price-btn price-btn-outline">Start Enterprise Trial</a>
             </div>
         </div>
     </section>
@@ -1200,55 +1371,56 @@
                     What do I need to get started?
                     <span class="arrow">+</span>
                 </div>
-                <div class="faq-a">Just sign up with your email, add your WhatsApp number, and create your first unit.
-                    NestMind AI connects through the Evolution API to handle WhatsApp messages automatically. No special
-                    hardware or software needed.</div>
+                <div class="faq-a">Just sign up with your email, add your WhatsApp number, and create your first unit. NestMind AI connects through the Evolution API to handle WhatsApp messages automatically. No special hardware or software needed.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-                    How does the AI handle tenant messages?
+                    How does the autonomous AI agent work?
                     <span class="arrow">+</span>
                 </div>
-                <div class="faq-a">NestMind AI uses an agentic framework powered by Google Gemini. When a tenant
-                    messages, the AI triages the request, classifies severity, checks legal compliance for your
-                    province, and drafts a reply — all in seconds. You can review drafts before they're sent, or enable
-                    autopilot for routine issues.</div>
+                <div class="faq-a">NestMind AI uses an agentic framework powered by Google Gemini. When a tenant messages or you give a command, the AI plans a sequence of actions, selects from 15+ built-in tools (image analysis, legal lookup, contractor matching, web scraping, etc.), and executes them autonomously. You can review its reasoning and override any decision.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+                    How does rent collection work?
+                    <span class="arrow">+</span>
+                </div>
+                <div class="faq-a">NestMind integrates with Stripe Connect. You onboard once (takes 5 minutes), then the system generates secure payment links for each tenant. Links can be sent automatically via WhatsApp at the start of each month. Payments are tracked in real-time with full statistics — collection rates, pending payments, and revenue analytics.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+                    What does tenant screening include?
+                    <span class="arrow">+</span>
+                </div>
+                <div class="faq-a">Tenant screening covers credit checks, criminal background verification, and identity validation. You can use automated providers (Certn, SingleKey) or enter screening results manually. The AI calculates a risk score and provides an approve/deny/review recommendation based on the results.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
                     Is my data secure?
                     <span class="arrow">+</span>
                 </div>
-                <div class="faq-a">Yes. All data is encrypted in transit and at rest. Multi-tenant architecture ensures
-                    complete isolation between landlords. Utility credentials are encrypted and never exposed to the AI
-                    — only used internally for automated scraping.</div>
+                <div class="faq-a">Yes. All data is encrypted in transit and at rest. Multi-tenant architecture ensures complete isolation between landlords. Utility credentials are encrypted and never exposed to the AI — only used internally for automated scraping. LLM guardrails prevent the AI from exposing sensitive data.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
                     Can I control what the AI sends to tenants?
                     <span class="arrow">+</span>
                 </div>
-                <div class="faq-a">Absolutely. You control the auto-reply toggle, the delay before replies are sent, and
-                    the cooldown between messages. For high-severity issues, the AI always alerts you first and waits
-                    for approval. You can also set it to full autopilot for routine requests.</div>
+                <div class="faq-a">Absolutely. You control the auto-reply toggle, the delay before replies are sent, and the cooldown between messages. For high-severity issues, the AI always alerts you first and waits for approval. You can also set it to full autopilot for routine requests.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-                    What provinces/states are supported?
+                    What provinces and states are supported?
                     <span class="arrow">+</span>
                 </div>
-                <div class="faq-a">NestMind AI includes legal compliance profiles for 12 jurisdictions: Ontario, British
-                    Columbia, Alberta, Saskatchewan, Manitoba, Quebec, Nova Scotia, New Brunswick, New York, California,
-                    Texas, and the United Kingdom. More are being added regularly.</div>
+                <div class="faq-a">NestMind AI includes legal compliance profiles for 12 jurisdictions: Ontario, British Columbia, Alberta, Saskatchewan, Manitoba, Quebec, Nova Scotia, New Brunswick, New York, California, Texas, and the United Kingdom. More are being added regularly.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-                    What if the AI makes a mistake?
+                    Can the AI read lease documents?
                     <span class="arrow">+</span>
                 </div>
-                <div class="faq-a">Every AI draft goes through legal compliance checks before being sent. For critical
-                    issues, the landlord is always notified first. You can review, edit, or reject any draft from the
-                    dashboard. The AI also logs every step it takes so you can audit its reasoning.</div>
+                <div class="faq-a">Yes. Upload any lease PDF and NestMind AI extracts key details — tenant name, rent amount, lease dates, renewal terms, and more. Standard Ontario lease forms (N-forms) can also be auto-filled and generated as PDFs directly from the dashboard.</div>
             </div>
         </div>
     </section>
@@ -1261,10 +1433,8 @@
                     <div class="nav-logo-icon"><img src="/logo.svg" alt="NestMind AI"></div>
                     <span class="nav-logo-text">NestMind AI</span>
                 </a>
-                <p>AI-powered property management that handles tenant communication, maintenance, utilities, and
-                    compliance — all through WhatsApp.</p>
-                <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted)">A product by <strong
-                        style="color:var(--text-secondary)">DataNest Canada Inc.</strong></p>
+                <p>Autonomous AI property management — handles tenant communication, rent collection, screening, maintenance, utilities, and legal compliance through WhatsApp.</p>
+                <p style="margin-top:8px;font-size:0.85rem;color:var(--text-muted)">A product by <strong style="color:var(--text-secondary)">DataNest Canada Inc.</strong></p>
             </div>
             <div class="footer-links">
                 <h4>Product</h4>
@@ -1287,30 +1457,55 @@
         <div class="footer-bottom">© 2026 NestMind AI — A product by DataNest Canada Inc. All rights reserved.</div>
     </footer>
 
-    <!-- Lightweight QR code generator (qrcode-generator, MIT) -->
+    <!-- QR code generator -->
     <script>
-        // Minimal QR code generator (Type 4, EC Level L) — renders to canvas
-        (function () { function QR(t, e) { var r = 1, n = e || 0, o = QR.getMinType(t, n); r = Math.max(r, o); var i = new QR.RSBlock(r, n), a = QR.createData(r, n, t), l = QR.mapData(a, i, r); this.modules = l; this.moduleCount = r * 4 + 17 } QR.getMinType = function (t, e) { for (var r = 1; r <= 40; r++) { var n = QR.RSBlock.getRSBlockTable(r, e); if (!n) continue; var o = 0; for (var i = 0; i < n.length; i += 2)o += n[i] * n[i + 1]; var a = o - QR.RSBlock.getECCount(r, e); if (t.length <= a) return r } return 40 }; QR.prototype.renderCanvas = function (c, s) { s = s || 4; var m = this.moduleCount, w = m * s; c.width = w; c.height = w; var x = c.getContext('2d'); x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, w); x.fillStyle = '#000000'; for (var r = 0; r < m; r++)for (var l = 0; l < m; l++)if (this.modules[r][l]) x.fillRect(l * s, r * s, s, s) }; QR.createBytes = function (b, r) { for (var o = [], i = 0; i < b.length; i++) { var d = b[i]; for (var j = 0; j < 8; j++)o.push(((d >>> 7 - j) & 1) === 1) } return o }; QR.RSBlock = function (t, e) { this.totalCount = 0; this.dataCount = 0; var r = QR.RSBlock.getRSBlockTable(t, e); if (!r) return; for (var i = 0; i < r.length; i += 2) { var n = r[i], o = r[i + 1]; this.totalCount += n * o; this.dataCount += n * (o - QR.RSBlock.getECCount(t, e) / n) } }; QR.RSBlock.getRSBlockTable = function () { return null }; QR.RSBlock.getECCount = function () { return 0 }; QR.createData = function () { return [] }; QR.mapData = function () { return [] }; window._QRGenerate = function (text, canvas, cellSize) { cellSize = cellSize || 4; try { var url = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(text); var img = new Image(); img.crossOrigin = 'anonymous'; img.onload = function () { canvas.width = 160; canvas.height = 160; canvas.getContext('2d').drawImage(img, 0, 0, 160, 160) }; img.onerror = function () { var ctx = canvas.getContext('2d'); canvas.width = 160; canvas.height = 160; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 160, 160); ctx.fillStyle = '#333'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('QR unavailable', 80, 80) }; img.src = url } catch (e) { } } })();
+        (function () { window._QRGenerate = function (text, canvas, cellSize) { cellSize = cellSize || 4; try { var url = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(text); var img = new Image(); img.crossOrigin = 'anonymous'; img.onload = function () { canvas.width = 160; canvas.height = 160; canvas.getContext('2d').drawImage(img, 0, 0, 160, 160) }; img.onerror = function () { var ctx = canvas.getContext('2d'); canvas.width = 160; canvas.height = 160; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 160, 160); ctx.fillStyle = '#333'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('QR unavailable', 80, 80) }; img.src = url } catch (e) { } } })();
     </script>
 
     <script>
-        // Rotating text animation
-        const words = ['Landlords', 'Property Managers', 'Real Estate Investors', 'Building Owners', 'Rental Portfolios'];
-        let wordIndex = 0;
-        const rotatingEl = document.getElementById('rotatingText');
-        setInterval(() => {
-            rotatingEl.style.opacity = '0';
-            rotatingEl.style.transform = 'translateY(10px)';
-            setTimeout(() => {
-                wordIndex = (wordIndex + 1) % words.length;
-                rotatingEl.textContent = words[wordIndex];
-                rotatingEl.style.opacity = '1';
-                rotatingEl.style.transform = 'translateY(0)';
-            }, 300);
-        }, 2500);
-        rotatingEl.style.transition = 'opacity 0.3s, transform 0.3s';
+        // ── Theme Toggle ──
+        (function () {
+            var html = document.documentElement;
+            var stored = localStorage.getItem('nestmind-theme');
+            var preferred = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            html.setAttribute('data-theme', preferred);
+            updateToggleUI(preferred);
 
-        // Generate hero QR code pointing to signup page
+            document.getElementById('themeToggle').addEventListener('click', function (e) {
+                var option = e.target.closest('.theme-toggle-option');
+                if (!option) return;
+                var theme = option.getAttribute('data-theme-val');
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('nestmind-theme', theme);
+                updateToggleUI(theme);
+            });
+
+            function updateToggleUI(theme) {
+                document.querySelectorAll('.theme-toggle-option').forEach(function (el) {
+                    el.classList.toggle('active', el.getAttribute('data-theme-val') === theme);
+                });
+            }
+        })();
+
+        // ── Rotating text animation ──
+        (function () {
+            var words = ['Property Management', 'Landlords', 'Rental Portfolios', 'Building Owners', 'Real Estate Investors'];
+            var wordIndex = 0;
+            var rotatingEl = document.getElementById('rotatingText');
+            setInterval(function () {
+                rotatingEl.style.opacity = '0';
+                rotatingEl.style.transform = 'translateY(10px)';
+                setTimeout(function () {
+                    wordIndex = (wordIndex + 1) % words.length;
+                    rotatingEl.textContent = words[wordIndex];
+                    rotatingEl.style.opacity = '1';
+                    rotatingEl.style.transform = 'translateY(0)';
+                }, 300);
+            }, 2500);
+            rotatingEl.style.transition = 'opacity 0.3s, transform 0.3s';
+        })();
+
+        // ── Generate hero QR code ──
         (function () {
             var canvas = document.getElementById('heroQrCanvas');
             if (!canvas) return;
