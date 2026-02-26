@@ -990,7 +990,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const respond = (payload: Record<string, unknown>) => {
       // Track AI usage for plan limits (increment counter when LLM was invoked)
       if (llmInvoked && landlordId) {
-        incrementMessageCount(landlordId).catch(() => {});
+        incrementMessageCount(landlordId).catch(() => { });
       }
       setWebhookStatus({
         receivedAt: new Date().toISOString(),

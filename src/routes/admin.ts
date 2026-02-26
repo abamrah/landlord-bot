@@ -1307,7 +1307,7 @@ router.post("/agent/ask", async (req, res) => {
     });
 
     // Increment message count after successful agent response
-    incrementMessageCount(authReq.landlordId).catch(() => {});
+    incrementMessageCount(authReq.landlordId).catch(() => { });
 
     // Save the AI response to conversation memory
     await conversationMemory.saveMessage({
@@ -2338,6 +2338,7 @@ router.post("/leases/upload", async (req, res) => {
     try {
       const { vertexAI } = await import("../config/gemini");
       if (vertexAI) {
+        console.log("[Lease] Starting AI extraction for", parsed.data.fileName, "mimeType:", parsed.data.mimeType, "base64 length:", parsed.data.fileBase64.length);
         const model = vertexAI.getGenerativeModel({ model: process.env.GOOGLE_VERTEX_MODEL || "gemini-2.5-pro" });
         const result = await model.generateContent({
           contents: [{
@@ -2369,18 +2370,65 @@ Return ONLY valid JSON wrapped in \`\`\`json ... \`\`\` followed by the summary.
             ],
           }],
         });
-        const responseText = result.response?.text?.() || "";
-        // Extract JSON from response
-        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)```/);
-        if (jsonMatch?.[1]) {
-          extractedTerms = JSON.parse(jsonMatch[1].trim());
+
+        // Safely extract response text — use candidates approach (more reliable than text())
+        let responseText = "";
+        try {
+          const parts = result.response?.candidates?.[0]?.content?.parts || [];
+          responseText = parts.map((p: any) => p.text || "").join("");
+        } catch {
+          // Fallback to text() method
+          try { responseText = result.response?.text?.() || ""; } catch { /* blocked or empty */ }
         }
-        // Extract summary (text after the JSON block)
-        const summaryMatch = responseText.match(/```[\s\S]*?```\s*([\s\S]+)/);
-        summary = summaryMatch?.[1]?.trim() || null;
+        console.log("[Lease] Gemini response length:", responseText.length, "preview:", responseText.substring(0, 200));
+
+        if (responseText) {
+          // Strategy 1: Extract JSON from ```json ... ``` code fence
+          const jsonMatch = responseText.match(/```json\s*([\s\S]*?)```/);
+          if (jsonMatch?.[1]) {
+            try { extractedTerms = JSON.parse(jsonMatch[1].trim()); } catch (e) { console.warn("[Lease] JSON parse from code fence failed:", e); }
+          }
+
+          // Strategy 2: Extract from generic ``` ... ``` code fence
+          if (!extractedTerms) {
+            const genericFence = responseText.match(/```\s*([\s\S]*?)```/);
+            if (genericFence?.[1]) {
+              try { extractedTerms = JSON.parse(genericFence[1].trim()); } catch { /* not valid JSON in fence */ }
+            }
+          }
+
+          // Strategy 3: Find first { ... } block and try to parse as JSON
+          if (!extractedTerms) {
+            const braceMatch = responseText.match(/\{[\s\S]*\}/);
+            if (braceMatch) {
+              try { extractedTerms = JSON.parse(braceMatch[0]); } catch { /* not valid JSON */ }
+            }
+          }
+
+          // Extract summary (text after the JSON block or last code fence)
+          if (extractedTerms) {
+            const summaryMatch = responseText.match(/```[\s\S]*?```\s*([\s\S]+)/);
+            summary = summaryMatch?.[1]?.trim() || null;
+            // If no summary after code fence, look for text after the JSON object
+            if (!summary && !jsonMatch) {
+              const afterJson = responseText.replace(/\{[\s\S]*\}/, "").trim();
+              if (afterJson.length > 20) summary = afterJson;
+            }
+          }
+
+          if (extractedTerms) {
+            console.log("[Lease] Extracted terms:", JSON.stringify(extractedTerms).substring(0, 300));
+          } else {
+            console.warn("[Lease] Could not parse JSON from Gemini response. Full response:", responseText.substring(0, 500));
+          }
+        } else {
+          console.warn("[Lease] Empty response from Gemini — model may have blocked the content");
+        }
+      } else {
+        console.warn("[Lease] vertexAI is null — GOOGLE_API_KEY not configured");
       }
     } catch (err) {
-      console.warn("Lease AI extraction failed, saving without terms", err);
+      console.warn("Lease AI extraction failed, saving without terms", (err as Error).message, (err as Error).stack?.substring(0, 300));
     }
 
     // Save the lease document

@@ -633,42 +633,129 @@
       transition: all .3s ease;
       border: 1px solid transparent;
     }
+
     .auto-reply-badge .ar-dot {
-      width: 6px; height: 6px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       display: inline-block;
       flex-shrink: 0;
     }
+
     /* received */
-    .ar-received { background: rgba(99,102,241,.12); color: #818cf8; border-color: rgba(99,102,241,.2); }
-    .ar-received .ar-dot { background: #818cf8; }
+    .ar-received {
+      background: rgba(99, 102, 241, .12);
+      color: #818cf8;
+      border-color: rgba(99, 102, 241, .2);
+    }
+
+    .ar-received .ar-dot {
+      background: #818cf8;
+    }
+
     /* processing — animated pulse */
-    .ar-processing { background: rgba(251,191,36,.12); color: #f59e0b; border-color: rgba(251,191,36,.2); }
-    .ar-processing .ar-dot { background: #f59e0b; animation: ar-pulse 1.2s ease-in-out infinite; }
-    @keyframes ar-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.6)} }
+    .ar-processing {
+      background: rgba(251, 191, 36, .12);
+      color: #f59e0b;
+      border-color: rgba(251, 191, 36, .2);
+    }
+
+    .ar-processing .ar-dot {
+      background: #f59e0b;
+      animation: ar-pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes ar-pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .4;
+        transform: scale(1.6)
+      }
+    }
+
     /* generated */
-    .ar-generated { background: rgba(56,189,248,.12); color: #38bdf8; border-color: rgba(56,189,248,.2); }
-    .ar-generated .ar-dot { background: #38bdf8; }
+    .ar-generated {
+      background: rgba(56, 189, 248, .12);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, .2);
+    }
+
+    .ar-generated .ar-dot {
+      background: #38bdf8;
+    }
+
     /* sent */
-    .ar-sent { background: rgba(34,197,94,.12); color: #22c55e; border-color: rgba(34,197,94,.2); }
-    .ar-sent .ar-dot { background: #22c55e; }
+    .ar-sent {
+      background: rgba(34, 197, 94, .12);
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, .2);
+    }
+
+    .ar-sent .ar-dot {
+      background: #22c55e;
+    }
+
     /* failed */
-    .ar-failed { background: rgba(239,68,68,.12); color: #ef4444; border-color: rgba(239,68,68,.2); }
-    .ar-failed .ar-dot { background: #ef4444; }
+    .ar-failed {
+      background: rgba(239, 68, 68, .12);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, .2);
+    }
+
+    .ar-failed .ar-dot {
+      background: #ef4444;
+    }
+
     /* held for approval */
-    .ar-held { background: rgba(249,115,22,.12); color: #f97316; border-color: rgba(249,115,22,.2); }
-    .ar-held .ar-dot { background: #f97316; }
+    .ar-held {
+      background: rgba(249, 115, 22, .12);
+      color: #f97316;
+      border-color: rgba(249, 115, 22, .2);
+    }
+
+    .ar-held .ar-dot {
+      background: #f97316;
+    }
+
     /* disabled */
-    .ar-disabled { background: rgba(107,114,128,.1); color: #9ca3af; border-color: rgba(107,114,128,.15); }
-    .ar-disabled .ar-dot { background: #9ca3af; }
+    .ar-disabled {
+      background: rgba(107, 114, 128, .1);
+      color: #9ca3af;
+      border-color: rgba(107, 114, 128, .15);
+    }
+
+    .ar-disabled .ar-dot {
+      background: #9ca3af;
+    }
+
     /* skipped */
-    .ar-skipped { background: rgba(107,114,128,.1); color: #9ca3af; border-color: rgba(107,114,128,.15); }
-    .ar-skipped .ar-dot { background: #9ca3af; }
+    .ar-skipped {
+      background: rgba(107, 114, 128, .1);
+      color: #9ca3af;
+      border-color: rgba(107, 114, 128, .15);
+    }
+
+    .ar-skipped .ar-dot {
+      background: #9ca3af;
+    }
 
     /* mobile adjustments for auto-reply badges */
     @media (max-width: 768px) {
-      .auto-reply-badge { font-size: 10px; padding: 2px 7px; }
-      .auto-reply-badge .ar-dot { width: 5px; height: 5px; }
+      .auto-reply-badge {
+        font-size: 10px;
+        padding: 2px 7px;
+      }
+
+      .auto-reply-badge .ar-dot {
+        width: 5px;
+        height: 5px;
+      }
     }
 
     /* ── stat connectors ── */
@@ -3066,9 +3153,12 @@
         <!-- FILTER TABS -->
         <div class="tab-row" style="margin-bottom:0;">
           <button class="tab-btn active" data-fin-filter="ALL" onclick="filterFinancials('ALL', this)">All</button>
-          <button class="tab-btn" data-fin-filter="RENT_PAYMENT" onclick="filterFinancials('RENT_PAYMENT', this)">Rent</button>
-          <button class="tab-btn" data-fin-filter="EXPENSE" onclick="filterFinancials('EXPENSE', this)">Expenses</button>
-          <button class="tab-btn" data-fin-filter="DEPOSIT" onclick="filterFinancials('DEPOSIT', this)">Deposits</button>
+          <button class="tab-btn" data-fin-filter="RENT_PAYMENT"
+            onclick="filterFinancials('RENT_PAYMENT', this)">Rent</button>
+          <button class="tab-btn" data-fin-filter="EXPENSE"
+            onclick="filterFinancials('EXPENSE', this)">Expenses</button>
+          <button class="tab-btn" data-fin-filter="DEPOSIT"
+            onclick="filterFinancials('DEPOSIT', this)">Deposits</button>
           <button class="tab-btn" data-fin-filter="REFUND" onclick="filterFinancials('REFUND', this)">Refunds</button>
           <button class="tab-btn" data-fin-filter="OTHER" onclick="filterFinancials('OTHER', this)">Other</button>
         </div>
@@ -3088,7 +3178,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="7" style="color:var(--text-muted)">Loading...</td></tr>
+              <tr>
+                <td colspan="7" style="color:var(--text-muted)">Loading...</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -4127,7 +4219,7 @@
       if (res.status === 401 || res.status === 403) { localStorage.removeItem('token'); localStorage.removeItem('landlord'); window.location.href = '/login'; throw new Error('Session expired'); }
       if (!res.ok) {
         var errBody = {};
-        try { errBody = await res.json(); } catch(e) {}
+        try { errBody = await res.json(); } catch (e) { }
         var err = new Error(errBody.message || errBody.error || 'Request failed ' + res.status);
         err.status = res.status;
         throw err;
@@ -4172,8 +4264,8 @@
       var info = _arStatusMap[maintenanceId] || _arStatusMap[tenantId];
       // Fallback: check the maintenance record's persisted autoReplyStatus
       if (!info) {
-        var m = maintenanceId ? state.maintenance.find(function(x){ return x.id === maintenanceId; }) : null;
-        if (!m && tenantId) m = state.maintenance.find(function(x){ return x.tenantId === tenantId; });
+        var m = maintenanceId ? state.maintenance.find(function (x) { return x.id === maintenanceId; }) : null;
+        if (!m && tenantId) m = state.maintenance.find(function (x) { return x.tenantId === tenantId; });
         if (m && m.autoReplyStatus) {
           info = { stage: m.autoReplyStatus, timestamp: m.autoReplyStatusAt || m.updatedAt };
         }
@@ -4187,7 +4279,7 @@
     }
     // Seed _arStatusMap from persisted maintenance data on load
     function seedAutoReplyStatuses() {
-      state.maintenance.forEach(function(m) {
+      state.maintenance.forEach(function (m) {
         if (m.autoReplyStatus) {
           var info = { stage: m.autoReplyStatus, timestamp: m.autoReplyStatusAt || m.updatedAt };
           _arStatusMap[m.id] = info;
@@ -6235,7 +6327,7 @@
             });
             // If no badges exist yet (first status), re-render the maintenance views
             if (!document.querySelector('[data-ar-mid="' + (msg.maintenanceId || '') + '"]') &&
-                !document.querySelector('[data-ar-tid="' + (msg.tenantId || '') + '"]')) {
+              !document.querySelector('[data-ar-tid="' + (msg.tenantId || '') + '"]')) {
               renderMaintenance();
               // Also re-render mobile mission panel tickets
               if (typeof _renderMobileKPIs === 'function') _renderMobileKPIs();
