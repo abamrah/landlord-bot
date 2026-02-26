@@ -3224,58 +3224,6 @@
           </div>
         </div>
 
-        <!-- UTILITY CHAT -->
-        <div class="panel">
-          <div class="panel-header">
-            <h3>💰 Utility Assistant</h3><span class="label">Check bills, usage & credentials</span>
-          </div>
-          <div class="form-row" style="margin-bottom:8px;">
-            <div class="form-field"><select id="agentUtilityUnit">
-                <option value="">Select unit...</option>
-              </select></div>
-            <div class="form-field">
-              <select id="agentUtilityType">
-                <option value="">All Types</option>
-                <option value="HYDRO">Hydro</option>
-                <option value="INTERNET">Internet</option>
-                <option value="WATER_GAS">Water/Gas</option>
-              </select>
-            </div>
-            <button class="btn btn-secondary btn-sm" id="agentUtilityBtn">Quick Check</button>
-          </div>
-          <div class="chat-messages" id="agentUtilityLog" style="height:280px;margin-bottom:0;">
-            <div class="chat-msg ai">
-              <div>Hi! I can check utility bills, look up credentials, compare usage across periods, and flag anomalies.
-                Select a unit above for a quick check, or ask me anything below.</div>
-            </div>
-          </div>
-          <div class="chat-input-row" style="margin-top:8px;">
-            <textarea id="agentUtilityQuestion"
-              placeholder="e.g. What was last month's hydro bill? Any anomalies in water usage?" rows="2"></textarea>
-            <button class="btn btn-primary" id="agentUtilityAskBtn" style="align-self:end;">Send</button>
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <!-- WEB SEARCH -->
-          <div class="panel panel-sm">
-            <div class="panel-header">
-              <h3>🔍 Web Search</h3><span class="label">Google-powered search</span>
-            </div>
-            <div class="form-row">
-              <div class="form-field"><input id="agentSearchQuery"
-                  placeholder="e.g. Honeywell T6 Pro thermostat manual" /></div>
-              <button class="btn btn-primary btn-sm" id="agentSearchBtn">Search</button>
-            </div>
-            <div class="chat-messages" id="agentSearchLog" style="height:200px;margin-top:8px;margin-bottom:0;">
-              <div class="chat-msg ai">
-                <div style="color:var(--text-muted)">Search results will appear here.</div>
-              </div>
-            </div>
-          </div>
-          <div></div>
-        </div>
-
         <!-- TOOLS LIST -->
         <div class="panel panel-sm">
           <div class="panel-header">
@@ -4104,7 +4052,6 @@
       sections.forEach(s => s.classList.toggle('active', s.id === id));
       navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
       closeSidebar();
-      if (id === 'agent') setTimeout(populateAgentUnitDropdown, 100);
       if (id === 'guides') updateGuidesChecklist();
     }
     navItems.forEach(n => n.addEventListener('click', () => showView(n.dataset.target)));
@@ -5417,9 +5364,13 @@
       } catch (err) { console.warn('Failed to load agent history', err); }
     }
 
+    var _desktopAgentSending = false;
     async function sendAgentMessage() {
       var input = document.getElementById('agentQuestion');
       var q = input.value.trim(); if (!q && !agentMediaData) return;
+      if (_desktopAgentSending) return; // prevent double-sends
+      _desktopAgentSending = true;
+      document.getElementById('agentAskBtn').disabled = true;
       var log = document.getElementById('agentChatLog');
       var userMsg = document.createElement('div');
       userMsg.className = 'chat-msg user';
@@ -5481,79 +5432,12 @@
           errMsg = '\u26A0\uFE0F You\'ve reached your monthly message limit. Upgrade your plan for more messages.';
         }
         thinking.innerHTML = '<div style="color:var(--danger)">' + errMsg + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+      } finally {
+        _desktopAgentSending = false;
+        document.getElementById('agentAskBtn').disabled = false;
       }
       log.scrollTop = log.scrollHeight;
     }
-
-    // Utility agent
-    document.getElementById('agentUtilityBtn').addEventListener('click', async function () {
-      var unitId = document.getElementById('agentUtilityUnit').value;
-      if (!unitId) return toast('Select a unit');
-      var utilityType = document.getElementById('agentUtilityType').value || undefined;
-      var log = document.getElementById('agentUtilityLog');
-      var msg = document.createElement('div'); msg.className = 'chat-msg ai';
-      msg.innerHTML = '<div style="color:var(--text-muted)">Checking utility portal...</div>';
-      log.appendChild(msg); log.scrollTop = log.scrollHeight;
-      try {
-        var res = await fetchJson('/admin/agent/utility-check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unitId: unitId, utilityType: utilityType }) });
-        msg.innerHTML = '<div style="white-space:pre-wrap">' + (res?.answer || res?.finalAnswer || 'No results.') + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
-      } catch (err) { msg.innerHTML = '<div style="color:var(--danger)">' + err.message + '</div>'; }
-      log.scrollTop = log.scrollHeight;
-    });
-
-    // Utility chat — conversational follow-up
-    document.getElementById('agentUtilityAskBtn').addEventListener('click', async function () {
-      var question = document.getElementById('agentUtilityQuestion').value.trim();
-      if (!question) return toast('Type a question');
-      var unitId = document.getElementById('agentUtilityUnit').value;
-      var utilityType = document.getElementById('agentUtilityType').value || undefined;
-      var log = document.getElementById('agentUtilityLog');
-      // Show user message
-      var userMsg = document.createElement('div'); userMsg.className = 'chat-msg user';
-      userMsg.innerHTML = '<div>' + question + '</div>';
-      log.appendChild(userMsg);
-      // Show thinking
-      var aiMsg = document.createElement('div'); aiMsg.className = 'chat-msg ai';
-      aiMsg.innerHTML = '<div style="color:var(--text-muted)">Thinking...</div>';
-      log.appendChild(aiMsg); log.scrollTop = log.scrollHeight;
-      document.getElementById('agentUtilityQuestion').value = '';
-      try {
-        var body = { question: question };
-        if (unitId) body.unitId = unitId;
-        if (utilityType) body.utilityType = utilityType;
-        var res = await fetchJson('/admin/agent/utility-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        aiMsg.innerHTML = '<div style="white-space:pre-wrap">' + (res?.answer || res?.finalAnswer || 'No response.') + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
-      } catch (err) { aiMsg.innerHTML = '<div style="color:var(--danger)">' + err.message + '</div>'; }
-      log.scrollTop = log.scrollHeight;
-    });
-    document.getElementById('agentUtilityQuestion').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('agentUtilityAskBtn').click(); } });
-
-    // Web search
-    document.getElementById('agentSearchBtn').addEventListener('click', async function () {
-      var query = document.getElementById('agentSearchQuery').value.trim();
-      if (!query) return toast('Enter a search query');
-      var log = document.getElementById('agentSearchLog');
-      var msg = document.createElement('div'); msg.className = 'chat-msg ai';
-      msg.innerHTML = '<div style="color:var(--text-muted)">🔍 Searching the web...</div>';
-      log.appendChild(msg); log.scrollTop = log.scrollHeight;
-      try {
-        var res = await fetchJson('/admin/agent/web-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: query }) });
-        var html = '';
-        if (res?.summary) html += '<div style="white-space:pre-wrap;margin-bottom:8px;">' + res.summary + '</div>';
-        if (res?.sources && res.sources.length) {
-          html += '<div style="margin-top:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px;"><strong>Sources:</strong></div>';
-          res.sources.forEach(function (s, i) {
-            var domain = '';
-            try { domain = new URL(s.url).hostname; } catch (e) { domain = s.url; }
-            html += '<div style="font-size:11px;margin-top:2px;"><a href="' + s.url + '" target="_blank" style="color:var(--primary)">' + (s.title || domain) + '</a></div>';
-          });
-        }
-        if (!html) html = res?.error || 'No results found.';
-        msg.innerHTML = '<div>' + html + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
-      } catch (err) { msg.innerHTML = '<div style="color:var(--danger)">' + err.message + '</div>'; }
-      log.scrollTop = log.scrollHeight;
-    });
-    document.getElementById('agentSearchQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('agentSearchBtn').click(); } });
 
     // Tools list
     document.getElementById('agentToolsBtn').addEventListener('click', async function () {
@@ -5571,12 +5455,6 @@
           }).join('') + '</div>';
       } catch (err) { document.getElementById('agentToolsList').textContent = 'Failed: ' + err.message; }
     });
-
-    function populateAgentUnitDropdown() {
-      var sel = document.getElementById('agentUtilityUnit');
-      if (sel.options.length > 1) return;
-      state.units.forEach(function (u) { var o = document.createElement('option'); o.value = u.id; o.textContent = u.label; sel.appendChild(o); });
-    }
 
     // ── DELEGATED CLICK HANDLER ──
     document.body.addEventListener('click', async function (e) {
@@ -6506,6 +6384,40 @@
       return outputArray;
     }
 
+    // Auto-enable push: if permission already granted, re-subscribe silently on load
+    (async function autoEnablePush() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      try {
+        var perm = Notification.permission;
+        if (perm === 'granted') {
+          // Already granted — silently re-subscribe
+          var reg = await navigator.serviceWorker.register('/sw.js');
+          var vapidData = await fetchJson('/admin/push/vapid-key');
+          if (!vapidData.vapidPublicKey) return;
+          var sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidData.vapidPublicKey),
+          });
+          var subJson = sub.toJSON();
+          await fetchJson('/admin/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: subJson.endpoint, keys: subJson.keys }),
+          });
+          console.info('[Push] Auto-subscribed on load');
+        } else if (perm === 'default') {
+          // Not yet asked — prompt after 5 seconds if not dismissed before
+          setTimeout(function () {
+            if (!localStorage.getItem('pushDismissed')) {
+              enablePushNotifications();
+            }
+          }, 5000);
+        }
+      } catch (err) {
+        console.warn('[Push] Auto-enable failed (non-critical)', err);
+      }
+    })();
+
     // Connect WebSocket on page load
     connectWebSocket();
 
@@ -6592,9 +6504,14 @@
       // Load mobile chat history on init
       loadMobileAgentChatHistory();
 
+      var _mobileAgentSending = false;
+
       function sendMobileAgentMessage() {
         var q = mobileInput.value.trim();
         if (!q && !mobileAgentMediaData) return;
+        if (_mobileAgentSending) return; // prevent double-sends
+        _mobileAgentSending = true;
+        mobileAskBtn.disabled = true;
         // Append user message
         var userMsg = document.createElement('div');
         userMsg.className = 'chat-msg user';
@@ -6626,8 +6543,11 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         }).then(function (res) {
+          _mobileAgentSending = false;
+          mobileAskBtn.disabled = false;
           var answer = (res && (res.answer || res.finalAnswer)) || 'No response.';
           var tools = res && res.toolCallCount ? res.toolCallCount + ' tools used' : '';
+          var formattedAnswer = formatChatText(answer);
           // Check for PDF data in pdfArtifacts from agent response
           var pdfButtons = '';
           if (res && res.pdfArtifacts && res.pdfArtifacts.length) {
@@ -6649,7 +6569,7 @@
               }
             } catch (e) { }
           }
-          thinking.innerHTML = '<div style="white-space:pre-wrap">' + answer + '</div>' + pdfButtons + '<div class="meta">Agent' + (tools ? ' · ' + tools : '') + ' · ' + new Date().toLocaleTimeString() + '</div>';
+          thinking.innerHTML = '<div style="white-space:pre-wrap">' + formattedAnswer + '</div>' + pdfButtons + '<div class="meta">Agent' + (tools ? ' · ' + tools : '') + ' · ' + new Date().toLocaleTimeString() + '</div>';
           mobileLog.scrollTop = mobileLog.scrollHeight;
           // Auto-download: trigger click on the first PDF button after render
           if (pdfButtons) {
@@ -6659,9 +6579,32 @@
             }, 300);
           }
         }).catch(function (err) {
+          _mobileAgentSending = false;
+          mobileAskBtn.disabled = false;
           var errMsg = err.message || 'Unknown error';
           if (err.status === 429 || errMsg.includes('message_limit') || errMsg.includes('monthly message limit')) {
             errMsg = '\u26A0\uFE0F You\'ve reached your monthly message limit. Upgrade your plan for more messages.';
+          } else if (!err.status || errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError') || errMsg.includes('network') || errMsg.includes('timeout') || errMsg.includes('Load failed')) {
+            // Network error — server may have completed; reload history after a short delay
+            errMsg = '⏳ Connection interrupted. Checking for your answer...';
+            thinking.innerHTML = '<div style="color:var(--text-muted)">' + errMsg + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+            mobileLog.scrollTop = mobileLog.scrollHeight;
+            setTimeout(function () {
+              fetchJson('/admin/agent/history?limit=3').then(function (histRes) {
+                if (histRes && histRes.messages && histRes.messages.length) {
+                  var last = histRes.messages[histRes.messages.length - 1];
+                  if (last.role === 'ai' && last.content) {
+                    thinking.innerHTML = '<div style="white-space:pre-wrap">' + formatChatText(last.content) + '</div><div class="meta">Agent · ' + new Date(last.createdAt).toLocaleTimeString() + '</div>';
+                    mobileLog.scrollTop = mobileLog.scrollHeight;
+                    return;
+                  }
+                }
+                thinking.innerHTML = '<div style="color:var(--text-muted)">Your request may still be processing. Pull down to refresh shortly.</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+              }).catch(function () {
+                thinking.innerHTML = '<div style="color:var(--text-muted)">Connection lost. Your request may still be processing — try refreshing in a moment.</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
+              });
+            }, 5000);
+            return;
           }
           thinking.innerHTML = '<div style="color:var(--danger)">' + errMsg + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
           mobileLog.scrollTop = mobileLog.scrollHeight;
