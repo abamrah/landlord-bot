@@ -23,10 +23,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export function lookupTenantTool(): ToolDefinition {
     return {
         name: "lookup_tenant",
-        description: "Look up a tenant by phone number or ID. Returns tenant info including unit, name, and lease details.",
+        description: "Look up a tenant by phone number, name, or ID. Returns tenant info including unit assignments, lease dates, and contact details. Supports partial/fuzzy name matching.",
         parameters: {
             phone: { type: "string", description: "Tenant phone number" },
             tenantId: { type: "string", description: "Tenant ID" },
+            name: { type: "string", description: "Tenant name (partial match supported — e.g., 'John' will find 'John Smith')" },
         },
         category: "data",
         enabled: true,
@@ -38,11 +39,23 @@ export function lookupTenantTool(): ToolDefinition {
             if (args.tenantId) {
                 const tenant = await db.tenant.findUnique({
                     where: { id: String(args.tenantId) },
-                    include: { units: true },
+                    include: { units: { include: { unit: { select: { label: true, address: true } }, leaseDocuments: { select: { id: true, fileName: true, extractedTerms: true, summary: true, uploadedAt: true } } } } },
                 });
                 return tenant || { error: "Tenant not found" };
             }
-            return { error: "Provide phone or tenantId" };
+            if (args.name) {
+                const searchName = String(args.name);
+                const where: any = { name: { contains: searchName, mode: "insensitive" } };
+                if (args.landlordId) where.landlordId = String(args.landlordId);
+                const tenants = await db.tenant.findMany({
+                    where,
+                    include: { units: { include: { unit: { select: { label: true, address: true } }, leaseDocuments: { select: { id: true, fileName: true, extractedTerms: true, summary: true, uploadedAt: true } } } } },
+                    take: 10,
+                });
+                if (tenants.length === 0) return { error: `No tenant found matching name "${searchName}"` };
+                return { tenants, total: tenants.length };
+            }
+            return { error: "Provide phone, tenantId, or name" };
         },
     };
 }
@@ -680,10 +693,13 @@ export function listTenantsTool(): ToolDefinition {
                     email: t.email,
                     autoReplyEnabled: t.autoReplyEnabled,
                     units: t.units.map((ut: any) => ({
+                        unitTenantId: ut.id,
+                        unitId: ut.unitId,
                         unitLabel: ut.unit?.label,
                         unitAddress: ut.unit?.address,
                         leaseStart: ut.startDate?.toISOString?.().split("T")[0] || null,
                         leaseEnd: ut.endDate?.toISOString?.().split("T")[0] || null,
+                        rentAmountCents: ut.rentAmountCents,
                     })),
                 })),
                 total: tenants.length,
@@ -794,10 +810,11 @@ export function expiringLeasesTool(): ToolDefinition {
 export function lookupLeaseTool(): ToolDefinition {
     return {
         name: "lookup_lease",
-        description: "Look up lease documents, extracted terms, and full text for a specific unit or tenant. Returns comprehensive AI-extracted lease data including all terms, rules, responsibilities, deposit info, utility responsibilities, pet/smoking policies, schedules, additional clauses, and the complete lease text. Use this to answer any question about a tenant's lease.",
+        description: "Look up lease documents, extracted terms, and full text for a specific unit, tenant, or all leases for this landlord. Returns comprehensive AI-extracted lease data including all terms, rules, responsibilities, deposit info, utility responsibilities, pet/smoking policies, schedules, additional clauses, and the complete lease text. Use this to answer any question about a tenant's lease. When no unitId or tenantId is given, returns ALL leases for the landlord. The extractedTerms.tenantNames field contains the actual names written in the lease document (which may differ from the system tenant name).",
         parameters: {
             unitId: { type: "string", description: "Unit ID to look up leases for" },
             tenantId: { type: "string", description: "Tenant ID to look up leases for" },
+            unitLabel: { type: "string", description: "Unit label to search by (e.g., 'Lower', 'Upper', 'Unit 1')" },
         },
         category: "data",
         enabled: true,
@@ -805,34 +822,29 @@ export function lookupLeaseTool(): ToolDefinition {
             const leaseSelect = {
                 id: true, fileName: true, extractedTerms: true, fullText: true, summary: true, uploadedAt: true,
             };
+
+            // Build where clause for UnitTenant lookup
             const where: any = {};
             if (args.unitId) where.unitId = String(args.unitId);
             if (args.tenantId) where.tenantId = String(args.tenantId);
-            if (!args.unitId && !args.tenantId) {
-                // If landlordId is available, get all leases for this landlord
-                if (args.landlordId) {
-                    const unitTenants = await db.unitTenant.findMany({
-                        where: { unit: { landlordId: String(args.landlordId) } },
-                        include: {
-                            tenant: { select: { name: true, phone: true } },
-                            unit: { select: { label: true, address: true } },
-                            leaseDocuments: { select: leaseSelect },
-                        },
-                    });
-                    return {
-                        leases: unitTenants.map((ut: any) => ({
-                            tenantName: ut.tenant?.name,
-                            unitLabel: ut.unit?.label,
-                            startDate: ut.startDate?.toISOString?.().split("T")[0],
-                            endDate: ut.endDate?.toISOString?.().split("T")[0],
-                            rentAmountCents: ut.rentAmountCents,
-                            documents: ut.leaseDocuments,
-                        })),
-                        total: unitTenants.length,
-                    };
-                }
-                return { error: "Provide unitId or tenantId" };
+
+            // Support searching by unit label
+            if (args.unitLabel && !args.unitId) {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                const unitWhere: any = { label: { contains: String(args.unitLabel), mode: "insensitive" } };
+                if (landlordId) unitWhere.landlordId = landlordId;
+                where.unit = unitWhere;
             }
+
+            // If no specific filter was given, return all leases for the landlord
+            if (!args.unitId && !args.tenantId && !args.unitLabel) {
+                if (args.landlordId) {
+                    where.unit = { landlordId: String(args.landlordId) };
+                } else {
+                    return { error: "Provide unitId, tenantId, or unitLabel" };
+                }
+            }
+
             const unitTenants = await db.unitTenant.findMany({
                 where,
                 include: {
@@ -841,16 +853,25 @@ export function lookupLeaseTool(): ToolDefinition {
                     leaseDocuments: { select: leaseSelect },
                 },
             });
+
+            // Filter to only include entries that have lease documents if a search was specific
+            const results = unitTenants.map((ut: any) => ({
+                unitTenantId: ut.id,
+                tenantName: ut.tenant?.name,
+                tenantPhone: ut.tenant?.phone,
+                unitLabel: ut.unit?.label,
+                unitAddress: ut.unit?.address,
+                startDate: ut.startDate?.toISOString?.().split("T")[0],
+                endDate: ut.endDate?.toISOString?.().split("T")[0],
+                rentAmountCents: ut.rentAmountCents,
+                hasLeaseDocument: ut.leaseDocuments.length > 0,
+                documents: ut.leaseDocuments,
+            }));
+
             return {
-                leases: unitTenants.map((ut: any) => ({
-                    tenantName: ut.tenant?.name,
-                    unitLabel: ut.unit?.label,
-                    startDate: ut.startDate?.toISOString?.().split("T")[0],
-                    endDate: ut.endDate?.toISOString?.().split("T")[0],
-                    rentAmountCents: ut.rentAmountCents,
-                    documents: ut.leaseDocuments,
-                })),
-                total: unitTenants.length,
+                leases: results,
+                total: results.length,
+                withDocuments: results.filter((r: any) => r.hasLeaseDocument).length,
             };
         },
     };

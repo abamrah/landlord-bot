@@ -495,9 +495,29 @@ function queueTenantReply(params: {
   /** Extracted media payload to carry through to flush */
   mediaResult?: ExtractedMedia | null;
 }) {
-  // Use composite key so DM and group messages from the same tenant
-  // are never mixed — each channel gets its own bucket/timer.
-  const bucketKey = `${params.tenantId}::${params.replyTo}`;
+  // ── Cross-channel deduplication ──
+  // If this tenant already has a pending bucket on a DIFFERENT channel (e.g., DM
+  // when group is pending, or vice versa), merge into the existing bucket instead
+  // of creating a second one. This prevents the tenant receiving duplicate replies
+  // when they message in both DM and group.
+  let bucketKey = `${params.tenantId}::${params.replyTo}`;
+  let existingBucketKey: string | null = null;
+  for (const [key, val] of pendingTenantReplies.entries()) {
+    if (key.startsWith(`${params.tenantId}::`) && key !== bucketKey) {
+      existingBucketKey = key;
+      break;
+    }
+  }
+  // If an existing bucket on another channel exists, merge into it
+  if (existingBucketKey) {
+    bucketKey = existingBucketKey;
+    console.info("cross-channel merge: tenant already has pending reply on another channel", {
+      tenantId: params.tenantId,
+      existingKey: existingBucketKey,
+      newReplyTo: params.replyTo,
+    });
+  }
+
   const bucket = pendingTenantReplies.get(bucketKey);
   const messages = bucket?.messages || [];
   const updatedMessages = [...messages, { content: params.tenantMessage, at: Date.now(), media: params.media }];
@@ -520,6 +540,7 @@ function queueTenantReply(params: {
   pendingTenantReplies.set(bucketKey, {
     messages: updatedMessages,
     timer,
+    // Keep the most recent replyTo so the reply goes to the latest channel
     replyTo: params.replyTo,
     isGroup: params.isGroup,
     landlordId: params.landlordId,
@@ -1625,6 +1646,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const conversationLog = Array.isArray(record?.chatLog) ? (record?.chatLog as any[]) : [];
 
     // ── AGENTIC IMMEDIATE PATH ──
+    // Guard: if we already sent a reply to this tenant in the last 30s (e.g., via
+    // another channel like DM vs group), skip to avoid duplicate replies.
+    const recentReplyCutoff = 30_000;
+    const lastReply = lastReplySentAt.get(tenant.id) || 0;
+    if (Date.now() - lastReply < recentReplyCutoff) {
+      console.info("skipping immediate reply — recent reply already sent to this tenant", {
+        tenantId: tenant.id, msSinceLastReply: Date.now() - lastReply, replyTo,
+      });
+      return respond({ ok: true, routed: "tenant_dedup_skip", llmInvoked, autoReplySent: false, autoReplyReason: "recent_reply_dedup" });
+    }
     if (AGENTIC_MODE && tenantLandlordId) {
       try {
         // ── Auto-reply status: processing (agentic immediate) ──
