@@ -27,11 +27,14 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearm
     && rm -rf /var/lib/apt/lists/*
 
 # ── Python packages ──────────────────────────────────────────
+# pikepdf needs libqpdf-dev for XFA PDF form filling (LTB N-forms)
+RUN apt-get update && apt-get install -y --no-install-recommends libqpdf-dev && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir --break-system-packages \
     undetected-chromedriver \
     selenium \
     PyVirtualDisplay \
-    google-generativeai
+    google-generativeai \
+    pikepdf
 
 # ── App setup ────────────────────────────────────────────────
 WORKDIR /app

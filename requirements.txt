@@ -1,8 +1,10 @@
 # NestMind AI — Python Dependencies
 # Used by scripts/fetchBill.py for anti-bot browser automation
+# and scripts/fill_xfa.py for LTB N-form PDF autofill
 # Install: pip install -r requirements.txt
 
 undetected-chromedriver>=3.5.5
 selenium>=4.20.0
 google-generativeai>=0.8.0
 PyVirtualDisplay>=3.0
+pikepdf>=8.0.0
