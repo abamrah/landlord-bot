@@ -194,6 +194,7 @@ router.post("/twilio", async (req, res, next) => {
 
 const SAFE_AUTOPILOT_SEVERITIES = new Set(["low", "normal"]);
 const CRITICAL_KEYWORDS = ["fire", "water leak", "gas leak", "gas", "no power", "no heat", "flood", "smoke"];
+const PAYMENT_KEYWORDS = ["paid", "payment sent", "transferred", "e-transfer", "etransfer", "e transfer", "here is proof", "sent the money", "rent paid", "paid rent", "paid my rent", "just paid", "already paid", "payment done", "payment made", "sent payment", "interac", "receipt", "proof of payment"];
 const DEFAULT_REPLY_DELAY_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes between replies per tenant (was 1 hour)
 const pendingTenantReplies = new Map<
@@ -354,6 +355,14 @@ function extractWhatsAppSenderInfo(payload: any) {
 function containsCriticalKeyword(text: string) {
   const normalized = text.toLowerCase();
   return CRITICAL_KEYWORDS.some((kw) => normalized.includes(kw));
+}
+
+function isPaymentMessage(text: string, hasMedia: boolean) {
+  const normalized = text.toLowerCase();
+  if (PAYMENT_KEYWORDS.some((kw) => normalized.includes(kw))) return true;
+  // A media-only message (screenshot) with no text or very short text like "paid" is likely payment proof
+  if (hasMedia && normalized.length < 20 && /paid|proof|receipt|sent/i.test(normalized)) return true;
+  return false;
 }
 
 /**
@@ -1377,6 +1386,110 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const tenantMessage = enrichedMessage || text || "[media received]";
     const hasMedia = Boolean(mediaResult);
     const immediateUnitId = (isGroup && groupUnit?.id) ? groupUnit.id : await resolveTenantUnitId(tenant.id);
+
+    // ── PAYMENT DETECTION — skip triage & maintenance creation for payment messages ──
+    const paymentDetected = isPaymentMessage(tenantMessage, hasMedia);
+    if (paymentDetected) {
+      // eslint-disable-next-line no-console
+      console.info("payment message detected — skipping triage, routing to agent immediately", {
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        sender,
+        hasMedia,
+        channel: isGroup ? "whatsapp_group" : "whatsapp_dm",
+      });
+
+      // Log the message to conversation if there's an existing record
+      if (record?.id) {
+        await repo.appendChatMessage({
+          id: record.id,
+          role: "tenant",
+          content: chatContent,
+          meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", sender, media: hasMedia, paymentMessage: true },
+        });
+      }
+
+      // Save to conversation memory
+      await conversationMemory.saveMessage({
+        phone: tenant.phone || sender,
+        landlordId: tenantLandlordId,
+        role: "tenant",
+        content: tenantMessage,
+        meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", paymentMessage: true },
+      });
+
+      // ── Auto-reply status: processing ──
+      broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "processing", {
+        tenantName: tenant.name,
+        reason: "Payment confirmation detected",
+      });
+
+      // Run agentic handler immediately (no delay for payment confirmations)
+      if (AGENTIC_MODE && tenantLandlordId) {
+        try {
+          const mediaParts = mediaResult?.base64
+            ? [{ base64: mediaResult.base64, mimeType: mediaResult.mimeType }]
+            : undefined;
+          const mediaDescription = mediaResult
+            ? (mediaResult.transcription
+              ? `[Voice note]: "${mediaResult.transcription}"`
+              : mediaResult.description
+                ? `[${mediaResult.type} analysis]: ${mediaResult.description}`
+                : `[${mediaResult.type} received]`)
+            : undefined;
+
+          const agentResult = await orchestrator.handleTenantMessage({
+            tenantPhone: sender,
+            message: tenantMessage,
+            landlordId: tenantLandlordId,
+            mediaDescription,
+            mediaParts,
+          });
+          llmInvoked = true;
+
+          let agentDraft = extractDraftReply(agentResult.finalAnswer || "");
+          if (/^Agent error:/i.test(agentDraft) || /llm_unavailable|vertex_not_configured/i.test(agentDraft)) {
+            agentDraft = "Thanks for letting us know! Your payment has been noted and your landlord will be notified.";
+          }
+          if (!isValidTenantDraft(agentDraft)) {
+            agentDraft = "Thanks for confirming your payment! Your landlord has been notified.";
+          }
+
+          // ── Auto-reply status: generated ──
+          broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "generated", {
+            tenantName: tenant.name, severity: "low",
+          });
+
+          const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
+          const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
+
+          if (agentDraft && canAutoReply) {
+            const sendResult = await whatsappService.sendWhatsAppText({ to: replyTo, text: agentDraft, landlordId: tenantLandlordId });
+            if (sendResult.ok) {
+              autoReplySent = true;
+              autoReplyReason = "payment_confirmed";
+              lastReplySentAt.set(tenant.id, Date.now());
+              if (record?.id) {
+                await repo.appendChatMessage({ id: record.id, role: "ai", content: agentDraft, meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", paymentReply: true } });
+              }
+              // eslint-disable-next-line no-console
+              console.info("payment confirmation reply sent", { tenantId: tenant.id, replyTo, toolCalls: agentResult.toolCallCount });
+              broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "sent", { tenantName: tenant.name });
+            } else {
+              console.error("payment reply send failed", { error: sendResult.error });
+              broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "failed", { tenantName: tenant.name });
+            }
+          }
+
+          return respond({ ok: true, routed: "payment_confirmation", llmInvoked, autoReplySent, autoReplyReason, toolCalls: agentResult.toolCallCount });
+        } catch (payErr) {
+          // eslint-disable-next-line no-console
+          console.error("payment confirmation agent failed, falling through to normal flow", payErr);
+          // Fall through to normal triage flow below
+        }
+      }
+    }
+
     const triage = await agentService.triageMaintenance({
       tenantMessage,
       tenantId: tenant.id,
