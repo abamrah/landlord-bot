@@ -1364,7 +1364,7 @@ export function generateNoticeTool(): ToolDefinition {
                     noticeType,
                     fileName: `${noticeType}_Notice_${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
                     pdfBase64: base64,
-                    message: `${noticeType} Notice generated for ${args.tenantName}. ${description}. The PDF is ready for download or can be sent via WhatsApp.`,
+                    message: `${noticeType} Notice generated for ${args.tenantName}. ${description}. A download button will appear automatically.`,
                 };
             } catch (err) {
                 return { error: `Failed to generate notice: ${(err as Error).message}` };
@@ -1464,7 +1464,7 @@ export function generateLeaseTool(): ToolDefinition {
                     success: true,
                     fileName: `Standard-Lease-${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
                     pdfBase64: base64,
-                    message: `Standard Ontario Lease generated for ${args.tenantName} at ${args.propertyStreetNo} ${args.propertyStreetName}. Rent: $${Number(args.rentAmount).toFixed(2)}/month starting ${args.leaseStartDate}. The PDF is ready for download or can be sent via WhatsApp.`,
+                    message: `Standard Ontario Lease generated for ${args.tenantName} at ${args.propertyStreetNo} ${args.propertyStreetName}. Rent: $${Number(args.rentAmount).toFixed(2)}/month starting ${args.leaseStartDate}. A download button will appear automatically.`,
                 };
             } catch (err) {
                 return { error: `Failed to generate lease: ${(err as Error).message}` };

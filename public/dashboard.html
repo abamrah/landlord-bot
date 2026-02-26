@@ -1140,6 +1140,7 @@
       font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
       white-space: pre;
     }
+
     .rt-inline-code {
       background: var(--surface-2);
       padding: 2px 6px;
@@ -1147,32 +1148,56 @@
       font-size: 0.85em;
       font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
     }
-    .rt-h { margin: 10px 0 6px; font-weight: 700; line-height: 1.3; color: var(--text); }
-    h1.rt-h { font-size: 1.4em; }
-    h2.rt-h { font-size: 1.25em; }
-    h3.rt-h { font-size: 1.1em; }
-    h4.rt-h { font-size: 1em; }
+
+    .rt-h {
+      margin: 10px 0 6px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    h1.rt-h {
+      font-size: 1.4em;
+    }
+
+    h2.rt-h {
+      font-size: 1.25em;
+    }
+
+    h3.rt-h {
+      font-size: 1.1em;
+    }
+
+    h4.rt-h {
+      font-size: 1em;
+    }
+
     .rt-list {
       margin: 6px 0;
       padding-left: 20px;
     }
+
     .rt-list li {
       margin: 3px 0;
       line-height: 1.5;
     }
+
     .rt-link {
       color: var(--accent) !important;
       text-decoration: underline;
       text-underline-offset: 2px;
     }
+
     .rt-link:hover {
       color: var(--accent-hover) !important;
     }
+
     .rt-hr {
       border: none;
       border-top: 1px solid var(--border);
       margin: 10px 0;
     }
+
     .rt-quote {
       border-left: 3px solid var(--accent);
       padding: 4px 12px;
@@ -2496,7 +2521,8 @@
     <div class="nav-title">Help</div>
     <a class="nav-item" data-target="guides">📖 <span>Tips & Guides</span></a>
     <div class="nav-spacer"></div>
-    <div class="nav-item" id="themeToggleSidebar" onclick="toggleDashTheme()" style="cursor:pointer;user-select:none;" title="Toggle light/dark mode">
+    <div class="nav-item" id="themeToggleSidebar" onclick="toggleDashTheme()" style="cursor:pointer;user-select:none;"
+      title="Toggle light/dark mode">
       <span id="themeIcon">☀️</span> <span id="themeLabel">Light Mode</span>
     </div>
     <a class="nav-item" data-target="account">👤 <span>Account</span></a>
@@ -3294,13 +3320,16 @@
           <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
             <div style="flex:1;min-width:220px;">
               <h3 style="font-size:15px;font-weight:600;margin-bottom:6px;">🏦 Stripe Connect</h3>
-              <p style="font-size:13px;color:var(--text-muted);margin:0;">Connect your bank account to receive rent payments directly via Stripe.</p>
+              <p style="font-size:13px;color:var(--text-muted);margin:0;">Connect your bank account to receive rent
+                payments directly via Stripe.</p>
             </div>
             <div id="connectStatusBadge" style="display:flex;align-items:center;gap:8px;">
               <span class="chip" id="connectChip" style="background:#fef3c7;color:#92400e;">Not Connected</span>
             </div>
-            <button class="btn btn-primary btn-sm" id="connectOnboardBtn" onclick="startConnectOnboarding()">Connect Bank Account</button>
-            <button class="btn btn-secondary btn-sm" id="connectDashboardBtn" onclick="openConnectDashboard()" style="display:none;">Stripe Dashboard</button>
+            <button class="btn btn-primary btn-sm" id="connectOnboardBtn" onclick="startConnectOnboarding()">Connect
+              Bank Account</button>
+            <button class="btn btn-secondary btn-sm" id="connectDashboardBtn" onclick="openConnectDashboard()"
+              style="display:none;">Stripe Dashboard</button>
           </div>
         </div>
 
@@ -3350,7 +3379,8 @@
               <label>Month</label>
               <input id="rentMonth" type="month" />
             </div>
-            <button class="btn btn-primary btn-sm" id="generateRentBtn" onclick="generateMonthlyRent()">Generate Payment Links</button>
+            <button class="btn btn-primary btn-sm" id="generateRentBtn" onclick="generateMonthlyRent()">Generate Payment
+              Links</button>
           </div>
           <div id="rentGenResults" style="margin-top:12px;display:none;"></div>
         </div>
@@ -3361,7 +3391,9 @@
           <div class="form-row" style="flex-wrap:wrap;">
             <div class="form-field">
               <label>Tenant</label>
-              <select id="rentTenantSelect"><option value="">Select tenant...</option></select>
+              <select id="rentTenantSelect">
+                <option value="">Select tenant...</option>
+              </select>
             </div>
             <div class="form-field">
               <label>Amount ($)</label>
@@ -3379,7 +3411,8 @@
               <label>Period End</label>
               <input id="rentPeriodEnd" type="date" />
             </div>
-            <button class="btn btn-primary btn-sm" style="align-self:end;" onclick="createSingleRentPayment()">Create Payment Link</button>
+            <button class="btn btn-primary btn-sm" style="align-self:end;" onclick="createSingleRentPayment()">Create
+              Payment Link</button>
           </div>
           <div id="rentCreateResult" style="margin-top:8px;font-size:13px;display:none;"></div>
         </div>
@@ -3401,7 +3434,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td colspan="7" style="color:var(--text-muted);">Loading...</td></tr>
+                <tr>
+                  <td colspan="7" style="color:var(--text-muted);">Loading...</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -3447,9 +3482,12 @@
             </div>
             <div class="form-field">
               <label>Unit (optional)</label>
-              <select id="screenUnitSelect"><option value="">Select unit...</option></select>
+              <select id="screenUnitSelect">
+                <option value="">Select unit...</option>
+              </select>
             </div>
-            <button class="btn btn-primary btn-sm" style="align-self:end;" onclick="requestNewScreening()">Request Screening</button>
+            <button class="btn btn-primary btn-sm" style="align-self:end;" onclick="requestNewScreening()">Request
+              Screening</button>
           </div>
           <div id="screenRequestResult" style="margin-top:8px;font-size:13px;display:none;"></div>
         </div>
@@ -3473,7 +3511,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td colspan="9" style="color:var(--text-muted);">No screenings yet</td></tr>
+                <tr>
+                  <td colspan="9" style="color:var(--text-muted);">No screenings yet</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -3799,10 +3839,12 @@
                 <!-- Landlord Info -->
                 <h4 style="margin:0 0 12px;color:var(--accent);">Landlord Information</h4>
                 <div class="grid-2" style="gap:10px;margin-bottom:16px;">
-                  <div><label class="label">Landlord Legal Name *</label><input class="input" id="leaseLandlordName" required></div>
+                  <div><label class="label">Landlord Legal Name *</label><input class="input" id="leaseLandlordName"
+                      required></div>
                   <div><label class="label">Email</label><input class="input" id="leaseEmail" type="email"></div>
                   <div><label class="label">Street No *</label><input class="input" id="leaseLLStreetNo" required></div>
-                  <div><label class="label">Street Name *</label><input class="input" id="leaseLLStreetName" required></div>
+                  <div><label class="label">Street Name *</label><input class="input" id="leaseLLStreetName" required>
+                  </div>
                   <div><label class="label">Unit #</label><input class="input" id="leaseLLUnit"></div>
                   <div><label class="label">City *</label><input class="input" id="leaseLLCity" required></div>
                   <div><label class="label">Postal Code *</label><input class="input" id="leaseLLPostal" required></div>
@@ -3811,60 +3853,79 @@
                 <!-- Tenant Info -->
                 <h4 style="margin:0 0 12px;color:var(--accent);">Tenant Information</h4>
                 <div class="grid-2" style="gap:10px;margin-bottom:8px;">
-                  <div><label class="label">Tenant Name *</label><input class="input" id="leaseTenantName" required></div>
+                  <div><label class="label">Tenant Name *</label><input class="input" id="leaseTenantName" required>
+                  </div>
                   <div><label class="label">Additional Tenant 2</label><input class="input" id="leaseTenant2"></div>
                   <div><label class="label">Additional Tenant 3</label><input class="input" id="leaseTenant3"></div>
                   <div><label class="label">Additional Tenant 4</label><input class="input" id="leaseTenant4"></div>
                 </div>
-                <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 16px;">Select an existing tenant to auto-fill:</p>
-                <select class="input" id="leaseTenantSelect" onchange="leaseAutoFillTenant()" style="margin-bottom:16px;">
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 16px;">Select an existing tenant to
+                  auto-fill:</p>
+                <select class="input" id="leaseTenantSelect" onchange="leaseAutoFillTenant()"
+                  style="margin-bottom:16px;">
                   <option value="">— Choose tenant —</option>
                 </select>
 
                 <!-- Property Address -->
                 <h4 style="margin:0 0 12px;color:var(--accent);">Rental Unit Address</h4>
                 <div class="grid-2" style="gap:10px;margin-bottom:16px;">
-                  <div><label class="label">Street No *</label><input class="input" id="leasePropStreetNo" required></div>
-                  <div><label class="label">Street Name *</label><input class="input" id="leasePropStreetName" required></div>
+                  <div><label class="label">Street No *</label><input class="input" id="leasePropStreetNo" required>
+                  </div>
+                  <div><label class="label">Street Name *</label><input class="input" id="leasePropStreetName" required>
+                  </div>
                   <div><label class="label">Unit # *</label><input class="input" id="leasePropUnit" required></div>
                   <div><label class="label">City *</label><input class="input" id="leasePropCity" required></div>
-                  <div><label class="label">Province</label><input class="input" id="leasePropProvince" value="Ontario"></div>
-                  <div><label class="label">Postal Code *</label><input class="input" id="leasePropPostal" required></div>
+                  <div><label class="label">Province</label><input class="input" id="leasePropProvince" value="Ontario">
+                  </div>
+                  <div><label class="label">Postal Code *</label><input class="input" id="leasePropPostal" required>
+                  </div>
                 </div>
 
                 <!-- Lease Terms -->
                 <h4 style="margin:0 0 12px;color:var(--accent);">Lease Terms</h4>
                 <div class="grid-2" style="gap:10px;margin-bottom:16px;">
                   <div><label class="label">Term Type</label>
-                    <select class="input" id="leaseTermType"><option value="fixed">Fixed Term</option><option value="monthly">Month-to-Month</option></select>
+                    <select class="input" id="leaseTermType">
+                      <option value="fixed">Fixed Term</option>
+                      <option value="monthly">Month-to-Month</option>
+                    </select>
                   </div>
-                  <div><label class="label">Start Date *</label><input class="input" id="leaseStartDate" type="date" required></div>
+                  <div><label class="label">Start Date *</label><input class="input" id="leaseStartDate" type="date"
+                      required></div>
                   <div><label class="label">End Date</label><input class="input" id="leaseEndDate" type="date"></div>
-                  <div><label class="label">Rent Due Day</label><input class="input" id="leaseRentDueDay" type="number" min="1" max="31" value="1"></div>
+                  <div><label class="label">Rent Due Day</label><input class="input" id="leaseRentDueDay" type="number"
+                      min="1" max="31" value="1"></div>
                 </div>
 
                 <!-- Rent / Deposits -->
                 <h4 style="margin:0 0 12px;color:var(--accent);">Rent & Deposits</h4>
                 <div class="grid-2" style="gap:10px;margin-bottom:16px;">
-                  <div><label class="label">Monthly Rent ($) *</label><input class="input" id="leaseRentAmount" type="number" step="0.01" min="0" required></div>
-                  <div><label class="label">Parking ($)</label><input class="input" id="leaseParkingCost" type="number" step="0.01" min="0"></div>
-                  <div><label class="label">Last Month Deposit ($)</label><input class="input" id="leaseLastMonthDeposit" type="number" step="0.01" min="0"></div>
-                  <div><label class="label">Key Deposit ($)</label><input class="input" id="leaseKeyDeposit" type="number" step="0.01" min="0"></div>
+                  <div><label class="label">Monthly Rent ($) *</label><input class="input" id="leaseRentAmount"
+                      type="number" step="0.01" min="0" required></div>
+                  <div><label class="label">Parking ($)</label><input class="input" id="leaseParkingCost" type="number"
+                      step="0.01" min="0"></div>
+                  <div><label class="label">Last Month Deposit ($)</label><input class="input"
+                      id="leaseLastMonthDeposit" type="number" step="0.01" min="0"></div>
+                  <div><label class="label">Key Deposit ($)</label><input class="input" id="leaseKeyDeposit"
+                      type="number" step="0.01" min="0"></div>
                 </div>
 
                 <!-- Additional -->
                 <h4 style="margin:0 0 12px;color:var(--accent);">Additional Clauses</h4>
                 <div style="margin-bottom:16px;">
                   <label class="label">Smoking Rules</label>
-                  <input class="input" id="leaseSmokingRules" placeholder="e.g. No smoking in the unit or on the balcony">
+                  <input class="input" id="leaseSmokingRules"
+                    placeholder="e.g. No smoking in the unit or on the balcony">
                   <label class="label" style="margin-top:10px;">Additional Terms</label>
-                  <textarea class="input" id="leaseAdditionalTerms" rows="3" placeholder="Any extra conditions..."></textarea>
+                  <textarea class="input" id="leaseAdditionalTerms" rows="3"
+                    placeholder="Any extra conditions..."></textarea>
                 </div>
               </form>
             </div>
             <div class="modal-footer">
               <button class="btn btn-secondary" onclick="closeCreateLease()">Cancel</button>
-              <button class="btn btn-primary" id="leaseGenBtn" onclick="submitCreateLease(event)">Generate Lease PDF</button>
+              <button class="btn btn-primary" id="leaseGenBtn" onclick="submitCreateLease(event)">Generate Lease
+                PDF</button>
             </div>
           </div>
         </div>
@@ -4273,7 +4334,8 @@
         <a class="mobile-nav-item" data-section="guides"><span class="nav-emoji">📖</span> Tips & Guides</a>
         <a class="mobile-nav-item" data-section="account"><span class="nav-emoji">👤</span> Account</a>
         <div style="height:16px;"></div>
-        <a class="mobile-nav-item" onclick="toggleDashTheme()" style="cursor:pointer;"><span class="nav-emoji" id="mobileThemeIcon">☀️</span> <span id="mobileThemeLabel">Light Mode</span></a>
+        <a class="mobile-nav-item" onclick="toggleDashTheme()" style="cursor:pointer;"><span class="nav-emoji"
+            id="mobileThemeIcon">☀️</span> <span id="mobileThemeLabel">Light Mode</span></a>
         <a class="mobile-nav-item" onclick="logout()" style="color:var(--danger);"><span class="nav-emoji">🚪</span>
           Logout</a>
       </div>
@@ -4502,7 +4564,7 @@
       var s = text;
 
       // Fenced code blocks ```lang\ncode\n```
-      s = s.replace(/```(\w*)\n([\s\S]*?)```/g, function(_, lang, code) {
+      s = s.replace(/```(\w*)\n([\s\S]*?)```/g, function (_, lang, code) {
         return '<pre class="rt-code-block"><code>' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>';
       });
       // Inline code `code`
@@ -4525,16 +4587,16 @@
       s = s.replace(/~(.+?)~/g, '<s>$1</s>');
 
       // Unordered lists: lines starting with - or *
-      s = s.replace(/(^|\n)((?:[ \t]*[-*] .+\n?)+)/g, function(_, pre, block) {
-        var items = block.trim().split('\n').map(function(line) {
+      s = s.replace(/(^|\n)((?:[ \t]*[-*] .+\n?)+)/g, function (_, pre, block) {
+        var items = block.trim().split('\n').map(function (line) {
           return '<li>' + line.replace(/^[ \t]*[-*] /, '') + '</li>';
         }).join('');
         return pre + '<ul class="rt-list">' + items + '</ul>';
       });
 
       // Ordered lists: lines starting with 1. 2. etc
-      s = s.replace(/(^|\n)((?:[ \t]*\d+\. .+\n?)+)/g, function(_, pre, block) {
-        var items = block.trim().split('\n').map(function(line) {
+      s = s.replace(/(^|\n)((?:[ \t]*\d+\. .+\n?)+)/g, function (_, pre, block) {
+        var items = block.trim().split('\n').map(function (line) {
           return '<li>' + line.replace(/^[ \t]*\d+\. /, '') + '</li>';
         }).join('');
         return pre + '<ol class="rt-list">' + items + '</ol>';
@@ -6508,10 +6570,10 @@
         var planBadgeColor = plan === 'ENTERPRISE' ? '#10b981' : plan === 'PRO' ? 'rgb(99,102,241)' : 'var(--text-muted)';
         document.getElementById('acctPlan').innerHTML =
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
-            '<span style="font-size:18px;font-weight:700;">' + plan + '</span>' +
-            '<span style="background:' + planBadgeColor + ';color:#fff;font-size:11px;padding:2px 10px;border-radius:12px;">' +
-              (plan === 'FREE' ? 'Free' : plan === 'PRO' ? '$29/mo' : '$79/mo') +
-            '</span>' +
+          '<span style="font-size:18px;font-weight:700;">' + plan + '</span>' +
+          '<span style="background:' + planBadgeColor + ';color:#fff;font-size:11px;padding:2px 10px;border-radius:12px;">' +
+          (plan === 'FREE' ? 'Free' : plan === 'PRO' ? '$29/mo' : '$79/mo') +
+          '</span>' +
           '</div>' +
           '<div style="color:var(--text-muted)">Units: ' + (me.usage?.units ?? '?') + ' / ' + (me.limits?.maxUnits ?? '\u221E') + '</div>' +
           '<div style="color:var(--text-muted)">Messages this month: ' + (me.usage?.messagesThisMonth ?? '?') + ' / ' + (me.limits?.maxMessagesPerMonth ?? '\u221E') + '</div>';
@@ -6606,7 +6668,7 @@
       } catch (e) { console.warn('Connect status load failed', e); }
     }
 
-    window.startConnectOnboarding = async function() {
+    window.startConnectOnboarding = async function () {
       try {
         var r = await fetchJson('/admin/rent/connect/onboard', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
         if (r.url) window.open(r.url, '_blank');
@@ -6614,7 +6676,7 @@
       } catch (e) { toast('Error: ' + e.message); }
     };
 
-    window.openConnectDashboard = async function() {
+    window.openConnectDashboard = async function () {
       try {
         var r = await fetchJson('/admin/rent/connect/login', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
         if (r.url) window.open(r.url, '_blank');
@@ -6625,7 +6687,7 @@
     async function loadRentStats() {
       try {
         var data = await fetchJson('/admin/rent/stats');
-        var fmt = function(cents) { return '$' + (cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+        var fmt = function (cents) { return '$' + (cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
         document.getElementById('rentCollected').textContent = fmt(data.thisMonth?.collectedCents || 0);
         document.getElementById('rentPending').textContent = fmt(data.pending?.amountCents || 0);
         document.getElementById('rentOverdue').textContent = fmt(data.overdue?.amountCents || 0);
@@ -6643,7 +6705,7 @@
           return;
         }
         var statusColors = { SUCCEEDED: '#22c55e', PENDING: '#f59e0b', PROCESSING: '#3b82f6', FAILED: '#ef4444', REFUNDED: '#8b5cf6', CANCELLED: '#71717a' };
-        tbody.innerHTML = payments.map(function(p) {
+        tbody.innerHTML = payments.map(function (p) {
           var due = new Date(p.dueDate).toLocaleDateString('en-CA');
           var paid = p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-CA') : '\u2014';
           var amt = '$' + (p.amountCents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 });
@@ -6666,9 +6728,9 @@
     function fillRentTenantSelect() {
       var sel = document.getElementById('rentTenantSelect');
       sel.innerHTML = '<option value="">Select tenant...</option>';
-      (state.tenants || []).forEach(function(t) {
+      (state.tenants || []).forEach(function (t) {
         var units = t.units || [];
-        units.forEach(function(ut) {
+        units.forEach(function (ut) {
           var opt = document.createElement('option');
           opt.value = JSON.stringify({ tenantId: t.id, unitTenantId: ut.id, rent: ut.rentAmountCents });
           opt.textContent = t.name + (ut.unit ? ' — ' + ut.unit.label : '');
@@ -6676,12 +6738,12 @@
         });
       });
       // Auto-fill rent amount when tenant selected
-      sel.addEventListener('change', function() {
+      sel.addEventListener('change', function () {
         if (sel.value) {
           try {
             var d = JSON.parse(sel.value);
             if (d.rent) document.getElementById('rentAmountInput').value = (d.rent / 100).toFixed(2);
-          } catch {}
+          } catch { }
         }
       });
       // Set default month
@@ -6692,7 +6754,7 @@
       document.getElementById('rentPeriodEnd').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
     }
 
-    window.generateMonthlyRent = async function() {
+    window.generateMonthlyRent = async function () {
       var month = document.getElementById('rentMonth').value;
       if (!month) { toast('Select a month'); return; }
       var btn = document.getElementById('generateRentBtn');
@@ -6710,7 +6772,7 @@
           el.innerHTML = '<p style="color:var(--text-muted);">No tenants with rent configured found.</p>';
           return;
         }
-        el.innerHTML = '<div style="font-size:13px;">' + results.map(function(r) {
+        el.innerHTML = '<div style="font-size:13px;">' + results.map(function (r) {
           var icon = r.url ? '✅' : (r.error === 'already_created' ? 'ℹ️' : '❌');
           var link = r.url ? ' — <a href="' + r.url + '" target="_blank">Payment Link</a>' : '';
           var err = r.error && r.error !== 'already_created' ? ' — <span style="color:var(--danger);">' + r.error + '</span>' : '';
@@ -6724,7 +6786,7 @@
       }
     };
 
-    window.createSingleRentPayment = async function() {
+    window.createSingleRentPayment = async function () {
       var sel = document.getElementById('rentTenantSelect');
       if (!sel.value) { toast('Select a tenant'); return; }
       var d = JSON.parse(sel.value);
@@ -6775,7 +6837,7 @@
         var statusColors = { REQUESTED: '#3b82f6', PENDING_CONSENT: '#f59e0b', IN_PROGRESS: '#8b5cf6', COMPLETED: '#22c55e', FAILED: '#ef4444', EXPIRED: '#71717a' };
         var riskColors = { low: '#22c55e', medium: '#f59e0b', high: '#ef4444' };
         var recColors = { approve: '#22c55e', conditional: '#f59e0b', decline: '#ef4444' };
-        tbody.innerHTML = screenings.map(function(s) {
+        tbody.innerHTML = screenings.map(function (s) {
           var date = new Date(s.createdAt).toLocaleDateString('en-CA');
           var sc = statusColors[s.status] || '#71717a';
           var rc = riskColors[s.riskScore] || '#71717a';
@@ -6790,8 +6852,8 @@
             '<td>' + (s.riskScore ? '<span style="color:' + rc + ';font-weight:600;">' + s.riskScore + '</span>' : '\u2014') + '</td>' +
             '<td>' + (s.recommendation ? '<span style="color:' + recc + ';font-weight:600;text-transform:capitalize;">' + s.recommendation + '</span>' : '\u2014') + '</td>' +
             '<td>' +
-              '<button class="btn btn-secondary btn-sm" onclick="viewScreening(\'' + s.id + '\')" title="Details">📋</button>' +
-              (s.status !== 'COMPLETED' && s.status !== 'FAILED' ? ' <button class="btn btn-secondary btn-sm" onclick="refreshScreening(\'' + s.id + '\')" title="Refresh">↻</button>' : '') +
+            '<button class="btn btn-secondary btn-sm" onclick="viewScreening(\'' + s.id + '\')" title="Details">📋</button>' +
+            (s.status !== 'COMPLETED' && s.status !== 'FAILED' ? ' <button class="btn btn-secondary btn-sm" onclick="refreshScreening(\'' + s.id + '\')" title="Refresh">↻</button>' : '') +
             '</td>' +
             '</tr>';
         }).join('');
@@ -6801,7 +6863,7 @@
     function fillScreeningUnitSelect() {
       var sel = document.getElementById('screenUnitSelect');
       sel.innerHTML = '<option value="">Select unit...</option>';
-      (state.units || []).forEach(function(u) {
+      (state.units || []).forEach(function (u) {
         var opt = document.createElement('option');
         opt.value = u.id;
         opt.textContent = u.label + (u.address ? ' — ' + u.address : '');
@@ -6809,7 +6871,7 @@
       });
     }
 
-    window.requestNewScreening = async function() {
+    window.requestNewScreening = async function () {
       var name = document.getElementById('screenName').value.trim();
       if (!name) { toast('Enter applicant name'); return; }
       var body = {
@@ -6836,7 +6898,7 @@
       }
     };
 
-    window.viewScreening = async function(id) {
+    window.viewScreening = async function (id) {
       try {
         var s = await fetchJson('/admin/screening/' + id);
         document.getElementById('screeningDetailTitle').textContent = 'Screening: ' + s.applicantName;
@@ -6879,11 +6941,11 @@
       } catch (e) { toast('Error loading screening: ' + e.message); }
     };
 
-    window.closeScreeningDetail = function() {
+    window.closeScreeningDetail = function () {
       document.getElementById('screeningDetailModal').style.display = 'none';
     };
 
-    window.saveManualScreening = async function(id) {
+    window.saveManualScreening = async function (id) {
       var body = {};
       var cs = document.getElementById('manualCreditScore').value;
       if (cs) body.creditScore = parseInt(cs);
@@ -6907,7 +6969,7 @@
       } catch (e) { toast('Save failed: ' + e.message); }
     };
 
-    window.refreshScreening = async function(id) {
+    window.refreshScreening = async function (id) {
       try {
         var r = await fetchJson('/admin/screening/' + id + '/check', { method: 'POST' });
         if (r.screening?.status === 'COMPLETED') toast('Screening completed!');

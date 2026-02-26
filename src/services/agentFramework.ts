@@ -20,6 +20,50 @@ import * as path from "path";
 
 const isDbEnabled = Boolean(process.env.DATABASE_URL);
 
+/**
+ * Strip large binary / blob fields from a tool result before sending it
+ * back to the LLM as a function response. This prevents base64-encoded
+ * PDFs, raw reports, and other bulky data from consuming tokens.
+ * The original result is kept intact in step.toolResults for the caller.
+ */
+function sanitizeForLLM(result: unknown): unknown {
+    if (result === null || result === undefined || typeof result !== "object") {
+        return result;
+    }
+
+    // Fields that should be stripped (large binary/blob data)
+    const STRIP_KEYS = new Set([
+        "pdfBase64", "pdf", "base64", "rawReport", "rawData",
+        "receiptData", "imageBase64", "fileData",
+    ]);
+
+    // Max string length to keep (anything bigger gets summarized)
+    const MAX_STRING_LEN = 2000;
+
+    if (Array.isArray(result)) {
+        return result.map((item) => sanitizeForLLM(item));
+    }
+
+    const cleaned: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(result as Record<string, unknown>)) {
+        if (STRIP_KEYS.has(key)) {
+            // Replace with a short note so the LLM knows the data exists
+            cleaned[key] = "[binary data generated — available for download]";
+            continue;
+        }
+        if (typeof value === "string" && value.length > MAX_STRING_LEN) {
+            cleaned[key] = value.slice(0, MAX_STRING_LEN) + `... [truncated, ${value.length} chars total]`;
+            continue;
+        }
+        if (typeof value === "object" && value !== null) {
+            cleaned[key] = sanitizeForLLM(value);
+            continue;
+        }
+        cleaned[key] = value;
+    }
+    return cleaned;
+}
+
 export type AgentMessage = {
     role: "user" | "model" | "tool";
     content?: string;
@@ -269,13 +313,17 @@ export async function runAgent(opts: {
 
             step.toolResults!.push({ callId, name: callName, result: toolResult, error: toolError });
 
-            // Build Gemini function response part
+            // Build Gemini function response part — strip large binary fields
+            // (pdfBase64, rawReport, etc.) to avoid burning tokens. The full
+            // result is preserved in step.toolResults for the caller.
+            const geminiResponse = sanitizeForLLM(toolResult);
+
             functionResponseParts.push({
                 functionResponse: {
                     name: callName,
-                    response: typeof toolResult === "object" && toolResult !== null
-                        ? toolResult
-                        : { result: String(toolResult ?? "") },
+                    response: typeof geminiResponse === "object" && geminiResponse !== null
+                        ? geminiResponse
+                        : { result: String(geminiResponse ?? "") },
                 },
             });
         }
