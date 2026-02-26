@@ -6036,22 +6036,43 @@
           '<div style="color:var(--text-muted);margin-top:8px;">Company: ' + (me.landlord.company || '\u2014') + '</div>' +
           '<div style="color:var(--text-muted)">Province: ' + (me.landlord.province || '\u2014') + '</div>';
         var plan = me.landlord.plan || 'FREE';
+        var planBadgeColor = plan === 'ENTERPRISE' ? '#10b981' : plan === 'PRO' ? 'rgb(99,102,241)' : 'var(--text-muted)';
         document.getElementById('acctPlan').innerHTML =
-          '<div style="font-size:16px;font-weight:700;margin-bottom:4px;">' + plan + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+            '<span style="font-size:18px;font-weight:700;">' + plan + '</span>' +
+            '<span style="background:' + planBadgeColor + ';color:#fff;font-size:11px;padding:2px 10px;border-radius:12px;">' +
+              (plan === 'FREE' ? 'Free' : plan === 'PRO' ? '$29/mo' : '$79/mo') +
+            '</span>' +
+          '</div>' +
           '<div style="color:var(--text-muted)">Units: ' + (me.usage?.units ?? '?') + ' / ' + (me.limits?.maxUnits ?? '\u221E') + '</div>' +
-          '<div style="color:var(--text-muted)">Messages: ' + (me.usage?.messagesThisMonth ?? '?') + ' / ' + (me.limits?.maxMessagesPerMonth ?? '\u221E') + '</div>';
+          '<div style="color:var(--text-muted)">Messages this month: ' + (me.usage?.messagesThisMonth ?? '?') + ' / ' + (me.limits?.maxMessagesPerMonth ?? '\u221E') + '</div>';
         var up = document.getElementById('acctUpgrade');
-        if (plan === 'FREE') up.innerHTML = '<button class="btn btn-primary" onclick="upgradePlan(\'PRO\')">Upgrade to Pro \u2014 $29/mo</button>';
-        else if (plan === 'PRO') up.innerHTML = '<button class="btn btn-primary" onclick="upgradePlan(\'ENTERPRISE\')">Upgrade to Enterprise \u2014 $79/mo</button>';
-        else up.innerHTML = '<span class="chip chip-success">Top plan</span>';
+        if (plan === 'FREE') {
+          up.innerHTML = '<button class="btn btn-primary" onclick="upgradePlan(\'PRO\')">Upgrade to Pro \u2014 $29/mo</button>';
+        } else if (plan === 'PRO') {
+          up.innerHTML =
+            '<button class="btn btn-primary" onclick="upgradePlan(\'ENTERPRISE\')">Upgrade to Enterprise \u2014 $79/mo</button>' +
+            '<button class="btn" style="background:var(--surface-hover);color:var(--text)" onclick="manageSubscription()">Manage Subscription</button>';
+        } else {
+          up.innerHTML =
+            '<span class="chip chip-success" style="margin-right:8px;">Top plan</span>' +
+            '<button class="btn" style="background:var(--surface-hover);color:var(--text)" onclick="manageSubscription()">Manage Subscription</button>';
+        }
       } catch (e) { document.getElementById('acctProfile').textContent = 'Could not load account.'; }
     }
 
     async function upgradePlan(plan) {
       try {
         var r = await fetchJson('/admin/billing/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: plan }) });
-        if (r.url) window.location.href = r.url; else toast('Billing not configured');
+        if (r.url) window.location.href = r.url; else toast('Billing not configured yet. Contact support.');
       } catch (err) { toast('Billing unavailable: ' + err.message); }
+    }
+
+    async function manageSubscription() {
+      try {
+        var r = await fetchJson('/admin/billing/portal', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        if (r.url) window.location.href = r.url; else toast(r.message || 'No active subscription found.');
+      } catch (err) { toast('Could not open billing portal: ' + err.message); }
     }
 
     // ── Delete Account ──

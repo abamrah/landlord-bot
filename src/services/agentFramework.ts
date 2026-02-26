@@ -13,6 +13,7 @@
 import { vertexAI, defaultModel } from "../config/gemini";
 import { ToolDefinition, ToolRegistry } from "./toolRegistry";
 import { db } from "../config/database";
+import { MAX_OUTPUT_TOKENS, MAX_TOTAL_TOKENS } from "./llmGuardrails";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -141,6 +142,20 @@ export async function runAgent(opts: {
     contents.push({ role: "user", parts: userParts });
 
     for (let iteration = 0; iteration < maxIter; iteration++) {
+        // Token budget guard — stop if we've consumed too many tokens
+        const consumedTokens = totalPromptTokens + totalResponseTokens;
+        if (consumedTokens > MAX_TOTAL_TOKENS) {
+            console.warn(`[AgentFramework] Token budget exceeded (${consumedTokens}/${MAX_TOTAL_TOKENS}). Stopping.`);
+            const durationMs = Date.now() - startTime;
+            logAgentUsage(opts.context?.landlordId as string, modelName, totalPromptTokens, totalResponseTokens, toolCallCount, durationMs, opts.taskType);
+            return {
+                finalAnswer: steps.map(s => s.thought).filter(Boolean).join("\n") || "I've used my processing budget for this request. Here's what I found so far.",
+                steps,
+                toolCallCount,
+                totalTokensEstimate: consumedTokens,
+            };
+        }
+
         // Call Gemini with tools
         let result: any;
         const maxRetries = 3;
@@ -150,6 +165,7 @@ export async function runAgent(opts: {
                 result = await model.generateContent({
                     contents,
                     tools: geminiTools.length > 0 ? [{ functionDeclarations: geminiTools }] : undefined,
+                    generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS },
                 } as any);
                 lastErr = null;
                 break;

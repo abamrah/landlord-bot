@@ -15,6 +15,7 @@ import { db } from "../config/database";
 import { getActivePlugin } from "./verticalPlugin";
 import repo, { loadLandlordContext, LandlordPortfolio } from "./repository";
 import conversationMemory from "./conversationMemory";
+import guardrails from "./llmGuardrails";
 
 /** Build a fully-loaded tool registry based on the account's plan */
 export function buildToolRegistry(plan: "FREE" | "PRO" | "ENTERPRISE" = "FREE"): ToolRegistry {
@@ -120,7 +121,7 @@ export async function handleTenantMessage(opts: {
 
     // Use plugin prompt if available, otherwise inline
     const plugin = getActivePlugin();
-    const systemPrompt = plugin
+    let systemPrompt = plugin
         ? plugin.getSystemPrompt("tenant-message", {
             accountId: opts.landlordId,
             plan: ctx.plan,
@@ -130,21 +131,34 @@ export async function handleTenantMessage(opts: {
         }) + (opts.mediaDescription ? `\n\nThe tenant also sent media: ${opts.mediaDescription}` : "")
         : buildFallbackTenantPrompt(ctx, opts.mediaDescription);
 
+    // Append security guardrail to system prompt
+    systemPrompt += "\n\n" + guardrails.SYSTEM_PROMPT_GUARDRAIL;
+
+    // Enforce input length (truncate if necessary — tenants won't see the error)
+    let message = opts.message;
+    if (message.length > guardrails.MAX_INPUT_LENGTH) {
+        message = message.slice(0, guardrails.MAX_INPUT_LENGTH) + "\n[Message truncated — exceeded maximum length]";
+    }
+
     // Collect multimodal parts: prefer new mediaParts, fall back to legacy imageBase64
     const mediaParts: Array<{ base64: string; mimeType: string }> = opts.mediaParts ?? [];
     if (!mediaParts.length && opts.imageBase64) {
         mediaParts.push({ base64: opts.imageBase64, mimeType: "image/jpeg" });
     }
 
-    return runAgent({
+    const result = await runAgent({
         systemPrompt,
-        userMessage: `Tenant phone: ${opts.tenantPhone}\nMessage: ${opts.message}`,
+        userMessage: `Tenant phone: ${opts.tenantPhone}\nMessage: ${message}`,
         tools: registry,
         context: { landlordId: opts.landlordId, province: ctx.province },
         maxIterations: 10,
         mediaParts: mediaParts.length ? mediaParts : undefined,
         taskType: "tenant-message",
     });
+
+    // Sanitise output before returning
+    result.finalAnswer = guardrails.sanitizeOutput(result.finalAnswer);
+    return result;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -297,12 +311,21 @@ export async function landlordAssistantAgent(opts: {
         systemPrompt = buildFallbackAssistantPrompt(ctx, opts.maintenanceId);
     }
 
+    // Append security guardrail to system prompt
+    systemPrompt += "\n\n" + guardrails.SYSTEM_PROMPT_GUARDRAIL;
+
+    // Enforce input length
+    let question = opts.question;
+    if (question.length > guardrails.MAX_INPUT_LENGTH) {
+        question = question.slice(0, guardrails.MAX_INPUT_LENGTH) + "\n[Message truncated — exceeded maximum length]";
+    }
+
     // Prepend conversation history to the user message for continuity
     const userMessage = historyText
-        ? `[Previous Conversation]\n${historyText}\n\n[Current Question]\n${opts.question}`
-        : opts.question;
+        ? `[Previous Conversation]\n${historyText}\n\n[Current Question]\n${question}`
+        : question;
 
-    return runAgent({
+    const result = await runAgent({
         systemPrompt,
         userMessage,
         tools: registry,
@@ -311,6 +334,10 @@ export async function landlordAssistantAgent(opts: {
         mediaParts: opts.mediaParts,
         taskType: "landlord-assistant",
     });
+
+    // Sanitise output before returning
+    result.finalAnswer = guardrails.sanitizeOutput(result.finalAnswer);
+    return result;
 }
 
 export default {

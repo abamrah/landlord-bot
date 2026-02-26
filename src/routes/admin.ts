@@ -8,7 +8,7 @@ import { getWebhookStatus } from "../services/webhookStatus";
 import { addReminder, deleteReminder, listReminders, toggleReminder } from "../services/reminderService";
 import { requireAuth, AuthRequest } from "../middleware/auth";
 import { checkPlanLimit, incrementMessageCount } from "../services/planService";
-import { createCheckoutSession } from "../services/stripeService";
+import { createCheckoutSession, createPortalSession, getStripeStatus } from "../services/stripeService";
 import { listProvinces } from "../config/rtaProfiles";
 import orchestrator from "../services/agentOrchestrator";
 import { readPage } from "../services/pageReader";
@@ -16,6 +16,7 @@ import conversationMemory from "../services/conversationMemory";
 import { db } from "../config/database";
 import { findExpiringLeases, sendLeaseExpiryAlerts } from "../services/leaseExpiryService";
 import { agentRateLimit } from "../services/rateLimiter";
+import { validateInput } from "../services/llmGuardrails";
 import greenButton from "../services/greenButtonService";
 
 const router = express.Router();
@@ -1235,6 +1236,19 @@ router.get("/billing/plans", (_req, res) => {
   res.json({ plans: PLANS });
 });
 
+/** POST /admin/billing/portal — Open Stripe customer portal for subscription management */
+router.post("/billing/portal", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const result = await createPortalSession(authReq.landlordId);
+  if (result.error) return res.status(400).json(result);
+  res.json({ url: result.url });
+});
+
+/** GET /admin/billing/status — Check Stripe configuration status */
+router.get("/billing/status", (_req, res) => {
+  res.json(getStripeStatus());
+});
+
 // ── Profile ──────────────────────────────────────────────────
 router.get("/profile", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
@@ -1273,6 +1287,10 @@ router.post("/agent/ask", async (req, res) => {
   });
   const parsed = schema.safeParse(req.body || {});
   if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+
+  // ── LLM Guardrails ──
+  const guard = validateInput(parsed.data.question);
+  if (!guard.ok) return res.status(guard.status).json({ error: guard.error, message: guard.message });
 
   try {
     // Save the user's question to conversation memory
