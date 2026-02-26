@@ -192,7 +192,8 @@ model LeaseDocument {
 	fileSize        Int         @default(0)
 	mimeType        String      @default("application/pdf")
 	fileData        Bytes?      // raw file bytes (optional — may store externally)
-	extractedTerms  Json?       // AI-extracted: { rent, startDate, endDate, deposit, clauses[], ... }
+	extractedTerms  Json?       // AI-extracted structured terms (rent, dates, deposit, rules, etc.)
+	fullText        String?     // Complete plain-text extraction of the entire lease document
 	summary         String?     // AI-generated plain-text summary
 	uploadedAt      DateTime    @default(now())
 

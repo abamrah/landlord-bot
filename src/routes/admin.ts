@@ -2337,6 +2337,7 @@ router.post("/leases/upload", async (req, res) => {
     // Use Gemini to extract lease terms from the PDF
     let extractedTerms: any = null;
     let summary: string | null = null;
+    let fullText: string | null = null;
     try {
       const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || process.env.GENERATIVE_AI_API_KEY || "";
       if (apiKey) {
@@ -2387,33 +2388,157 @@ router.post("/leases/upload", async (req, res) => {
 
         if (uploadedFile?.state === "ACTIVE") {
           const model = gemini.getGenerativeModel({ model: modelName });
+
+          // ── Step 1: Full text extraction ──
+          // Extract the complete text of the lease so the agent can reference any detail later
+          try {
+            const textResult = await model.generateContent({
+              contents: [{
+                role: "user",
+                parts: [
+                  { fileData: { fileUri: uploadedFile.uri, mimeType: uploadedFile.mimeType } },
+                  {
+                    text: `Extract the COMPLETE text content of this lease document, preserving all details.
+Include every section, clause, schedule, addendum, and appendix.
+Reproduce the full text as faithfully as possible — do NOT summarize or skip any sections.
+Include all parties, dates, amounts, rules, obligations, conditions, and fine print.
+Output ONLY the extracted text, no commentary.`
+                  },
+                ],
+              }],
+            });
+            const textParts = textResult.response?.candidates?.[0]?.content?.parts || [];
+            fullText = textParts.map((p: any) => p.text || "").join("");
+            if (fullText) {
+              console.log("[Lease] Full text extracted, length:", fullText.length);
+            }
+          } catch (textErr) {
+            console.warn("[Lease] Full text extraction failed:", (textErr as Error).message);
+          }
+
+          // ── Step 2: Structured terms extraction ──
           const result = await model.generateContent({
             contents: [{
               role: "user",
               parts: [
                 { fileData: { fileUri: uploadedFile.uri, mimeType: uploadedFile.mimeType } },
                 {
-                  text: `Extract key lease terms from this document. Return a JSON object with these fields (use null for missing):
+                  text: `You are a legal document analyst. Extract ALL terms, details, and provisions from this lease document.
+Return a comprehensive JSON object. Use null for any field not found in the document. Be thorough — capture EVERY detail.
+
 {
-  "rentAmount": number or null (monthly rent in dollars),
-  "rentCurrency": "CAD" or "USD",
+  "leaseType": "fixed-term" | "month-to-month" | "other" | null,
+  "isOntarioStandardLease": boolean,
+
+  "landlord": {
+    "name": string or null,
+    "address": string or null,
+    "phone": string or null,
+    "email": string or null,
+    "emergencyContact": string or null
+  },
+  "tenantNames": ["name1", "name2"],
+  "tenantEmails": ["email1"] or null,
+  "tenantPhones": ["phone1"] or null,
+
+  "propertyAddress": string or null,
+  "unitNumber": string or null,
+  "parkingSpace": string or null,
+  "storageLocker": string or null,
+  "propertyType": "apartment" | "house" | "condo" | "townhouse" | "room" | "other" | null,
+  "isCondo": boolean or null,
+
   "startDate": "YYYY-MM-DD" or null,
   "endDate": "YYYY-MM-DD" or null,
+  "moveInDate": "YYYY-MM-DD" or null,
+
+  "rentAmount": number or null (monthly, in dollars),
+  "rentCurrency": "CAD" | "USD",
+  "rentDueDay": number or null (day of month),
+  "rentPaymentMethod": string or null (e.g., "e-transfer", "cheque", "direct deposit"),
+  "firstMonthRentPaid": boolean or null,
+  "lastMonthRentDeposit": number or null,
+  "lastMonthRentDepositDate": "YYYY-MM-DD" or null,
+  "keyDeposit": number or null,
   "securityDeposit": number or null,
-  "tenantNames": ["name1", "name2"],
-  "landlordName": "name" or null,
-  "propertyAddress": "address" or null,
+
+  "rentIncludes": {
+    "electricity": boolean or null,
+    "heat": boolean or null,
+    "water": boolean or null,
+    "gas": boolean or null,
+    "internet": boolean or null,
+    "cableTV": boolean or null,
+    "parking": boolean or null,
+    "laundry": boolean or null,
+    "airConditioning": boolean or null,
+    "other": [string] or null
+  },
+  "tenantPaysFor": [string] or null,
+  "landlordPaysFor": [string] or null,
+
+  "rentIncreases": {
+    "allowed": boolean or null,
+    "guidelineExempt": boolean or null,
+    "increaseDate": "YYYY-MM-DD" or null,
+    "newRentAmount": number or null,
+    "increaseDetails": string or null
+  },
+
+  "smokingAllowed": boolean or null,
+  "smokingRestrictions": string or null,
+  "petsAllowed": boolean or null,
+  "petRestrictions": string or null,
+  "guestsPolicy": string or null,
+  "sublettingAllowed": boolean or null,
+  "sublettingConditions": string or null,
+
+  "maintenanceResponsibilities": {
+    "landlord": [string] or null,
+    "tenant": [string] or null
+  },
+  "repairProcess": string or null,
+
+  "insuranceRequired": boolean or null,
+  "insuranceDetails": string or null,
+
+  "noticeToTerminateDays": number or null,
+  "earlyTerminationClause": string or null,
+  "renewalTerms": string or null,
+
   "latePaymentFee": number or null,
-  "parkingIncluded": boolean,
-  "petsAllowed": boolean,
-  "utilityResponsibilities": {"electricity": "tenant"|"landlord", "water": "tenant"|"landlord", "gas": "tenant"|"landlord", "internet": "tenant"|"landlord"},
-  "specialClauses": ["clause 1", "clause 2"],
-  "renewalTerms": "description" or null,
-  "noticeToVacateDays": number or null
+  "nsfFee": number or null,
+  "latePaymentPolicy": string or null,
+
+  "entryNoticeHours": number or null (notice landlord must give before entering),
+  "entryConditions": string or null,
+
+  "condoRules": string or null,
+  "buildingRules": [string] or null,
+  "parkingRules": string or null,
+  "noiseRestrictions": string or null,
+  "commonAreaRules": string or null,
+  "moveInOutRules": string or null,
+  "garbageRecyclingRules": string or null,
+
+  "additionalTerms": [string] or null,
+  "schedules": [{"name": string, "content": string}] or null,
+  "specialClauses": [string] or null,
+
+  "signaturesPresent": boolean or null,
+  "signedDate": "YYYY-MM-DD" or null,
+  "witnessNames": [string] or null,
+
+  "keysProvided": [string] or null,
+  "appliances": [string] or null,
+  "furnishings": [string] or null,
+
+  "accessibilityFeatures": string or null,
+  "emergencyProcedures": string or null
 }
 
-Also provide a 2-3 sentence plain-text summary of the lease.
-Return ONLY valid JSON wrapped in \`\`\`json ... \`\`\` followed by the summary.` },
+After the JSON, provide a comprehensive 5-8 sentence summary covering the key terms, obligations, and notable provisions.
+Return the JSON wrapped in \`\`\`json ... \`\`\` followed by the summary.` },
               ],
             }],
           });
@@ -2483,16 +2608,20 @@ Return ONLY valid JSON wrapped in \`\`\`json ... \`\`\` followed by the summary.
         mimeType: parsed.data.mimeType,
         fileData: fileBuffer,
         extractedTerms: extractedTerms || undefined,
+        fullText: fullText || undefined,
         summary,
       },
     });
 
-    // Update UnitTenant dates from extracted terms if available
-    if (extractedTerms?.startDate || extractedTerms?.endDate) {
+    // Update UnitTenant dates and rent from extracted terms if available
+    if (extractedTerms) {
       const updateData: any = {};
       if (extractedTerms.startDate) updateData.startDate = new Date(extractedTerms.startDate);
       if (extractedTerms.endDate) updateData.endDate = new Date(extractedTerms.endDate);
-      await db.unitTenant.update({ where: { id: parsed.data.unitTenantId }, data: updateData });
+      if (extractedTerms.rentAmount) updateData.rentAmountCents = Math.round(extractedTerms.rentAmount * 100);
+      if (Object.keys(updateData).length > 0) {
+        await db.unitTenant.update({ where: { id: parsed.data.unitTenantId }, data: updateData });
+      }
     }
 
     res.json({
@@ -2514,7 +2643,7 @@ router.get("/leases/:unitTenantId", async (req, res) => {
   try {
     const ut = await db.unitTenant.findUnique({
       where: { id: req.params.unitTenantId },
-      include: { unit: true, tenant: true, leaseDocuments: { select: { id: true, fileName: true, fileSize: true, mimeType: true, extractedTerms: true, summary: true, uploadedAt: true } } },
+      include: { unit: true, tenant: true, leaseDocuments: { select: { id: true, fileName: true, fileSize: true, mimeType: true, extractedTerms: true, fullText: true, summary: true, uploadedAt: true } } },
     });
     if (!ut || ut.unit?.landlordId !== authReq.landlordId) {
       return res.status(404).json({ error: "not_found" });

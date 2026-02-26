@@ -794,7 +794,7 @@ export function expiringLeasesTool(): ToolDefinition {
 export function lookupLeaseTool(): ToolDefinition {
     return {
         name: "lookup_lease",
-        description: "Look up lease documents and extracted terms for a specific unit or tenant. Returns AI-extracted lease terms (rent, dates, deposit, clauses) from uploaded lease PDFs.",
+        description: "Look up lease documents, extracted terms, and full text for a specific unit or tenant. Returns comprehensive AI-extracted lease data including all terms, rules, responsibilities, deposit info, utility responsibilities, pet/smoking policies, schedules, additional clauses, and the complete lease text. Use this to answer any question about a tenant's lease.",
         parameters: {
             unitId: { type: "string", description: "Unit ID to look up leases for" },
             tenantId: { type: "string", description: "Tenant ID to look up leases for" },
@@ -802,6 +802,9 @@ export function lookupLeaseTool(): ToolDefinition {
         category: "data",
         enabled: true,
         async execute(args) {
+            const leaseSelect = {
+                id: true, fileName: true, extractedTerms: true, fullText: true, summary: true, uploadedAt: true,
+            };
             const where: any = {};
             if (args.unitId) where.unitId = String(args.unitId);
             if (args.tenantId) where.tenantId = String(args.tenantId);
@@ -813,7 +816,7 @@ export function lookupLeaseTool(): ToolDefinition {
                         include: {
                             tenant: { select: { name: true, phone: true } },
                             unit: { select: { label: true, address: true } },
-                            leaseDocuments: { select: { id: true, fileName: true, extractedTerms: true, summary: true, uploadedAt: true } },
+                            leaseDocuments: { select: leaseSelect },
                         },
                     });
                     return {
@@ -822,6 +825,7 @@ export function lookupLeaseTool(): ToolDefinition {
                             unitLabel: ut.unit?.label,
                             startDate: ut.startDate?.toISOString?.().split("T")[0],
                             endDate: ut.endDate?.toISOString?.().split("T")[0],
+                            rentAmountCents: ut.rentAmountCents,
                             documents: ut.leaseDocuments,
                         })),
                         total: unitTenants.length,
@@ -834,7 +838,7 @@ export function lookupLeaseTool(): ToolDefinition {
                 include: {
                     tenant: { select: { name: true, phone: true } },
                     unit: { select: { label: true, address: true } },
-                    leaseDocuments: { select: { id: true, fileName: true, extractedTerms: true, summary: true, uploadedAt: true } },
+                    leaseDocuments: { select: leaseSelect },
                 },
             });
             return {
@@ -843,6 +847,7 @@ export function lookupLeaseTool(): ToolDefinition {
                     unitLabel: ut.unit?.label,
                     startDate: ut.startDate?.toISOString?.().split("T")[0],
                     endDate: ut.endDate?.toISOString?.().split("T")[0],
+                    rentAmountCents: ut.rentAmountCents,
                     documents: ut.leaseDocuments,
                 })),
                 total: unitTenants.length,
