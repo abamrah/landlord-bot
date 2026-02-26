@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { vertexAI, defaultModel } from "../config/gemini";
 import { getProfile } from "../config/rtaProfiles";
 
@@ -246,6 +247,20 @@ async function runGeminiVision(prompt: string, image: { base64: string; mimeType
   if (!model) {
     return "vertex_not_configured";
   }
+
+  // For PDFs, use the File API instead of inlineData to avoid "document has no pages"
+  let mediaPart: any;
+  if (image.mimeType === "application/pdf") {
+    try {
+      mediaPart = await uploadPdfForVision(image.base64);
+    } catch {
+      // Fall back to inlineData if File API fails
+      mediaPart = { inlineData: { data: image.base64, mimeType: image.mimeType } };
+    }
+  } else {
+    mediaPart = { inlineData: { data: image.base64, mimeType: image.mimeType } };
+  }
+
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
@@ -255,7 +270,7 @@ async function runGeminiVision(prompt: string, image: { base64: string; mimeType
             role: "user",
             parts: [
               { text: prompt },
-              { inlineData: { data: image.base64, mimeType: image.mimeType } },
+              mediaPart,
             ],
           },
         ],
@@ -274,6 +289,37 @@ async function runGeminiVision(prompt: string, image: { base64: string; mimeType
     }
   }
   return "llm_unavailable";
+}
+
+/** Upload a PDF to the Google AI File API and return a fileData part */
+async function uploadPdfForVision(base64: string): Promise<any> {
+  const apiKey =
+    process.env.GOOGLE_API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GENERATIVE_AI_API_KEY ||
+    "";
+  if (!apiKey) throw new Error("No Google API key");
+
+  const { GoogleAIFileManager } = require("@google/generative-ai/server");
+  const fileManager = new GoogleAIFileManager(apiKey);
+
+  const tmpFile = path.join(os.tmpdir(), `vision-pdf-${Date.now()}.pdf`);
+  fs.writeFileSync(tmpFile, Buffer.from(base64, "base64"));
+
+  try {
+    const uploadResult = await fileManager.uploadFile(tmpFile, {
+      mimeType: "application/pdf",
+      displayName: `vision-upload-${Date.now()}.pdf`,
+    });
+    return {
+      fileData: {
+        mimeType: uploadResult.file.mimeType,
+        fileUri: uploadResult.file.uri,
+      },
+    };
+  } finally {
+    try { fs.unlinkSync(tmpFile); } catch { /* ignore */ }
+  }
 }
 
 function safeParseJSON(text: string) {

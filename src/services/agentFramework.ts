@@ -13,6 +13,9 @@
 import { vertexAI, defaultModel } from "../config/gemini";
 import { ToolDefinition, ToolRegistry } from "./toolRegistry";
 import { db } from "../config/database";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 
 const isDbEnabled = Boolean(process.env.DATABASE_URL);
 
@@ -114,13 +117,25 @@ export async function runAgent(opts: {
     const contents: Array<{ role: string; parts: any[] }> = [];
 
     // System instruction is injected as the first user turn with a preamble
-    // Include multimodal media parts (images, audio, video) alongside text
+    // Include multimodal media parts (images, audio, video, PDFs) alongside text
     const userParts: any[] = [
         { text: `${opts.systemPrompt}\n\n---\nUser request: ${opts.userMessage}` },
     ];
     if (opts.mediaParts?.length) {
         for (const media of opts.mediaParts) {
-            userParts.push({ inlineData: { data: media.base64, mimeType: media.mimeType } });
+            // PDFs must go through the File API — inlineData gives "document has no pages"
+            if (media.mimeType === "application/pdf") {
+                try {
+                    const filePart = await uploadPdfToFileApi(media.base64);
+                    userParts.push(filePart);
+                } catch (uploadErr) {
+                    // eslint-disable-next-line no-console
+                    console.warn("[Agent] PDF File API upload failed, falling back to inlineData", uploadErr);
+                    userParts.push({ inlineData: { data: media.base64, mimeType: media.mimeType } });
+                }
+            } else {
+                userParts.push({ inlineData: { data: media.base64, mimeType: media.mimeType } });
+            }
         }
     }
     contents.push({ role: "user", parts: userParts });
@@ -293,4 +308,50 @@ function logAgentUsage(
             taskType: taskType || null,
         },
     }).catch((err: any) => console.warn("logAgentUsage failed", err));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PDF UPLOAD VIA GOOGLE AI FILE API
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Upload a base64-encoded PDF to the Google AI File API and return a
+ * `fileData` part that can be used in Gemini content.  The File API
+ * handles PDFs much more reliably than inlineData (which often errors
+ * with "The document has no pages").
+ */
+async function uploadPdfToFileApi(base64: string): Promise<any> {
+    const apiKey =
+        process.env.GOOGLE_API_KEY ||
+        process.env.GEMINI_API_KEY ||
+        process.env.GENERATIVE_AI_API_KEY ||
+        "";
+    if (!apiKey) throw new Error("No Google API key configured");
+
+    const { GoogleAIFileManager } = require("@google/generative-ai/server");
+    const fileManager = new GoogleAIFileManager(apiKey);
+
+    // Write base64 to a temp file (the SDK needs a file path)
+    const tmpDir = os.tmpdir();
+    const tmpFile = path.join(tmpDir, `agent-pdf-${Date.now()}.pdf`);
+    const buffer = Buffer.from(base64, "base64");
+    fs.writeFileSync(tmpFile, buffer);
+
+    try {
+        const uploadResult = await fileManager.uploadFile(tmpFile, {
+            mimeType: "application/pdf",
+            displayName: `agent-upload-${Date.now()}.pdf`,
+        });
+
+        // Return a fileData part that Gemini understands
+        return {
+            fileData: {
+                mimeType: uploadResult.file.mimeType,
+                fileUri: uploadResult.file.uri,
+            },
+        };
+    } finally {
+        // Clean up temp file
+        try { fs.unlinkSync(tmpFile); } catch { /* ignore */ }
+    }
 }
