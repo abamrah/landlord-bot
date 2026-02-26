@@ -1373,6 +1373,713 @@ export function generateNoticeTool(): ToolDefinition {
     };
 }
 
+// ═══════════════════════════════════════════════════════════
+//  STANDARD ONTARIO LEASE GENERATION TOOL
+// ═══════════════════════════════════════════════════════════
+
+export function generateLeaseTool(): ToolDefinition {
+    return {
+        name: "generate_lease",
+        description:
+            "Generate a pre-filled Standard Ontario Lease (Form 2229E) as a PDF document. " +
+            "This is the official residential tenancy agreement form required in Ontario. " +
+            "IMPORTANT: Before calling this tool, ask the landlord for ALL required information:\n" +
+            "- Landlord legal name, mailing address (street no, street name, unit, city, postal code)\n" +
+            "- Tenant name(s) — primary tenant is required, up to 3 additional tenants\n" +
+            "- Rental unit address (street no, street name, unit, city, province, postal code)\n" +
+            "- Lease start date, end date (if fixed term), term type (fixed or month-to-month)\n" +
+            "- Monthly rent amount, rent due day\n" +
+            "- Optional: parking cost, last month deposit, key deposit, smoking rules, additional terms, email",
+        parameters: {
+            landlordName: { type: "string", description: "Landlord's legal name" },
+            landlordStreetNo: { type: "string", description: "Landlord address: street number" },
+            landlordStreetName: { type: "string", description: "Landlord address: street name" },
+            landlordUnit: { type: "string", description: "Landlord address: unit number (optional)" },
+            landlordCity: { type: "string", description: "Landlord address: city" },
+            landlordPostalCode: { type: "string", description: "Landlord address: postal code" },
+            tenantName: { type: "string", description: "Primary tenant full name" },
+            additionalTenants: { type: "string", description: "JSON array of additional tenant names, e.g. [\"Jane Doe\", \"Bob Smith\"]" },
+            propertyStreetNo: { type: "string", description: "Rental unit: street number" },
+            propertyStreetName: { type: "string", description: "Rental unit: street name" },
+            propertyUnit: { type: "string", description: "Rental unit: unit/apt number" },
+            propertyCity: { type: "string", description: "Rental unit: city" },
+            propertyProvince: { type: "string", description: "Rental unit: province (default: Ontario)" },
+            propertyPostalCode: { type: "string", description: "Rental unit: postal code" },
+            email: { type: "string", description: "Contact email for the lease" },
+            leaseStartDate: { type: "string", description: "Lease start date (YYYY-MM-DD)" },
+            leaseEndDate: { type: "string", description: "Lease end date (YYYY-MM-DD), omit for month-to-month" },
+            termType: { type: "string", description: "fixed or monthly (default: fixed)" },
+            rentAmount: { type: "number", description: "Monthly base rent amount in dollars" },
+            rentDueDay: { type: "string", description: "Day of month rent is due (e.g. 1)" },
+            parkingCost: { type: "number", description: "Monthly parking cost (optional)" },
+            lastMonthDeposit: { type: "number", description: "Last month's rent deposit amount (optional)" },
+            keyDeposit: { type: "number", description: "Key deposit amount (optional)" },
+            smokingRules: { type: "string", description: "Smoking rules text (optional)" },
+            additionalTerms: { type: "string", description: "Additional terms/conditions (optional)" },
+        },
+        required: ["landlordName", "landlordStreetNo", "landlordStreetName", "landlordCity", "landlordPostalCode", "tenantName", "propertyStreetNo", "propertyStreetName", "propertyCity", "propertyPostalCode", "leaseStartDate", "rentAmount"],
+        category: "utility",
+        enabled: true,
+        async execute(args) {
+            try {
+                const noticeService = require("../noticeService");
+                let additionalTenants: string[] | undefined;
+                if (args.additionalTenants) {
+                    try { additionalTenants = JSON.parse(String(args.additionalTenants)); } catch { additionalTenants = undefined; }
+                }
+                const pdfBuffer = await noticeService.generateStandardLease({
+                    landlordName: String(args.landlordName),
+                    landlordAddress: {
+                        streetNo: String(args.landlordStreetNo),
+                        streetName: String(args.landlordStreetName),
+                        unitNo: args.landlordUnit ? String(args.landlordUnit) : undefined,
+                        city: String(args.landlordCity),
+                        postalCode: String(args.landlordPostalCode),
+                    },
+                    tenantName: String(args.tenantName),
+                    additionalTenants,
+                    propertyAddress: {
+                        streetNo: String(args.propertyStreetNo),
+                        streetName: String(args.propertyStreetName),
+                        unitNo: args.propertyUnit ? String(args.propertyUnit) : undefined,
+                        city: String(args.propertyCity),
+                        province: args.propertyProvince ? String(args.propertyProvince) : "Ontario",
+                        postalCode: String(args.propertyPostalCode),
+                    },
+                    email: args.email ? String(args.email) : undefined,
+                    leaseStartDate: String(args.leaseStartDate),
+                    leaseEndDate: args.leaseEndDate ? String(args.leaseEndDate) : undefined,
+                    termType: args.termType ? String(args.termType) : "fixed",
+                    rentAmount: Number(args.rentAmount),
+                    rentDueDay: args.rentDueDay ? String(args.rentDueDay) : undefined,
+                    parkingCost: args.parkingCost ? Number(args.parkingCost) : undefined,
+                    lastMonthDeposit: args.lastMonthDeposit ? Number(args.lastMonthDeposit) : undefined,
+                    keyDeposit: args.keyDeposit ? Number(args.keyDeposit) : undefined,
+                    smokingRules: args.smokingRules ? String(args.smokingRules) : undefined,
+                    additionalTerms: args.additionalTerms ? String(args.additionalTerms) : undefined,
+                    signDate: new Date().toISOString().split("T")[0],
+                });
+                const base64 = pdfBuffer.toString("base64");
+                return {
+                    success: true,
+                    fileName: `Standard-Lease-${String(args.tenantName).replace(/\s+/g, "_")}.pdf`,
+                    pdfBase64: base64,
+                    message: `Standard Ontario Lease generated for ${args.tenantName} at ${args.propertyStreetNo} ${args.propertyStreetName}. Rent: $${Number(args.rentAmount).toFixed(2)}/month starting ${args.leaseStartDate}. The PDF is ready for download or can be sent via WhatsApp.`,
+                };
+            } catch (err) {
+                return { error: `Failed to generate lease: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function sendLeaseAlertsTool(): ToolDefinition {
+    return {
+        name: "send_lease_alerts",
+        description:
+            "Send WhatsApp alerts to tenants whose leases are expiring soon. " +
+            "Checks for leases expiring within 60 days and sends renewal reminders. " +
+            "Use this when the landlord asks to notify tenants about upcoming lease expirations.",
+        parameters: {},
+        category: "communication",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const expiring = await db.unitTenant.findMany({
+                    where: {
+                        unit: { landlordId },
+                        endDate: { not: null, lte: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) },
+                    },
+                    include: { tenant: true, unit: true },
+                });
+                let sent = 0;
+                for (const ut of expiring) {
+                    if (ut.tenant?.phone && ut.unit) {
+                        const daysLeft = Math.ceil((new Date(ut.endDate!).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+                        const msg = `Hi ${ut.tenant.name}, this is a reminder that your lease for ${ut.unit.label} at ${ut.unit.address} expires on ${new Date(ut.endDate!).toLocaleDateString()}. That's ${daysLeft} days away. Please contact your landlord to discuss renewal options.`;
+                        await whatsappService.sendWhatsAppText({ to: ut.tenant.phone, text: msg, landlordId });
+                        sent++;
+                    }
+                }
+                return { success: true, alertsSent: sent, message: `Sent ${sent} lease expiry alerts to tenants.` };
+            } catch (err) {
+                return { error: `Failed to send alerts: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TENANT SCREENING TOOLS
+// ═══════════════════════════════════════════════════════════
+
+export function requestScreeningTool(): ToolDefinition {
+    return {
+        name: "request_screening",
+        description:
+            "Request a tenant background/credit screening check. " +
+            "Supports Certn, SingleKey, or manual entry depending on system configuration. " +
+            "Provide the applicant's name, and optionally their email, phone, and the unit they're applying for.",
+        parameters: {
+            applicantName: { type: "string", description: "Full name of the person to screen" },
+            applicantEmail: { type: "string", description: "Applicant's email (required for Certn/SingleKey)" },
+            applicantPhone: { type: "string", description: "Applicant's phone number" },
+            unitId: { type: "string", description: "The unit ID they are applying for (optional)" },
+        },
+        required: ["applicantName"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const { requestScreening } = require("../../routes/admin");
+                // Direct DB call instead of going through HTTP
+                const screening = await db.tenantScreening.create({
+                    data: {
+                        landlordId,
+                        applicantName: String(args.applicantName),
+                        applicantEmail: args.applicantEmail ? String(args.applicantEmail) : null,
+                        applicantPhone: args.applicantPhone ? String(args.applicantPhone) : null,
+                        unitId: args.unitId ? String(args.unitId) : null,
+                        provider: process.env.SCREENING_PROVIDER || "manual",
+                        status: "REQUESTED",
+                    },
+                });
+                return {
+                    success: true,
+                    screeningId: screening.id,
+                    status: screening.status,
+                    provider: screening.provider,
+                    message: `Screening request created for ${args.applicantName}. ID: ${screening.id}. Provider: ${screening.provider}. Status: ${screening.status}. ${screening.provider === "manual" ? "You can update the results manually." : "Results will be available once the provider completes the check."}`,
+                };
+            } catch (err) {
+                return { error: `Failed to request screening: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function listScreeningsTool(): ToolDefinition {
+    return {
+        name: "list_screenings",
+        description:
+            "List all tenant screening requests. " +
+            "Can filter by status (PENDING, IN_PROGRESS, COMPLETED, FAILED). " +
+            "Shows applicant name, status, provider, credit score, recommendation, and dates.",
+        parameters: {
+            status: { type: "string", description: "Filter by status: PENDING, IN_PROGRESS, COMPLETED, FAILED" },
+            limit: { type: "number", description: "Max results (default 20)" },
+        },
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const where: any = { landlordId };
+                if (args.status) where.status = String(args.status).toUpperCase();
+                const screenings = await db.tenantScreening.findMany({
+                    where,
+                    orderBy: { createdAt: "desc" },
+                    take: Number(args.limit) || 20,
+                    select: {
+                        id: true, applicantName: true, applicantEmail: true, applicantPhone: true,
+                        status: true, provider: true, creditScore: true, creditRating: true,
+                        recommendation: true, identityVerified: true, criminalClear: true,
+                        evictionHistory: true, incomeVerified: true, monthlyIncome: true,
+                        reportSummary: true, createdAt: true, completedAt: true,
+                    },
+                });
+                return { screenings, total: screenings.length };
+            } catch (err) {
+                return { error: `Failed to list screenings: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function getScreeningTool(): ToolDefinition {
+    return {
+        name: "get_screening",
+        description:
+            "Get detailed results of a specific tenant screening by ID. " +
+            "Returns full screening report including credit score, criminal check, identity verification, " +
+            "eviction history, income verification, and recommendation.",
+        parameters: {
+            screeningId: { type: "string", description: "The screening request ID" },
+        },
+        required: ["screeningId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const screening = await db.tenantScreening.findFirst({
+                    where: { id: String(args.screeningId), landlordId },
+                });
+                if (!screening) return { error: "Screening not found" };
+                return screening;
+            } catch (err) {
+                return { error: `Failed to get screening: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function updateScreeningTool(): ToolDefinition {
+    return {
+        name: "update_screening",
+        description:
+            "Manually update a tenant screening with results (for manual screening mode). " +
+            "Use this when the landlord has received screening results and wants to record them.",
+        parameters: {
+            screeningId: { type: "string", description: "The screening ID to update" },
+            creditScore: { type: "number", description: "Credit score (0–900)" },
+            creditRating: { type: "string", description: "excellent, good, fair, or poor" },
+            identityVerified: { type: "boolean", description: "Whether identity was verified" },
+            criminalClear: { type: "boolean", description: "Whether criminal record check is clear" },
+            evictionHistory: { type: "boolean", description: "Whether applicant has eviction history (true = has history)" },
+            incomeVerified: { type: "boolean", description: "Whether income was verified" },
+            monthlyIncome: { type: "number", description: "Verified monthly income amount" },
+            recommendation: { type: "string", description: "approve, conditional, or decline" },
+            notes: { type: "string", description: "Additional notes about the screening" },
+        },
+        required: ["screeningId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const existing = await db.tenantScreening.findFirst({
+                    where: { id: String(args.screeningId), landlordId },
+                });
+                if (!existing) return { error: "Screening not found" };
+                const data: any = { status: "COMPLETED", completedAt: new Date() };
+                if (args.creditScore !== undefined) data.creditScore = Number(args.creditScore);
+                if (args.creditRating) data.creditRating = String(args.creditRating);
+                if (args.identityVerified !== undefined) data.identityVerified = Boolean(args.identityVerified);
+                if (args.criminalClear !== undefined) data.criminalClear = Boolean(args.criminalClear);
+                if (args.evictionHistory !== undefined) data.evictionHistory = Boolean(args.evictionHistory);
+                if (args.incomeVerified !== undefined) data.incomeVerified = Boolean(args.incomeVerified);
+                if (args.monthlyIncome !== undefined) data.monthlyIncome = Number(args.monthlyIncome);
+                if (args.recommendation) data.recommendation = String(args.recommendation);
+                if (args.notes) data.reportSummary = String(args.notes);
+                const updated = await db.tenantScreening.update({
+                    where: { id: String(args.screeningId) },
+                    data,
+                });
+                return {
+                    success: true,
+                    screening: updated,
+                    message: `Screening for ${updated.applicantName} updated. Recommendation: ${updated.recommendation || "pending"}. Credit score: ${updated.creditScore || "not set"}.`,
+                };
+            } catch (err) {
+                return { error: `Failed to update screening: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  REMINDER MANAGEMENT TOOLS
+// ═══════════════════════════════════════════════════════════
+
+export function createReminderTool(): ToolDefinition {
+    return {
+        name: "create_reminder",
+        description:
+            "Create a new automated reminder for rent or utility payments. " +
+            "Reminders send WhatsApp messages to tenants on the specified day of month. " +
+            "Ask the landlord: type (rent or utility), day of month (1-28), time (HH:MM in UTC), " +
+            "and style (short, medium, professional, casual).",
+        parameters: {
+            type: { type: "string", description: "Reminder type: rent or utility" },
+            dayOfMonth: { type: "number", description: "Day of month to send (1-28)" },
+            timeUtc: { type: "string", description: "Time in UTC format, e.g. '14:00'" },
+            style: { type: "string", description: "Message style: short, medium, professional, or casual" },
+        },
+        required: ["type", "dayOfMonth", "timeUtc", "style"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const type = String(args.type).toLowerCase();
+                if (type !== "rent" && type !== "utility") return { error: "type must be 'rent' or 'utility'" };
+                const dayOfMonth = Number(args.dayOfMonth);
+                if (dayOfMonth < 1 || dayOfMonth > 28) return { error: "dayOfMonth must be 1-28" };
+                const reminder = await db.reminder.create({
+                    data: {
+                        id: `rem-${Date.now()}`,
+                        landlordId,
+                        type: type as "rent" | "utility",
+                        dayOfMonth,
+                        timeUtc: String(args.timeUtc),
+                        style: String(args.style) as any,
+                        active: true,
+                    },
+                });
+                return {
+                    success: true,
+                    reminder,
+                    message: `${type} reminder created! Will send on day ${dayOfMonth} of each month at ${args.timeUtc} UTC in ${args.style} style.`,
+                };
+            } catch (err) {
+                return { error: `Failed to create reminder: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function updateReminderTool(): ToolDefinition {
+    return {
+        name: "update_reminder",
+        description:
+            "Enable or disable an existing reminder. Use list_reminders first to get the reminder ID.",
+        parameters: {
+            reminderId: { type: "string", description: "The reminder ID to update" },
+            active: { type: "boolean", description: "true to enable, false to disable" },
+        },
+        required: ["reminderId", "active"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const reminder = await db.reminder.findFirst({
+                    where: { id: String(args.reminderId), landlordId },
+                });
+                if (!reminder) return { error: "Reminder not found" };
+                const updated = await db.reminder.update({
+                    where: { id: String(args.reminderId) },
+                    data: { active: Boolean(args.active) },
+                });
+                return {
+                    success: true,
+                    reminder: updated,
+                    message: `Reminder ${updated.id} ${updated.active ? "enabled" : "disabled"}.`,
+                };
+            } catch (err) {
+                return { error: `Failed to update reminder: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function deleteReminderTool(): ToolDefinition {
+    return {
+        name: "delete_reminder",
+        description: "Delete a reminder permanently. Use list_reminders first to get the reminder ID.",
+        parameters: {
+            reminderId: { type: "string", description: "The reminder ID to delete" },
+        },
+        required: ["reminderId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const reminder = await db.reminder.findFirst({
+                    where: { id: String(args.reminderId), landlordId },
+                });
+                if (!reminder) return { error: "Reminder not found" };
+                await db.reminder.delete({ where: { id: String(args.reminderId) } });
+                return { success: true, message: `Reminder ${args.reminderId} deleted.` };
+            } catch (err) {
+                return { error: `Failed to delete reminder: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TENANT & UNIT MANAGEMENT TOOLS
+// ═══════════════════════════════════════════════════════════
+
+export function createTenantTool(): ToolDefinition {
+    return {
+        name: "create_tenant",
+        description:
+            "Add a new tenant to the system. Requires at minimum a name. " +
+            "Optionally assign them to a unit and set their role (tenant or resident). " +
+            "If a phone number is provided, a welcome message will be sent via WhatsApp automatically.",
+        parameters: {
+            name: { type: "string", description: "Tenant's full name" },
+            phone: { type: "string", description: "WhatsApp phone number (with country code, e.g. 16471234567)" },
+            email: { type: "string", description: "Tenant's email address" },
+            unitId: { type: "string", description: "Unit ID to assign them to (use list_units to find IDs)" },
+            role: { type: "string", description: "tenant (lease holder) or resident (co-occupant)" },
+            leaseStart: { type: "string", description: "Lease start date (YYYY-MM-DD)" },
+            leaseEnd: { type: "string", description: "Lease end date (YYYY-MM-DD)" },
+            rentAmountCents: { type: "number", description: "Monthly rent in cents (e.g. 200000 = $2000)" },
+        },
+        required: ["name"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                // Check for duplicate phone
+                if (args.phone) {
+                    const existing = await repo.findTenantByPhone(String(args.phone), landlordId);
+                    if (existing) return { error: `A tenant with phone ${args.phone} already exists: ${existing.name}` };
+                }
+                const tenant = await repo.createTenant({
+                    name: String(args.name),
+                    phone: args.phone ? String(args.phone) : undefined,
+                    email: args.email ? String(args.email) : undefined,
+                    unitId: args.unitId ? String(args.unitId) : undefined,
+                    landlordId,
+                    role: args.role ? String(args.role) : undefined,
+                    startDate: args.leaseStart ? String(args.leaseStart) : undefined,
+                    endDate: args.leaseEnd ? String(args.leaseEnd) : undefined,
+                    rentAmountCents: args.rentAmountCents ? Number(args.rentAmountCents) : undefined,
+                } as any);
+                if (!tenant) return { error: "Failed to create tenant" };
+
+                // Send welcome message if phone provided
+                if (args.phone) {
+                    try {
+                        const landlord = await db.landlord.findUnique({ where: { id: landlordId }, select: { name: true, company: true } });
+                        const landlordName = landlord?.company || landlord?.name || "Your Landlord";
+                        const welcomeMsg = `*Welcome to ${landlordName}'s Property Management!*\n\nHi ${args.name}, your landlord has set you up on NestMind — an AI-powered platform. Send a message here anytime to report maintenance issues or ask questions.`;
+                        await whatsappService.sendWhatsAppText({ to: String(args.phone), text: welcomeMsg, landlordId });
+                    } catch (_err) { /* non-critical */ }
+                }
+
+                return {
+                    success: true,
+                    tenant,
+                    message: `Tenant "${args.name}" created successfully.${args.unitId ? " Assigned to unit." : ""}${args.phone ? " Welcome message sent via WhatsApp." : ""}`,
+                };
+            } catch (err) {
+                return { error: `Failed to create tenant: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function updateTenantTool(): ToolDefinition {
+    return {
+        name: "update_tenant",
+        description:
+            "Update an existing tenant's information — name, phone, email, or unit assignment. " +
+            "Use lookup_tenant or list_tenants first to get the tenant ID.",
+        parameters: {
+            tenantId: { type: "string", description: "Tenant ID to update" },
+            name: { type: "string", description: "New name (optional)" },
+            phone: { type: "string", description: "New phone number (optional)" },
+            email: { type: "string", description: "New email (optional)" },
+            unitId: { type: "string", description: "New unit assignment (optional)" },
+        },
+        required: ["tenantId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const existing = await db.tenant.findFirst({
+                    where: { id: String(args.tenantId), landlordId },
+                });
+                if (!existing) return { error: "Tenant not found" };
+                const data: any = {};
+                if (args.name) data.name = String(args.name);
+                if (args.phone) data.phone = String(args.phone);
+                if (args.email) data.email = String(args.email);
+                const updated = await db.tenant.update({
+                    where: { id: String(args.tenantId) },
+                    data,
+                });
+                return {
+                    success: true,
+                    tenant: updated,
+                    message: `Tenant "${updated.name}" updated successfully.`,
+                };
+            } catch (err) {
+                return { error: `Failed to update tenant: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function createUnitTool(): ToolDefinition {
+    return {
+        name: "create_unit",
+        description:
+            "Create a new rental unit. Must belong to an existing property. " +
+            "Use list_units first to see existing properties and their IDs. " +
+            "Specify the property ID, a label (e.g. 'Apt 4B'), and the utility type.",
+        parameters: {
+            propertyId: { type: "string", description: "Property ID this unit belongs to" },
+            label: { type: "string", description: "Unit label (e.g. 'Apt 4B', 'Suite 101')" },
+            utilityType: { type: "string", description: "single (one tenant pays) or shared (split among occupants)" },
+        },
+        required: ["propertyId", "label"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                // Verify property belongs to landlord
+                const property = await db.property.findFirst({
+                    where: { id: String(args.propertyId), landlordId },
+                });
+                if (!property) return { error: "Property not found or does not belong to you" };
+                const unit = await db.unit.create({
+                    data: {
+                        label: String(args.label),
+                        address: property.address,
+                        landlordId,
+                        propertyId: String(args.propertyId),
+                        utilityType: args.utilityType ? (String(args.utilityType).toUpperCase() as any) : "SINGLE",
+                    },
+                });
+                return {
+                    success: true,
+                    unit,
+                    message: `Unit "${args.label}" created at ${property.address}. ID: ${unit.id}`,
+                };
+            } catch (err) {
+                return { error: `Failed to create unit: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function updateUnitTool(): ToolDefinition {
+    return {
+        name: "update_unit",
+        description:
+            "Update a rental unit's label or utility type. " +
+            "Use list_units or lookup_unit to find the unit ID.",
+        parameters: {
+            unitId: { type: "string", description: "Unit ID to update" },
+            label: { type: "string", description: "New label (optional)" },
+            utilityType: { type: "string", description: "single or shared (optional)" },
+        },
+        required: ["unitId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const unit = await db.unit.findFirst({
+                    where: { id: String(args.unitId), landlordId },
+                });
+                if (!unit) return { error: "Unit not found" };
+                const data: any = {};
+                if (args.label) data.label = String(args.label);
+                if (args.utilityType) data.utilityType = String(args.utilityType).toUpperCase() as any;
+                const updated = await db.unit.update({
+                    where: { id: String(args.unitId) },
+                    data,
+                });
+                return {
+                    success: true,
+                    unit: updated,
+                    message: `Unit "${updated.label}" updated.`,
+                };
+            } catch (err) {
+                return { error: `Failed to update unit: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CONTRACTOR MANAGEMENT TOOLS
+// ═══════════════════════════════════════════════════════════
+
+export function updateContractorTool(): ToolDefinition {
+    return {
+        name: "update_contractor",
+        description:
+            "Update a contractor's information — name, phone, email, company, specialties, or notes. " +
+            "Use list_contractors to find the contractor ID.",
+        parameters: {
+            contractorId: { type: "string", description: "Contractor ID to update" },
+            name: { type: "string", description: "New name (optional)" },
+            phone: { type: "string", description: "New phone (optional)" },
+            email: { type: "string", description: "New email (optional)" },
+            company: { type: "string", description: "Company name (optional)" },
+            specialties: { type: "string", description: "Comma-separated specialties, e.g. 'plumbing,electrical' (optional)" },
+            notes: { type: "string", description: "Additional notes (optional)" },
+        },
+        required: ["contractorId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const contractor = await db.contractor.findFirst({
+                    where: { id: String(args.contractorId), landlordId },
+                });
+                if (!contractor) return { error: "Contractor not found" };
+                const data: any = {};
+                if (args.name) data.name = String(args.name);
+                if (args.phone) data.phone = String(args.phone);
+                if (args.email) data.email = String(args.email);
+                if (args.company) data.company = String(args.company);
+                if (args.specialties) data.specialties = String(args.specialties).split(",").map((s: string) => s.trim());
+                if (args.notes) data.notes = String(args.notes);
+                const updated = await db.contractor.update({
+                    where: { id: String(args.contractorId) },
+                    data,
+                });
+                return {
+                    success: true,
+                    contractor: updated,
+                    message: `Contractor "${updated.name}" updated.`,
+                };
+            } catch (err) {
+                return { error: `Failed to update contractor: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
+export function deleteContractorTool(): ToolDefinition {
+    return {
+        name: "delete_contractor",
+        description:
+            "Delete a contractor from the system. Use list_contractors to find the contractor ID. " +
+            "This is permanent — the contractor's record will be removed.",
+        parameters: {
+            contractorId: { type: "string", description: "Contractor ID to delete" },
+        },
+        required: ["contractorId"],
+        category: "data",
+        enabled: true,
+        async execute(args) {
+            try {
+                const landlordId = args.landlordId ? String(args.landlordId) : undefined;
+                if (!landlordId) return { error: "landlordId required" };
+                const contractor = await db.contractor.findFirst({
+                    where: { id: String(args.contractorId), landlordId },
+                });
+                if (!contractor) return { error: "Contractor not found" };
+                await db.contractor.delete({ where: { id: String(args.contractorId) } });
+                return { success: true, message: `Contractor "${contractor.name}" deleted.` };
+            } catch (err) {
+                return { error: `Failed to delete contractor: ${(err as Error).message}` };
+            }
+        },
+    };
+}
+
 /**
  * Register all built-in tools. Call this at startup.
  */
@@ -1419,6 +2126,26 @@ export function registerBuiltinTools(): ToolDefinition[] {
         financialSummaryTool(),
         // Legal notice tools
         generateNoticeTool(),
+        // Lease generation
+        generateLeaseTool(),
+        sendLeaseAlertsTool(),
+        // Screening tools
+        requestScreeningTool(),
+        listScreeningsTool(),
+        getScreeningTool(),
+        updateScreeningTool(),
+        // Reminder management
+        createReminderTool(),
+        updateReminderTool(),
+        deleteReminderTool(),
+        // Tenant / Unit management
+        createTenantTool(),
+        updateTenantTool(),
+        createUnitTool(),
+        updateUnitTool(),
+        // Contractor management
+        updateContractorTool(),
+        deleteContractorTool(),
     ];
 }
 
