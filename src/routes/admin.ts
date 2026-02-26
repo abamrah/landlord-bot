@@ -2330,23 +2330,70 @@ router.post("/leases/upload", async (req, res) => {
       return res.status(404).json({ error: "unit_tenant_not_found" });
     }
 
-    const fileBuffer = Buffer.from(parsed.data.fileBase64, "base64");
+    // Clean up base64 — strip any data URI prefix and whitespace
+    const cleanBase64 = parsed.data.fileBase64.replace(/^data:[^;]+;base64,/i, "").replace(/\s+/g, "");
+    const fileBuffer = Buffer.from(cleanBase64, "base64");
 
     // Use Gemini to extract lease terms from the PDF
     let extractedTerms: any = null;
     let summary: string | null = null;
     try {
-      const { vertexAI } = await import("../config/gemini");
-      if (vertexAI) {
-        console.log("[Lease] Starting AI extraction for", parsed.data.fileName, "mimeType:", parsed.data.mimeType, "base64 length:", parsed.data.fileBase64.length);
-        const model = vertexAI.getGenerativeModel({ model: process.env.GOOGLE_VERTEX_MODEL || "gemini-2.5-pro" });
-        const result = await model.generateContent({
-          contents: [{
-            role: "user",
-            parts: [
-              { inlineData: { data: parsed.data.fileBase64, mimeType: parsed.data.mimeType } },
-              {
-                text: `Extract key lease terms from this document. Return a JSON object with these fields (use null for missing):
+      const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || process.env.GENERATIVE_AI_API_KEY || "";
+      if (apiKey) {
+        console.log("[Lease] Starting AI extraction for", parsed.data.fileName, "mimeType:", parsed.data.mimeType, "file size:", fileBuffer.length, "bytes");
+
+        // Use the Files API to upload the PDF first (avoids "document has no pages" error with inlineData)
+        const { GoogleAIFileManager } = await import("@google/generative-ai/server");
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
+        const fs = await import("fs");
+        const os = await import("os");
+        const path = await import("path");
+
+        const fileManager = new GoogleAIFileManager(apiKey);
+        const gemini = new GoogleGenerativeAI(apiKey);
+        const modelName = process.env.GOOGLE_VERTEX_MODEL || "gemini-2.5-pro";
+
+        // Write buffer to a temp file (Files API requires a file path)
+        const tmpDir = os.tmpdir();
+        const tmpFile = path.join(tmpDir, `lease-${Date.now()}-${parsed.data.fileName}`);
+        fs.writeFileSync(tmpFile, fileBuffer);
+
+        let uploadedFile: any;
+        try {
+          console.log("[Lease] Uploading file to Gemini Files API...");
+          const uploadResult = await fileManager.uploadFile(tmpFile, {
+            mimeType: parsed.data.mimeType || "application/pdf",
+            displayName: parsed.data.fileName,
+          });
+          uploadedFile = uploadResult.file;
+          console.log("[Lease] File uploaded:", uploadedFile.name, "state:", uploadedFile.state);
+
+          // Wait for file to finish processing (ACTIVE state)
+          let attempts = 0;
+          while (uploadedFile.state === "PROCESSING" && attempts < 30) {
+            await new Promise((r) => setTimeout(r, 2000));
+            const check = await fileManager.getFile(uploadedFile.name);
+            uploadedFile = check;
+            attempts++;
+          }
+
+          if (uploadedFile.state !== "ACTIVE") {
+            console.warn("[Lease] File not ACTIVE after waiting, state:", uploadedFile.state);
+          }
+        } finally {
+          // Clean up temp file
+          try { fs.unlinkSync(tmpFile); } catch { /* ignore */ }
+        }
+
+        if (uploadedFile?.state === "ACTIVE") {
+          const model = gemini.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent({
+            contents: [{
+              role: "user",
+              parts: [
+                { fileData: { fileUri: uploadedFile.uri, mimeType: uploadedFile.mimeType } },
+                {
+                  text: `Extract key lease terms from this document. Return a JSON object with these fields (use null for missing):
 {
   "rentAmount": number or null (monthly rent in dollars),
   "rentCurrency": "CAD" or "USD",
@@ -2367,68 +2414,64 @@ router.post("/leases/upload", async (req, res) => {
 
 Also provide a 2-3 sentence plain-text summary of the lease.
 Return ONLY valid JSON wrapped in \`\`\`json ... \`\`\` followed by the summary.` },
-            ],
-          }],
-        });
+              ],
+            }],
+          });
 
-        // Safely extract response text — use candidates approach (more reliable than text())
-        let responseText = "";
-        try {
-          const parts = result.response?.candidates?.[0]?.content?.parts || [];
-          responseText = parts.map((p: any) => p.text || "").join("");
-        } catch {
-          // Fallback to text() method
-          try { responseText = result.response?.text?.() || ""; } catch { /* blocked or empty */ }
-        }
-        console.log("[Lease] Gemini response length:", responseText.length, "preview:", responseText.substring(0, 200));
-
-        if (responseText) {
-          // Strategy 1: Extract JSON from ```json ... ``` code fence
-          const jsonMatch = responseText.match(/```json\s*([\s\S]*?)```/);
-          if (jsonMatch?.[1]) {
-            try { extractedTerms = JSON.parse(jsonMatch[1].trim()); } catch (e) { console.warn("[Lease] JSON parse from code fence failed:", e); }
+          // Safely extract response text
+          let responseText = "";
+          try {
+            const parts = result.response?.candidates?.[0]?.content?.parts || [];
+            responseText = parts.map((p: any) => p.text || "").join("");
+          } catch {
+            try { responseText = result.response?.text?.() || ""; } catch { /* blocked or empty */ }
           }
+          console.log("[Lease] Gemini response length:", responseText.length, "preview:", responseText.substring(0, 200));
 
-          // Strategy 2: Extract from generic ``` ... ``` code fence
-          if (!extractedTerms) {
-            const genericFence = responseText.match(/```\s*([\s\S]*?)```/);
-            if (genericFence?.[1]) {
-              try { extractedTerms = JSON.parse(genericFence[1].trim()); } catch { /* not valid JSON in fence */ }
+          if (responseText) {
+            // Strategy 1: ```json ... ```
+            const jsonMatch = responseText.match(/```json\s*([\s\S]*?)```/);
+            if (jsonMatch?.[1]) {
+              try { extractedTerms = JSON.parse(jsonMatch[1].trim()); } catch (e) { console.warn("[Lease] JSON parse from code fence failed:", e); }
             }
-          }
-
-          // Strategy 3: Find first { ... } block and try to parse as JSON
-          if (!extractedTerms) {
-            const braceMatch = responseText.match(/\{[\s\S]*\}/);
-            if (braceMatch) {
-              try { extractedTerms = JSON.parse(braceMatch[0]); } catch { /* not valid JSON */ }
+            // Strategy 2: ``` ... ```
+            if (!extractedTerms) {
+              const genericFence = responseText.match(/```\s*([\s\S]*?)```/);
+              if (genericFence?.[1]) {
+                try { extractedTerms = JSON.parse(genericFence[1].trim()); } catch { /* not valid JSON */ }
+              }
             }
-          }
-
-          // Extract summary (text after the JSON block or last code fence)
-          if (extractedTerms) {
-            const summaryMatch = responseText.match(/```[\s\S]*?```\s*([\s\S]+)/);
-            summary = summaryMatch?.[1]?.trim() || null;
-            // If no summary after code fence, look for text after the JSON object
-            if (!summary && !jsonMatch) {
-              const afterJson = responseText.replace(/\{[\s\S]*\}/, "").trim();
-              if (afterJson.length > 20) summary = afterJson;
+            // Strategy 3: raw { ... }
+            if (!extractedTerms) {
+              const braceMatch = responseText.match(/\{[\s\S]*\}/);
+              if (braceMatch) {
+                try { extractedTerms = JSON.parse(braceMatch[0]); } catch { /* not valid JSON */ }
+              }
             }
-          }
-
-          if (extractedTerms) {
-            console.log("[Lease] Extracted terms:", JSON.stringify(extractedTerms).substring(0, 300));
+            // Extract summary
+            if (extractedTerms) {
+              const summaryMatch = responseText.match(/```[\s\S]*?```\s*([\s\S]+)/);
+              summary = summaryMatch?.[1]?.trim() || null;
+              if (!summary && !jsonMatch) {
+                const afterJson = responseText.replace(/\{[\s\S]*\}/, "").trim();
+                if (afterJson.length > 20) summary = afterJson;
+              }
+              console.log("[Lease] Extracted terms:", JSON.stringify(extractedTerms).substring(0, 300));
+            } else {
+              console.warn("[Lease] Could not parse JSON from response:", responseText.substring(0, 500));
+            }
           } else {
-            console.warn("[Lease] Could not parse JSON from Gemini response. Full response:", responseText.substring(0, 500));
+            console.warn("[Lease] Empty response from Gemini");
           }
-        } else {
-          console.warn("[Lease] Empty response from Gemini — model may have blocked the content");
+
+          // Clean up uploaded file from Gemini
+          try { await fileManager.deleteFile(uploadedFile.name); } catch { /* ignore */ }
         }
       } else {
-        console.warn("[Lease] vertexAI is null — GOOGLE_API_KEY not configured");
+        console.warn("[Lease] GOOGLE_API_KEY not configured — skipping AI extraction");
       }
     } catch (err) {
-      console.warn("Lease AI extraction failed, saving without terms", (err as Error).message, (err as Error).stack?.substring(0, 300));
+      console.warn("[Lease] AI extraction failed, saving without terms:", (err as Error).message);
     }
 
     // Save the lease document
