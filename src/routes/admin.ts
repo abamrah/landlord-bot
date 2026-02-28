@@ -2276,20 +2276,46 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
       // Helper: check if a value looks like a real 8-digit pairing code (e.g. "ABCD-EFGH" or "12345678")
       const isShortPairingCode = (v: any) => typeof v === "string" && v.length <= 20 && /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(v.trim());
 
-      // Method 1: GET with query param (correct Evolution API v2 approach)
+      // Helper: extract pairing code from any result object
+      const extractPairingCode = (r: any): string | null => {
+        if (!r) return null;
+        for (const candidate of [r?.pairingCode, r?.code, r?.data?.pairingCode, r?.data?.code]) {
+          if (isShortPairingCode(candidate)) return candidate;
+        }
+        return null;
+      };
+
+      // Step 1: Initialize the QR connection first (without number).
+      // Evolution API (Baileys) needs the WebSocket in "connecting" state before
+      // a pairing code can be generated.
+      try {
+        const initResult = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`);
+        base64 = initResult?.base64 || initResult?.data?.base64 || null;
+        console.log("[WhatsApp] Connection initialized for pairing code, waiting for WS ready...", {
+          instanceName: req.params.instanceName,
+          hasBase64: Boolean(base64),
+        });
+      } catch (initErr) {
+        console.warn("[WhatsApp] Initial connect call failed (may already be connecting):", (initErr as Error).message);
+      }
+
+      // Step 2: Wait for the WebSocket to reach the connecting/QR state.
+      // Baileys needs ~2-3 seconds to open the WS and generate the QR before
+      // requestPairingCode() can succeed.
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Step 3: Now request the pairing code with the phone number.
+      // Method A: GET with query param (Evolution API v2)
       try {
         const r1 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
         rawResult = r1;
-        // Check all possible fields for a short pairing code
-        for (const candidate of [r1?.pairingCode, r1?.code, r1?.data?.pairingCode, r1?.data?.code]) {
-          if (isShortPairingCode(candidate)) { pairingCode = candidate; break; }
-        }
-        base64 = r1?.base64 || r1?.data?.base64 || null;
+        pairingCode = extractPairingCode(r1);
+        if (!base64) base64 = r1?.base64 || r1?.data?.base64 || null;
       } catch (e1) {
         console.warn("[WhatsApp] GET connect with number failed:", (e1 as Error).message);
       }
 
-      // Method 2: Fallback — POST with body (older API versions)
+      // Method B: Fallback — POST with body (some Evolution API versions)
       if (!pairingCode) {
         try {
           const r2 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
@@ -2297,11 +2323,24 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
             body: { number: phoneNumber },
           });
           rawResult = rawResult || r2;
-          for (const candidate of [r2?.pairingCode, r2?.code, r2?.data?.pairingCode, r2?.data?.code]) {
-            if (isShortPairingCode(candidate)) { pairingCode = candidate; break; }
-          }
+          pairingCode = extractPairingCode(r2);
         } catch (e2) {
           console.warn("[WhatsApp] POST connect with number fallback failed:", (e2 as Error).message);
+        }
+      }
+
+      // Method C: If still no pairing code, try a longer wait and retry once more.
+      // Some slower instances need more time for the WS to be ready.
+      if (!pairingCode) {
+        console.log("[WhatsApp] Pairing code not found yet, retrying after additional delay...");
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        try {
+          const r3 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
+          rawResult = rawResult || r3;
+          pairingCode = extractPairingCode(r3);
+          if (!base64) base64 = r3?.base64 || r3?.data?.base64 || null;
+        } catch (e3) {
+          console.warn("[WhatsApp] Retry GET connect with number failed:", (e3 as Error).message);
         }
       }
 

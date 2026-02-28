@@ -13,6 +13,7 @@ const maintenanceSchema = z.object({
 const chatSchema = z.object({
   role: z.enum(["tenant", "landlord", "ai"]),
   content: z.string().min(1, "content required"),
+  sendToTenant: z.boolean().optional(),
 });
 
 const refineSchema = z.object({
@@ -233,6 +234,37 @@ router.post("/:id/chat", async (req, res) => {
     if (!updated) return res.status(404).json({ error: "not_found" });
 
     if (parsed.data.role !== "tenant") {
+      // If landlord explicitly wants to send this message to the tenant via WhatsApp
+      if (parsed.data.sendToTenant && parsed.data.role === "landlord" && record.tenantId) {
+        try {
+          const tenant = await repo.getTenantById(record.tenantId);
+          if (tenant && tenant.phone) {
+            const sendResult = await whatsappService.sendWhatsAppText({
+              to: tenant.phone,
+              text: parsed.data.content,
+              landlordId: landlordId,
+            });
+            if (!sendResult.ok) {
+              console.error("Draft send to tenant FAILED", { tenantId: record.tenantId, phone: tenant.phone, error: sendResult.error });
+              return res.status(500).json({ error: "whatsapp_send_failed", details: sendResult.error, item: updated });
+            }
+            // Log the sent message as an AI/forwarded message in the chat
+            await repo.appendChatMessage({
+              id: record.id,
+              role: "ai",
+              content: parsed.data.content,
+              meta: { channel: "whatsapp", forwarded: true, approvedBy: "dashboard" },
+            });
+            console.info("Draft sent to tenant via WhatsApp (dashboard approval)", { tenantId: record.tenantId, phone: tenant.phone });
+            return res.json({ item: updated, sentToTenant: true, to: tenant.phone });
+          } else {
+            return res.status(400).json({ error: "tenant_no_phone", message: "Tenant does not have a phone number", item: updated });
+          }
+        } catch (sendErr) {
+          console.error("Draft send to tenant EXCEPTION", { error: sendErr.message });
+          return res.status(500).json({ error: "whatsapp_send_exception", details: sendErr.message, item: updated });
+        }
+      }
       return res.json({ item: updated });
     }
 

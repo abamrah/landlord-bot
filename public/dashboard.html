@@ -6066,15 +6066,15 @@
         if (window.innerWidth <= 640 && typeof openApprovalModal === 'function') {
           openApprovalModal(existing).then(function (draft) {
             if (!draft || !draft.trim()) { toast('No message'); return; }
-            fetchJson('/maintenance/' + id + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'landlord', content: draft }) })
-              .then(function () { toast('Sent'); document.getElementById('maintDrawer').classList.remove('open'); loadMaintenance(); })
+            fetchJson('/maintenance/' + id + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'landlord', content: draft, sendToTenant: true }) })
+              .then(function (r) { toast(r.sentToTenant ? 'Sent to tenant via WhatsApp ✅' : 'Saved'); document.getElementById('maintDrawer').classList.remove('open'); loadMaintenance(); })
               .catch(function (e) { toast('Error: ' + e.message); });
           });
         } else {
           var draft = prompt('Edit before sending:', existing) || existing;
           if (!draft.trim()) return toast('No message');
-          await fetchJson('/maintenance/' + id + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'landlord', content: draft }) });
-          toast('Sent'); document.getElementById('maintDrawer').classList.remove('open'); loadMaintenance();
+          var r = await fetchJson('/maintenance/' + id + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'landlord', content: draft, sendToTenant: true }) });
+          toast(r.sentToTenant ? 'Sent to tenant via WhatsApp ✅' : 'Saved'); document.getElementById('maintDrawer').classList.remove('open'); loadMaintenance();
         }
       }
       if (t.classList.contains('autopilot-toggle')) {
