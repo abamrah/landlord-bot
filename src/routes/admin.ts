@@ -2246,10 +2246,12 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
   const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
   if (landlord?.evolutionInstanceName !== req.params.instanceName) return res.status(403).json({ error: "forbidden" });
   try {
+    const instName = encodeURIComponent(req.params.instanceName);
+
     // Ensure webhook URL is up-to-date — use internal Railway URL if set
     const wbBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
     const currentWebhookUrl = `${wbBase}/webhooks/whatsapp/evolution`;
-    evoFetch(`/webhook/set/${encodeURIComponent(req.params.instanceName)}`, {
+    evoFetch(`/webhook/set/${instName}`, {
       method: "POST",
       body: {
         url: currentWebhookUrl,
@@ -2268,93 +2270,164 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
     const phoneNumber = (req.query.number as string || "").replace(/[^0-9]/g, "");
 
     if (phoneNumber) {
-      // Request 8-digit WhatsApp link/pairing code (not QR code data)
+      // ── Pairing Code Flow ──────────────────────────────────────────────
+      // Evolution API (Baileys) generates an 8-char pairing code that the
+      // user enters in WhatsApp → Linked Devices → Link with Phone Number.
       let pairingCode: string | null = null;
       let base64: string | null = null;
-      let rawResult: any = null;
+      const allRawResults: any[] = [];
 
-      // Helper: check if a value looks like a real 8-digit pairing code (e.g. "ABCD-EFGH" or "12345678")
-      const isShortPairingCode = (v: any) => typeof v === "string" && v.length <= 20 && /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(v.trim());
+      // Helper: check if a value looks like a real 8-digit pairing code
+      const isShortPairingCode = (v: any) =>
+        typeof v === "string" && v.length >= 8 && v.length <= 20 &&
+        /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(v.trim());
 
-      // Helper: extract pairing code from any result object
+      // Helper: deep-extract pairing code from any result object
       const extractPairingCode = (r: any): string | null => {
         if (!r) return null;
-        for (const candidate of [r?.pairingCode, r?.code, r?.data?.pairingCode, r?.data?.code]) {
-          if (isShortPairingCode(candidate)) return candidate;
+        // Check all known field locations
+        const candidates = [
+          r?.pairingCode, r?.code, r?.data?.pairingCode, r?.data?.code,
+          r?.instance?.pairingCode, r?.response?.pairingCode,
+        ];
+        for (const c of candidates) {
+          if (isShortPairingCode(c)) return c.trim();
         }
-        return null;
+        // Brute-force scan all string values in the result
+        const scanObj = (obj: any, depth = 0): string | null => {
+          if (depth > 3 || !obj) return null;
+          if (typeof obj === "string" && isShortPairingCode(obj)) return obj.trim();
+          if (typeof obj === "object") {
+            for (const key of Object.keys(obj)) {
+              const found = scanObj(obj[key], depth + 1);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+        return scanObj(r);
       };
 
-      // Step 1: Initialize the QR connection first (without number).
-      // Evolution API (Baileys) needs the WebSocket in "connecting" state before
-      // a pairing code can be generated.
+      const extractBase64 = (r: any): string | null =>
+        r?.base64 || r?.data?.base64 || null;
+
+      // ── Strategy 1: Single POST call with number in body ──────────────
+      // Evolution API v2 expects the number in the POST body. The API
+      // internally waits ~5s for the WS to be ready, then calls
+      // Baileys' requestPairingCode(number).
+      console.log("[WhatsApp] Pairing code: trying POST /instance/connect with body { number }...", { instName: req.params.instanceName, phoneNumber });
       try {
-        const initResult = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`);
-        base64 = initResult?.base64 || initResult?.data?.base64 || null;
-        console.log("[WhatsApp] Connection initialized for pairing code, waiting for WS ready...", {
-          instanceName: req.params.instanceName,
-          hasBase64: Boolean(base64),
+        const r1 = await evoFetch(`/instance/connect/${instName}`, {
+          method: "POST",
+          body: { number: phoneNumber },
         });
-      } catch (initErr) {
-        console.warn("[WhatsApp] Initial connect call failed (may already be connecting):", (initErr as Error).message);
-      }
-
-      // Step 2: Wait for the WebSocket to reach the connecting/QR state.
-      // Baileys needs ~2-3 seconds to open the WS and generate the QR before
-      // requestPairingCode() can succeed.
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      // Step 3: Now request the pairing code with the phone number.
-      // Method A: GET with query param (Evolution API v2)
-      try {
-        const r1 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
-        rawResult = r1;
+        allRawResults.push({ method: "POST-body", result: r1 });
         pairingCode = extractPairingCode(r1);
-        if (!base64) base64 = r1?.base64 || r1?.data?.base64 || null;
+        base64 = extractBase64(r1);
+        console.log("[WhatsApp] POST body result:", { keys: r1 ? Object.keys(r1) : [], pairingCode, hasBase64: !!base64 });
       } catch (e1) {
-        console.warn("[WhatsApp] GET connect with number failed:", (e1 as Error).message);
+        console.warn("[WhatsApp] POST connect with body failed:", (e1 as Error).message);
       }
 
-      // Method B: Fallback — POST with body (some Evolution API versions)
+      // ── Strategy 2: GET with query param (some v2 builds, v1 compat) ──
       if (!pairingCode) {
+        console.log("[WhatsApp] Pairing code: trying GET /instance/connect?number=...");
         try {
-          const r2 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`, {
+          const r2 = await evoFetch(`/instance/connect/${instName}?number=${phoneNumber}`);
+          allRawResults.push({ method: "GET-query", result: r2 });
+          pairingCode = extractPairingCode(r2);
+          if (!base64) base64 = extractBase64(r2);
+          console.log("[WhatsApp] GET query result:", { keys: r2 ? Object.keys(r2) : [], pairingCode, hasBase64: !!base64 });
+        } catch (e2) {
+          console.warn("[WhatsApp] GET connect with query param failed:", (e2 as Error).message);
+        }
+      }
+
+      // ── Strategy 3: Restart flow — logout, reconnect, then request ────
+      // If both direct approaches fail, the instance may already be in a
+      // stale state. Restart the connection cleanly.
+      if (!pairingCode) {
+        console.log("[WhatsApp] Direct approaches failed. Restarting instance connection for clean pairing code...");
+        try {
+          // Restart the instance to get a clean socket state
+          await evoFetch(`/instance/restart/${instName}`, { method: "POST", body: {} }).catch(() => {});
+          // Wait for instance to fully restart and reach "connecting" state
+          await new Promise((resolve) => setTimeout(resolve, 4000));
+
+          // Now try POST with number again on the fresh connection
+          const r3 = await evoFetch(`/instance/connect/${instName}`, {
             method: "POST",
             body: { number: phoneNumber },
           });
-          rawResult = rawResult || r2;
-          pairingCode = extractPairingCode(r2);
-        } catch (e2) {
-          console.warn("[WhatsApp] POST connect with number fallback failed:", (e2 as Error).message);
-        }
-      }
-
-      // Method C: If still no pairing code, try a longer wait and retry once more.
-      // Some slower instances need more time for the WS to be ready.
-      if (!pairingCode) {
-        console.log("[WhatsApp] Pairing code not found yet, retrying after additional delay...");
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        try {
-          const r3 = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}?number=${phoneNumber}`);
-          rawResult = rawResult || r3;
+          allRawResults.push({ method: "POST-after-restart", result: r3 });
           pairingCode = extractPairingCode(r3);
-          if (!base64) base64 = r3?.base64 || r3?.data?.base64 || null;
+          if (!base64) base64 = extractBase64(r3);
+          console.log("[WhatsApp] POST after restart result:", { keys: r3 ? Object.keys(r3) : [], pairingCode, hasBase64: !!base64 });
         } catch (e3) {
-          console.warn("[WhatsApp] Retry GET connect with number failed:", (e3 as Error).message);
+          console.warn("[WhatsApp] POST after restart failed:", (e3 as Error).message);
         }
       }
 
-      // Log what we found for debugging
-      const allKeys = rawResult ? Object.keys(rawResult) : [];
-      const pcVal = rawResult?.pairingCode;
-      const pcLen = typeof pcVal === "string" ? pcVal.length : 0;
-      console.log("[WhatsApp] Pairing code response:", { keys: allKeys, pairingCodeLen: pcLen, shortCodeFound: !!pairingCode, pairingCode });
+      // ── Strategy 4: Connect without number first, wait, then request ──
+      if (!pairingCode) {
+        console.log("[WhatsApp] Trying manual two-step: connect → wait → connect with number...");
+        try {
+          // Initialize connection (generates QR, sets WS to "connecting")
+          const initRes = await evoFetch(`/instance/connect/${instName}`);
+          if (!base64) base64 = extractBase64(initRes);
 
-      return res.json({ pairingCode, base64, raw: rawResult });
+          // Wait for WS to fully establish (Baileys needs QR phase)
+          await new Promise((resolve) => setTimeout(resolve, 6000));
+
+          // Now request pairing code via POST
+          const r4 = await evoFetch(`/instance/connect/${instName}`, {
+            method: "POST",
+            body: { number: phoneNumber },
+          });
+          allRawResults.push({ method: "POST-after-init-wait", result: r4 });
+          pairingCode = extractPairingCode(r4);
+          if (!base64) base64 = extractBase64(r4);
+          console.log("[WhatsApp] Two-step POST result:", { keys: r4 ? Object.keys(r4) : [], pairingCode, hasBase64: !!base64 });
+        } catch (e4) {
+          console.warn("[WhatsApp] Two-step approach failed:", (e4 as Error).message);
+        }
+
+        // Last resort: GET with number after the init+wait
+        if (!pairingCode) {
+          try {
+            const r5 = await evoFetch(`/instance/connect/${instName}?number=${phoneNumber}`);
+            allRawResults.push({ method: "GET-after-init-wait", result: r5 });
+            pairingCode = extractPairingCode(r5);
+            if (!base64) base64 = extractBase64(r5);
+            console.log("[WhatsApp] Two-step GET result:", { keys: r5 ? Object.keys(r5) : [], pairingCode, hasBase64: !!base64 });
+          } catch (e5) {
+            console.warn("[WhatsApp] Two-step GET failed:", (e5 as Error).message);
+          }
+        }
+      }
+
+      // ── Comprehensive diagnostic logging ──────────────────────────────
+      console.log("[WhatsApp] PAIRING CODE FINAL:", {
+        found: !!pairingCode,
+        pairingCode,
+        hasBase64: !!base64,
+        attempts: allRawResults.length,
+        rawSummaries: allRawResults.map((r) => ({
+          method: r.method,
+          keys: r.result ? Object.keys(r.result) : [],
+          pairingCode: r.result?.pairingCode?.substring?.(0, 30),
+          pairingCodeType: typeof r.result?.pairingCode,
+          pairingCodeLen: typeof r.result?.pairingCode === "string" ? r.result.pairingCode.length : 0,
+          codeField: typeof r.result?.code === "string" ? r.result.code.substring(0, 30) : undefined,
+          codeLen: typeof r.result?.code === "string" ? r.result.code.length : 0,
+        })),
+      });
+
+      return res.json({ pairingCode, base64, raw: allRawResults[allRawResults.length - 1]?.result || null });
     }
 
     // No phone number — return QR code (desktop flow)
-    const result = await evoFetch(`/instance/connect/${encodeURIComponent(req.params.instanceName)}`);
+    const result = await evoFetch(`/instance/connect/${instName}`);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
