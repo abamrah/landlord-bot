@@ -1508,6 +1508,12 @@ router.post("/agent/ask", async (req, res) => {
     maintenanceId: z.string().optional(),
     mediaBase64: z.string().optional(),
     mediaMimeType: z.string().optional(),
+    // Support multiple file uploads at once
+    mediaFiles: z.array(z.object({
+      base64: z.string(),
+      mimeType: z.string(),
+      name: z.string().optional(),
+    })).optional(),
   });
   const parsed = schema.safeParse(req.body || {});
   if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
@@ -1525,9 +1531,13 @@ router.post("/agent/ask", async (req, res) => {
       content: parsed.data.question,
     });
 
-    // Build media parts if provided
+    // Build media parts from single file (legacy) or multiple files
     const mediaParts: Array<{ base64: string; mimeType: string }> = [];
-    if (parsed.data.mediaBase64 && parsed.data.mediaMimeType) {
+    if (parsed.data.mediaFiles && parsed.data.mediaFiles.length) {
+      for (const f of parsed.data.mediaFiles) {
+        mediaParts.push({ base64: f.base64, mimeType: f.mimeType });
+      }
+    } else if (parsed.data.mediaBase64 && parsed.data.mediaMimeType) {
       mediaParts.push({ base64: parsed.data.mediaBase64, mimeType: parsed.data.mediaMimeType });
     }
 

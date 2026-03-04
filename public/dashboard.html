@@ -3182,7 +3182,7 @@
                   </select>
                 </div>
                 <div class="form-field"><label>XML File</label>
-                  <input type="file" id="gbFileInput" accept=".xml,.XML" style="font-size:12px;" />
+                  <input type="file" id="gbFileInput" accept=".xml,.XML" style="font-size:12px;" multiple />
                 </div>
                 <button class="btn btn-primary" id="gbUploadBtn" style="align-self:end;">Upload</button>
               </div>
@@ -3561,9 +3561,9 @@
                 style="background:none; border:none; color:var(--danger); cursor:pointer; margin-left:8px;">✕</button>
             </div>
             <div class="chat-input-row">
-              <input type="file" id="agentFileInput" accept="image/*,video/*,application/pdf" style="display:none;" />
+              <input type="file" id="agentFileInput" accept="image/*,video/*,application/pdf" style="display:none;" multiple />
               <button onclick="document.getElementById('agentFileInput').click()" class="btn"
-                style="align-self:end; padding:8px;" title="Attach image, video, or PDF">📎</button>
+                style="align-self:end; padding:8px;" title="Attach images, videos, or PDFs (multiple)">📎</button>
               <textarea id="agentQuestion"
                 placeholder="Ask anything — maintenance, tenancy law, find a product manual, search the web for appliance info..."
                 rows="2"></textarea>
@@ -4367,7 +4367,7 @@
           <button onclick="document.getElementById('mobileAgentFileInput').click()"
             style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;"
             title="Attach file">📎</button>
-          <input type="file" id="mobileAgentFileInput" accept="image/*,video/*,application/pdf" style="display:none">
+          <input type="file" id="mobileAgentFileInput" accept="image/*,video/*,application/pdf" style="display:none" multiple>
           <textarea id="mobileAgentQuestion" placeholder="Ask anything..." rows="1"></textarea>
           <button class="mobile-chat-send" id="mobileAgentAskBtn">➤</button>
         </div>
@@ -5842,23 +5842,31 @@
     });
 
     // ── AI AGENT CHAT ──
-    var agentMediaData = null; // { base64, mimeType, name }
+    var agentMediaFiles = []; // Array of { base64, mimeType, name }
     document.getElementById('agentAskBtn').addEventListener('click', sendAgentMessage);
     document.getElementById('agentQuestion').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); } });
     document.getElementById('agentFileInput').addEventListener('change', function (e) {
-      var file = e.target.files[0]; if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        var base64 = reader.result.split(',')[1];
-        agentMediaData = { base64: base64, mimeType: file.type, name: file.name };
-        document.getElementById('agentMediaName').textContent = '📎 ' + file.name;
-        document.getElementById('agentMediaPreview').style.display = 'flex';
-      };
-      reader.readAsDataURL(file);
+      var files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      var pending = files.length;
+      files.forEach(function (file) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var base64 = reader.result.split(',')[1];
+          agentMediaFiles.push({ base64: base64, mimeType: file.type, name: file.name });
+          pending--;
+          if (pending === 0) {
+            var label = agentMediaFiles.length === 1 ? ('📎 ' + agentMediaFiles[0].name) : ('📎 ' + agentMediaFiles.length + ' files attached');
+            document.getElementById('agentMediaName').textContent = label;
+            document.getElementById('agentMediaPreview').style.display = 'flex';
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     });
 
     function clearAgentMedia() {
-      agentMediaData = null;
+      agentMediaFiles = [];
       document.getElementById('agentMediaPreview').style.display = 'none';
       document.getElementById('agentFileInput').value = '';
     }
@@ -5897,7 +5905,7 @@
     var _desktopAgentSending = false;
     async function sendAgentMessage() {
       var input = document.getElementById('agentQuestion');
-      var q = input.value.trim(); if (!q && !agentMediaData) return;
+      var q = input.value.trim(); if (!q && !agentMediaFiles.length) return;
       if (_desktopAgentSending) return; // prevent double-sends
       _desktopAgentSending = true;
       document.getElementById('agentAskBtn').disabled = true;
@@ -5905,7 +5913,8 @@
       var userMsg = document.createElement('div');
       userMsg.className = 'chat-msg user';
       var displayText = q || '';
-      if (agentMediaData) displayText += (displayText ? '\n' : '') + '📎 ' + agentMediaData.name;
+      if (agentMediaFiles.length === 1) displayText += (displayText ? '\n' : '') + '📎 ' + agentMediaFiles[0].name;
+      else if (agentMediaFiles.length > 1) displayText += (displayText ? '\n' : '') + '📎 ' + agentMediaFiles.length + ' files';
       userMsg.innerHTML = '<div>' + displayText + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
       log.appendChild(userMsg);
       input.value = '';
@@ -5918,10 +5927,9 @@
       log.scrollTop = log.scrollHeight;
 
       try {
-        var body = { question: q || 'Analyze this file' };
-        if (agentMediaData) {
-          body.mediaBase64 = agentMediaData.base64;
-          body.mediaMimeType = agentMediaData.mimeType;
+        var body = { question: q || 'Analyze these files' };
+        if (agentMediaFiles.length) {
+          body.mediaFiles = agentMediaFiles.map(function (f) { return { base64: f.base64, mimeType: f.mimeType, name: f.name }; });
         }
         clearAgentMedia();
         var res = await fetchJson('/admin/agent/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -6211,35 +6219,44 @@
       var fileInput = document.createElement('input');
       fileInput.type = 'file';
       fileInput.accept = 'application/pdf,image/*';
+      fileInput.multiple = true;
       fileInput.onchange = async function () {
-        var file = fileInput.files[0]; if (!file) return;
-        btn.textContent = 'Uploading...'; btn.disabled = true;
+        var files = Array.from(fileInput.files || []); if (!files.length) return;
+        btn.textContent = 'Uploading ' + files.length + ' file(s)...'; btn.disabled = true;
         try {
-          var reader = new FileReader();
-          reader.onload = async function () {
-            var base64 = reader.result.split(',')[1];
-            var res = await fetchJson('/admin/leases/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ unitTenantId: utId, fileName: file.name, fileBase64: base64, mimeType: file.type })
+          var uploadCount = 0;
+          for (var fi = 0; fi < files.length; fi++) {
+            var file = files[fi];
+            await new Promise(function (resolve, reject) {
+              var reader = new FileReader();
+              reader.onload = async function () {
+                try {
+                  var base64 = reader.result.split(',')[1];
+                  var res = await fetchJson('/admin/leases/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ unitTenantId: utId, fileName: file.name, fileBase64: base64, mimeType: file.type })
+                  });
+                  uploadCount++;
+                  if (res.extractedTerms) {
+                    var terms = res.extractedTerms;
+                    var msg = 'Lease uploaded for ' + tenantName + ' (' + file.name + ')!\n\n';
+                    if (terms.rentAmount) msg += '💰 Rent: $' + terms.rentAmount + '/mo\n';
+                    if (terms.startDate) msg += '📅 Start: ' + terms.startDate + '\n';
+                    if (terms.endDate) msg += '📅 End: ' + terms.endDate + '\n';
+                    if (terms.securityDeposit) msg += '🔒 Deposit: $' + terms.securityDeposit + '\n';
+                    if (res.summary) msg += '\n' + res.summary;
+                    alert(msg);
+                  }
+                  resolve();
+                } catch (err) { reject(err); }
+              };
+              reader.readAsDataURL(file);
             });
-            btn.textContent = '📤 Upload Lease'; btn.disabled = false;
-            if (res.extractedTerms) {
-              var terms = res.extractedTerms;
-              var msg = 'Lease uploaded for ' + tenantName + '!\n\n';
-              if (terms.rentAmount) msg += '💰 Rent: $' + terms.rentAmount + '/mo\n';
-              if (terms.startDate) msg += '📅 Start: ' + terms.startDate + '\n';
-              if (terms.endDate) msg += '📅 End: ' + terms.endDate + '\n';
-              if (terms.securityDeposit) msg += '🔒 Deposit: $' + terms.securityDeposit + '\n';
-              if (res.summary) msg += '\n' + res.summary;
-              toast('Lease uploaded & analyzed!');
-              alert(msg);
-            } else {
-              toast('Lease uploaded (no AI extraction available)');
-            }
-            loadTenants();
-          };
-          reader.readAsDataURL(file);
+          }
+          btn.textContent = '📤 Upload Lease'; btn.disabled = false;
+          toast(uploadCount + ' lease file(s) uploaded' + (uploadCount > 0 ? ' & analyzed!' : ''));
+          loadTenants();
         } catch (err) {
           btn.textContent = '📤 Upload Lease'; btn.disabled = false;
           toast('Upload failed: ' + err.message);
@@ -6362,22 +6379,30 @@
       var utilityType = document.getElementById('gbUploadType').value;
       var fileInput = document.getElementById('gbFileInput');
       if (!unitId || !provider) return toast('Select unit and provider');
-      if (!fileInput.files || !fileInput.files.length) return toast('Select an XML file');
+      if (!fileInput.files || !fileInput.files.length) return toast('Select one or more XML files');
       var statusEl = document.getElementById('gbUploadStatus');
-      statusEl.textContent = 'Reading file...';
+      var files = Array.from(fileInput.files);
+      var totalSummaries = 0, totalReadings = 0, totalBillsSaved = 0, totalBillsFound = 0;
+      statusEl.textContent = 'Uploading ' + files.length + ' file(s)...';
       statusEl.style.color = 'var(--text-muted)';
       try {
-        var xml = await fileInput.files[0].text();
-        statusEl.textContent = 'Uploading & parsing...';
-        var res = await fetchJson('/admin/green-button/upload', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ xml: xml, unitId: unitId, provider: provider, utilityType: utilityType })
-        });
+        for (var i = 0; i < files.length; i++) {
+          statusEl.textContent = 'Processing file ' + (i + 1) + ' of ' + files.length + '...';
+          var xml = await files[i].text();
+          var res = await fetchJson('/admin/green-button/upload', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ xml: xml, unitId: unitId, provider: provider, utilityType: utilityType })
+          });
+          totalSummaries += (res.parsed?.usageSummaries || 0);
+          totalReadings += (res.parsed?.intervalReadings || 0);
+          totalBillsSaved += (res.billsSaved || 0);
+          totalBillsFound += (res.totalBillsFound || 0);
+        }
         statusEl.style.color = 'var(--success)';
-        statusEl.textContent = '✓ Parsed ' + (res.parsed?.usageSummaries || 0) + ' summaries, ' +
-          (res.parsed?.intervalReadings || 0) + ' readings. Saved ' + (res.billsSaved || 0) + ' new bills (' + (res.totalBillsFound || 0) + ' total found).';
+        statusEl.textContent = '✓ ' + files.length + ' file(s): Parsed ' + totalSummaries + ' summaries, ' +
+          totalReadings + ' readings. Saved ' + totalBillsSaved + ' new bills (' + totalBillsFound + ' total found).';
         fileInput.value = '';
-        loadUtilities(); // Refresh bills table
+        loadUtilities();
       } catch (err) {
         statusEl.style.color = 'var(--danger)';
         statusEl.textContent = 'Error: ' + err.message;
@@ -7449,7 +7474,7 @@
       var mobileAskBtn = document.getElementById('mobileAgentAskBtn');
       var mobileInput = document.getElementById('mobileAgentQuestion');
       var mobileLog = document.getElementById('mobileAgentChatLog');
-      var mobileAgentMediaData = null; // { base64, mimeType, name }
+      var mobileAgentMediaData = null; // DEPRECATED — use mobileAgentMediaFiles instead
       var mobileAgentFileInput = document.getElementById('mobileAgentFileInput');
 
       // ── Fix mobile keyboard pushing chat input halfway up ──
@@ -7475,22 +7500,30 @@
         window.visualViewport.addEventListener('scroll', onViewportResize);
       })();
 
-      // Mobile media upload handler
+      // Mobile media upload handler (multi-file)
+      var mobileAgentMediaFiles = [];
       mobileAgentFileInput.addEventListener('change', function () {
-        var file = this.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var base64 = e.target.result.split(',')[1];
-          mobileAgentMediaData = { base64: base64, mimeType: file.type, name: file.name };
-          document.getElementById('mobileMediaFileName').textContent = file.name;
-          document.getElementById('mobileAgentMediaPreview').style.display = 'flex';
-        };
-        reader.readAsDataURL(file);
+        var files = Array.from(this.files || []);
+        if (!files.length) return;
+        var pending = files.length;
+        files.forEach(function (file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var base64 = e.target.result.split(',')[1];
+            mobileAgentMediaFiles.push({ base64: base64, mimeType: file.type, name: file.name });
+            pending--;
+            if (pending === 0) {
+              var label = mobileAgentMediaFiles.length === 1 ? mobileAgentMediaFiles[0].name : (mobileAgentMediaFiles.length + ' files');
+              document.getElementById('mobileMediaFileName').textContent = label;
+              document.getElementById('mobileAgentMediaPreview').style.display = 'flex';
+            }
+          };
+          reader.readAsDataURL(file);
+        });
       });
 
       window.clearMobileAgentMedia = function () {
-        mobileAgentMediaData = null;
+        mobileAgentMediaFiles = [];
         document.getElementById('mobileAgentMediaPreview').style.display = 'none';
         mobileAgentFileInput.value = '';
       };
@@ -7524,7 +7557,7 @@
 
       function sendMobileAgentMessage() {
         var q = mobileInput.value.trim();
-        if (!q && !mobileAgentMediaData) return;
+        if (!q && !mobileAgentMediaFiles.length) return;
         if (_mobileAgentSending) return; // prevent double-sends
         _mobileAgentSending = true;
         mobileAskBtn.disabled = true;
@@ -7532,7 +7565,8 @@
         var userMsg = document.createElement('div');
         userMsg.className = 'chat-msg user';
         var displayText = q ? q.replace(/</g, '&lt;') : '';
-        if (mobileAgentMediaData) displayText = '📎 ' + mobileAgentMediaData.name + (displayText ? '\n' + displayText : '');
+        if (mobileAgentMediaFiles.length === 1) displayText = '📎 ' + mobileAgentMediaFiles[0].name + (displayText ? '\n' + displayText : '');
+        else if (mobileAgentMediaFiles.length > 1) displayText = '📎 ' + mobileAgentMediaFiles.length + ' files' + (displayText ? '\n' + displayText : '');
         userMsg.innerHTML = '<div>' + displayText + '</div><div class="meta">' + new Date().toLocaleTimeString() + '</div>';
         mobileLog.appendChild(userMsg);
         mobileInput.value = '';
@@ -7540,10 +7574,9 @@
         mobileLog.scrollTop = mobileLog.scrollHeight;
 
         // Build request body
-        var body = { question: q || 'Analyze this file' };
-        if (mobileAgentMediaData) {
-          body.mediaBase64 = mobileAgentMediaData.base64;
-          body.mediaMimeType = mobileAgentMediaData.mimeType;
+        var body = { question: q || 'Analyze these files' };
+        if (mobileAgentMediaFiles.length) {
+          body.mediaFiles = mobileAgentMediaFiles.map(function (f) { return { base64: f.base64, mimeType: f.mimeType, name: f.name }; });
         }
         clearMobileAgentMedia();
 
