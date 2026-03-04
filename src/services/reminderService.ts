@@ -5,6 +5,13 @@ import agentService from "./agentService";
 
 const isDbEnabled = Boolean(process.env.DATABASE_URL);
 
+/**
+ * In-memory set of reminder IDs that have already fired in the current
+ * runDueReminders() invocation. Prevents concurrent interval overlaps
+ * from double-sending within the same polling cycle.
+ */
+const firedThisCycle = new Set<string>();
+
 type ReminderInput = {
   id?: string;
   landlordId?: string;
@@ -73,10 +80,10 @@ function getLocalTime(now: Date, timezone: string): { day: number; hour: number;
 /**
  * Check if a reminder should fire now, using the landlord's timezone.
  * The `timeUtc` field is treated as the landlord's LOCAL time.
- * Widened check window to ±1 minute to handle 30-second polling edge case.
+ * Uses same-calendar-day dedup: only one send per reminder per calendar day.
  */
 function shouldSendNow(
-  reminder: { dayOfMonth: number; timeUtc: string; lastSentAt?: Date | null },
+  reminder: { id?: string; dayOfMonth: number; timeUtc: string; lastSentAt?: Date | null },
   now: Date,
   timezone?: string
 ) {
@@ -88,16 +95,21 @@ function shouldSendNow(
 
   if (local.day !== reminder.dayOfMonth) return false;
 
-  // Check if we're within ±1 minute of the target time
+  // Exact minute match only (no ±1 min window) to prevent re-fires
   const targetMin = time.hour * 60 + time.minute;
   const currentMin = local.hour * 60 + local.minute;
-  if (Math.abs(currentMin - targetMin) > 1) return false;
+  if (currentMin !== targetMin) return false;
 
-  // Don't re-send if already sent within the last 2 minutes
+  // Same-calendar-day dedup: if lastSentAt falls on the same local day, skip.
+  // This prevents any repeat sends within the same day regardless of timing.
   if (reminder.lastSentAt) {
-    const elapsed = now.getTime() - reminder.lastSentAt.getTime();
-    if (elapsed < 120000) return false; // 2 minute dedup window
+    const lastLocal = getLocalTime(reminder.lastSentAt, tz);
+    if (lastLocal.day === local.day) return false;
   }
+
+  // In-memory guard against concurrent polling overlaps
+  if (reminder.id && firedThisCycle.has(reminder.id)) return false;
+
   return true;
 }
 
@@ -160,6 +172,9 @@ export async function runDueReminders(now = new Date()): Promise<ReminderResult[
   if (!isDbEnabled) return [];
   const results: ReminderResult[] = [];
 
+  // Clear the in-memory fired set at the start of each polling cycle
+  firedThisCycle.clear();
+
   try {
     const reminders = await db.reminder.findMany({ where: { active: true } });
 
@@ -180,11 +195,22 @@ export async function runDueReminders(now = new Date()): Promise<ReminderResult[
       const tz = reminder.landlordId ? (landlordTimezones.get(reminder.landlordId) || "America/Toronto") : "America/Toronto";
       if (!shouldSendNow(reminder, now, tz)) continue;
 
+      // Mark this reminder as fired in-memory to prevent concurrent overlap
+      firedThisCycle.add(reminder.id);
+
       // Mark as sent immediately to prevent duplicate sends
-      await db.reminder.update({
-        where: { id: reminder.id },
-        data: { lastSentAt: now },
-      });
+      try {
+        await db.reminder.update({
+          where: { id: reminder.id },
+          data: { lastSentAt: now },
+        });
+      } catch (updateErr) {
+        console.error("CRITICAL: failed to update lastSentAt for reminder — skipping to prevent repeat sends", {
+          reminderId: reminder.id,
+          error: (updateErr as Error).message,
+        });
+        continue; // Skip sending if we can't update the dedup marker
+      }
 
       let sent = 0;
       let failed = 0;

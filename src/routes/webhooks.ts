@@ -582,6 +582,27 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
   const combinedMessage = bucket.messages.map((m) => m.content).join("\n---\n").trim();
 
   // ── AGENTIC PATH ──
+  // ── LANDLORD ACTIVE CHECK (batch path) ──
+  const landlordActiveBatch = await conversationMemory.hasRecentLandlordReply({
+    phone: tenant.phone || bucket.replyTo,
+    landlordId,
+    windowMinutes: 30,
+  });
+  if (landlordActiveBatch) {
+    // eslint-disable-next-line no-console
+    console.info("skipping auto-reply (batch) — landlord recently messaged this tenant", {
+      tenantId: tenant.id, tenantName: tenant.name, replyTo: bucket.replyTo,
+    });
+    await conversationMemory.saveMessage({
+      phone: tenant.phone || bucket.replyTo,
+      landlordId,
+      role: "tenant",
+      content: combinedMessage,
+      meta: { channel: bucket.isGroup ? "whatsapp_group" : "whatsapp", landlordActiveSkip: true },
+    });
+    return null;
+  }
+
   if (AGENTIC_MODE && landlordId) {
     try {
       // ── Auto-reply status: processing (agentic batch) ──
@@ -1570,6 +1591,30 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       }
     }
 
+    // ── ACKNOWLEDGEMENT DETECTION — skip triage & ticket creation for simple ack messages ──
+    const ACK_PATTERNS = /^(ok|okay|k|thanks|thank you|thx|ty|sure|got it|sounds good|np|no problem|cool|great|alright|will do|noted|perfect|yes|yep|yeah|ya|yup|fine|good|understood|awesome|no worries|kk|👍|👌|🙏|✅|💯)\.?!?$/i;
+    const normalizedMsg = (tenantMessage || "").trim().replace(/\s+/g, " ");
+    if (ACK_PATTERNS.test(normalizedMsg) && !record?.id) {
+      // Simple acknowledgement with no open ticket — don't create a ticket or triage
+      // eslint-disable-next-line no-console
+      console.info("acknowledgement message detected — skipping triage/ticket creation", {
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        message: normalizedMsg,
+      });
+
+      // Save to conversation memory so context is preserved
+      await conversationMemory.saveMessage({
+        phone: tenant.phone || sender,
+        landlordId: tenantLandlordId,
+        role: "tenant",
+        content: tenantMessage,
+        meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", acknowledgement: true },
+      });
+
+      return respond({ ok: true, routed: "tenant_acknowledgement", llmInvoked: false, autoReplySent: false, autoReplyReason: "acknowledgement_skipped" });
+    }
+
     const triage = await agentService.triageMaintenance({
       tenantMessage,
       tenantId: tenant.id,
@@ -1577,9 +1622,65 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     });
     llmInvoked = true;
 
+    // ── NOT_MAINTENANCE detection — skip ticket creation for non-maintenance messages ──
+    const triageSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
+    if (triageSeverity === "not_maintenance" && !record?.id) {
+      // eslint-disable-next-line no-console
+      console.info("triage classified as not_maintenance — skipping ticket creation", {
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        summary: triage?.summary,
+      });
+
+      await conversationMemory.saveMessage({
+        phone: tenant.phone || sender,
+        landlordId: tenantLandlordId,
+        role: "tenant",
+        content: tenantMessage,
+        meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", notMaintenance: true },
+      });
+
+      // Still run the agentic handler so the tenant gets a conversational reply
+      // but no ticket is created.
+      if (AGENTIC_MODE && tenantLandlordId) {
+        try {
+          const mediaParts = mediaResult?.base64
+            ? [{ base64: mediaResult.base64, mimeType: mediaResult.mimeType }]
+            : undefined;
+          const mediaDescription = mediaResult
+            ? (mediaResult.transcription
+              ? `[Voice note]: "${mediaResult.transcription}"`
+              : mediaResult.description
+                ? `[${mediaResult.type} analysis]: ${mediaResult.description}`
+                : `[${mediaResult.type} received]`)
+            : undefined;
+
+          const agentResult = await orchestrator.handleTenantMessage({
+            tenantPhone: sender,
+            message: tenantMessage,
+            landlordId: tenantLandlordId,
+            mediaDescription,
+            mediaParts,
+          });
+
+          let agentDraft = extractDraftReply(agentResult.finalAnswer || "");
+          if (isValidTenantDraft(agentDraft)) {
+            const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
+            const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
+            if (canAutoReply) {
+              await whatsappService.sendWhatsAppText({ to: replyTo, text: agentDraft, landlordId: tenantLandlordId });
+              lastReplySentAt.set(tenant.id, Date.now());
+            }
+          }
+        } catch (_err) { /* non-critical */ }
+      }
+
+      return respond({ ok: true, routed: "tenant_not_maintenance", llmInvoked, autoReplySent: false, autoReplyReason: "not_maintenance" });
+    }
+
     const delayMs = await computeDelayMs(
       tenant.id,
-      (triage?.classification?.severity || "normal").toString().toLowerCase(),
+      triageSeverity,
       tenantMessage,
       tenantLandlordId
     );
@@ -1599,7 +1700,10 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           mediaDescription: mediaResult?.description || mediaResult?.transcription,
         },
       });
-    } else {
+    } else if (!AGENTIC_MODE) {
+      // Only create a ticket in linear mode — in agentic mode, the agent
+      // decides whether to create one via the create_maintenance_request tool,
+      // avoiding duplicate tickets.
       record = await repo.createMaintenanceRequest({
         tenantId: tenant.id,
         unitId: immediateUnitId,
@@ -1656,6 +1760,31 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       });
       return respond({ ok: true, routed: "tenant_dedup_skip", llmInvoked, autoReplySent: false, autoReplyReason: "recent_reply_dedup" });
     }
+
+    // ── LANDLORD ACTIVE CHECK ──
+    // If the landlord has sent a message to this tenant recently (within 30 min),
+    // skip the auto-reply — the landlord is actively handling the conversation.
+    const landlordActive = await conversationMemory.hasRecentLandlordReply({
+      phone: tenant.phone || sender,
+      landlordId: tenantLandlordId,
+      windowMinutes: 30,
+    });
+    if (landlordActive) {
+      // eslint-disable-next-line no-console
+      console.info("skipping auto-reply — landlord recently messaged this tenant", {
+        tenantId: tenant.id, tenantName: tenant.name, replyTo,
+      });
+      // Still save the tenant message to conversation memory
+      await conversationMemory.saveMessage({
+        phone: tenant.phone || sender,
+        landlordId: tenantLandlordId,
+        role: "tenant",
+        content: tenantMessage,
+        meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", landlordActiveSkip: true },
+      });
+      return respond({ ok: true, routed: "tenant_landlord_active", llmInvoked, autoReplySent: false, autoReplyReason: "landlord_active_skip" });
+    }
+
     if (AGENTIC_MODE && tenantLandlordId) {
       try {
         // ── Auto-reply status: processing (agentic immediate) ──

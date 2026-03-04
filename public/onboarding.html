@@ -631,9 +631,10 @@
                     manager.<br>
                     <strong>WhatsApp → Settings → Linked Devices → Link a Device</strong>
                 </p>
-                <p class="onb-mobile-hint" style="display:none;">Enter your phone number to get a pairing code, then
-                    enter it in WhatsApp.<br>
-                    <strong>WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</strong>
+                <p class="onb-mobile-hint" style="display:none;">📱 <strong>For best results, open this page on a desktop/laptop browser</strong> to scan the QR code.<br><br>
+                    If you'd like to continue on mobile, enter your phone number below to get a pairing code.<br>
+                    <strong>WhatsApp → Settings → Linked Devices → Link a Device → Link with Phone Number</strong><br><br>
+                    Or you can <strong>skip this step</strong> and connect WhatsApp later from your dashboard.
                 </p>
 
                 <!-- Mobile: phone number input for pairing code -->
@@ -649,6 +650,10 @@
                     </div>
                     <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Include country code (e.g. +1
                         for US/Canada)</div>
+                    <div class="onb-mobile-hint" style="display:none;margin-top:14px;">
+                        <button class="btn btn-secondary" onclick="completeStep(0)" style="width:100%;max-width:320px;margin:0 auto;">⏭ Skip — I'll connect WhatsApp later</button>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">You can connect WhatsApp anytime from your dashboard.</div>
+                    </div>
                 </div>
 
                 <div id="qrArea" style="text-align:center;margin:16px 0;">

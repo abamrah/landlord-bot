@@ -924,7 +924,7 @@ export async function findLatestMaintenanceForTenantId(tenantId?: string) {
     return await db.maintenanceRequest.findFirst({
       where: {
         tenantId,
-        status: { in: [MaintenanceStatus.OPEN, MaintenanceStatus.IN_PROGRESS] },
+        status: { in: [MaintenanceStatus.OPEN, MaintenanceStatus.IN_PROGRESS, MaintenanceStatus.PENDING, MaintenanceStatus.IN_TRIAGE, MaintenanceStatus.SCHEDULED] },
       },
       orderBy: { createdAt: "desc" },
     });

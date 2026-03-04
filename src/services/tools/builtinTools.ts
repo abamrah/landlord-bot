@@ -1851,7 +1851,7 @@ export function createTenantTool(): ToolDefinition {
                     try {
                         const landlord = await db.landlord.findUnique({ where: { id: landlordId }, select: { name: true, company: true } });
                         const landlordName = landlord?.company || landlord?.name || "Your Landlord";
-                        const welcomeMsg = `*Welcome to ${landlordName}'s Property Management!*\n\nHi ${args.name}, your landlord has set you up on NestMind — an AI-powered platform. Send a message here anytime to report maintenance issues or ask questions.`;
+                        const welcomeMsg = `*Welcome to ${landlordName}'s Property Management!*\n\nHi ${args.name}, your landlord has set you up on NestMind — an AI-powered platform for property management.\n\n✉️ *All communication with your landlord will be through this WhatsApp chat.* No need to call or email — just send a message here!\n\n*How it works:*\n• Send a message here anytime to report maintenance issues or ask questions\n• You'll receive rent reminders before due dates\n• AI-assisted support means faster response times\n\nWe're here to help! Send "Hi" anytime to get started.`;
                         await whatsappService.sendWhatsAppText({ to: String(args.phone), text: welcomeMsg, landlordId });
                     } catch (_err) { /* non-critical */ }
                 }

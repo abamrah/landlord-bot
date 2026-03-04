@@ -119,9 +119,39 @@ export async function getMessageCount(params: {
     }
 }
 
+/**
+ * Check if the landlord has sent a message to this phone number recently.
+ * Used to suppress AI auto-replies when the landlord is actively chatting.
+ */
+export async function hasRecentLandlordReply(params: {
+    phone: string;
+    landlordId?: string;
+    windowMinutes?: number;
+}): Promise<boolean> {
+    if (!isDbEnabled || !params.phone) return false;
+    const windowMs = (params.windowMinutes || 30) * 60 * 1000;
+    const cutoff = new Date(Date.now() - windowMs);
+    try {
+        const recent = await db.conversationMessage.findFirst({
+            where: {
+                phone: params.phone,
+                role: "landlord",
+                createdAt: { gte: cutoff },
+                ...(params.landlordId ? { landlordId: params.landlordId } : {}),
+            },
+            orderBy: { createdAt: "desc" },
+        });
+        return Boolean(recent);
+    } catch (err) {
+        console.warn("hasRecentLandlordReply failed", err);
+        return false;
+    }
+}
+
 export default {
     saveMessage,
     getHistory,
     formatHistory,
     getMessageCount,
+    hasRecentLandlordReply,
 };
