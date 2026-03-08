@@ -3643,6 +3643,8 @@
               style="display:none;">Disconnect</button>
             <button class="btn btn-secondary btn-sm" id="waRestartBtn" onclick="dashRestart()"
               style="display:none;">Restart</button>
+            <button class="btn btn-sm" id="waRemoveBtn" onclick="dashRemoveInstance()"
+              style="display:none;background:var(--error-bg);color:var(--error-text);border:1px solid var(--error-border);">Remove Instance</button>
             <button class="btn btn-secondary btn-sm" id="waRefreshBtn" onclick="dashCheckState()">↻ Refresh</button>
           </div>
         </div>
@@ -5465,6 +5467,7 @@
       var connectBtn = document.getElementById('waConnectBtn');
       var disconnectBtn = document.getElementById('waDisconnectBtn');
       var restartBtn = document.getElementById('waRestartBtn');
+      var removeBtn = document.getElementById('waRemoveBtn');
       var qrContainer = document.getElementById('waQrContainer');
       var pairingEl = document.getElementById('waPairingCode');
       var errorEl = document.getElementById('waQrError');
@@ -5479,12 +5482,28 @@
           connectBtn.style.display = '';
           disconnectBtn.style.display = 'none';
           restartBtn.style.display = 'none';
+          removeBtn.style.display = 'none';
           connectedEl.style.display = 'none';
           if (phoneInput) phoneInput.style.display = 'none';
           return;
         }
         dashQrInstance = mine.instanceName;
         var status = mine.state;
+
+        // Instance was deleted externally (from Evolution API Manager) — show remove button to clean up DB
+        if (mine.instanceGone || status === 'gone') {
+          stateChip.textContent = 'Instance Deleted';
+          stateChip.className = 'chip chip-warn';
+          connectedEl.style.display = 'none';
+          connectBtn.style.display = 'none';
+          disconnectBtn.style.display = 'none';
+          restartBtn.style.display = 'none';
+          removeBtn.style.display = '';
+          errorEl.textContent = 'This instance was deleted from Evolution API. Click "Remove Instance" to clean up, then create a new one.';
+          errorEl.style.display = 'block';
+          if (phoneInput) phoneInput.style.display = 'none';
+          return;
+        }
 
         if (status === 'open') {
           stateChip.textContent = 'Connected';
@@ -5498,6 +5517,8 @@
           connectBtn.style.display = 'none';
           disconnectBtn.style.display = '';
           restartBtn.style.display = '';
+          removeBtn.style.display = '';
+          errorEl.style.display = 'none';
           if (dashQrPollTimer) { clearInterval(dashQrPollTimer); dashQrPollTimer = null; }
           // Show chat panel when connected
           document.getElementById('waNestMindChat').style.display = '';
@@ -5508,6 +5529,8 @@
           connectBtn.style.display = '';
           disconnectBtn.style.display = status === 'close' ? '' : 'none';
           restartBtn.style.display = '';
+          removeBtn.style.display = '';
+          errorEl.style.display = 'none';
         }
       } catch (err) {
         stateChip.textContent = 'Error';
@@ -5687,7 +5710,15 @@
         await fetchJson('/admin/whatsapp/instance/logout/' + encodeURIComponent(dashQrInstance), { method: 'DELETE' });
         toast('WhatsApp disconnected');
         dashCheckState();
-      } catch (err) { toast('Disconnect failed: ' + err.message); }
+      } catch (err) {
+        // If instance is gone, suggest removing it
+        if (err.message && (err.message.includes('404') || err.message.includes('not found') || err.message.includes('not exists'))) {
+          toast('Instance not found on server. Use "Remove Instance" to clean up.');
+        } else {
+          toast('Disconnect failed: ' + err.message);
+        }
+        dashCheckState();
+      }
     }
 
     async function dashRestart() {
@@ -5696,7 +5727,28 @@
         await fetchJson('/admin/whatsapp/instance/restart/' + encodeURIComponent(dashQrInstance), { method: 'PUT' });
         toast('Instance restarting…');
         setTimeout(dashCheckState, 3000);
-      } catch (err) { toast('Restart failed: ' + err.message); }
+      } catch (err) {
+        if (err.message && (err.message.includes('404') || err.message.includes('not found') || err.message.includes('not exists') || err.message.includes('instance_not_found'))) {
+          toast('Instance not found. Use "Remove Instance" to clean up, then create a new one.');
+        } else {
+          toast('Restart failed: ' + err.message);
+        }
+        dashCheckState();
+      }
+    }
+
+    async function dashRemoveInstance() {
+      if (!dashQrInstance) return toast('No instance to remove');
+      if (!confirm('Remove this WhatsApp instance? You will need to create and connect a new one.')) return;
+      try {
+        await fetchJson('/admin/whatsapp/instance/remove/' + encodeURIComponent(dashQrInstance), { method: 'DELETE' });
+        toast('Instance removed. Click "Connect WhatsApp" to create a new one.');
+        dashQrInstance = null;
+        dashCheckState();
+        loadInstanceInfo();
+      } catch (err) {
+        toast('Remove failed: ' + err.message);
+      }
     }
 
     // Check WhatsApp state on page load

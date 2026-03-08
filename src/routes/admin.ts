@@ -2223,11 +2223,19 @@ router.get("/whatsapp/instance/mine", async (req, res) => {
     if (!landlord?.evolutionInstanceName) return res.json({ instanceName: null });
     // Also fetch current state
     let state = "unknown";
+    let instanceGone = false;
     try {
       const s = await evoFetch(`/instance/connectionState/${encodeURIComponent(landlord.evolutionInstanceName)}`);
       state = (s as any)?.instance?.state || "unknown";
-    } catch { }
-    res.json({ instanceName: landlord.evolutionInstanceName, state });
+    } catch (stateErr) {
+      const msg = (stateErr as Error).message || "";
+      // If Evolution API says the instance doesn't exist, flag it so the UI can offer cleanup
+      if (msg.includes("404") || msg.includes("not found") || msg.toLowerCase().includes("not exists")) {
+        state = "gone";
+        instanceGone = true;
+      }
+    }
+    res.json({ instanceName: landlord.evolutionInstanceName, state, instanceGone });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
@@ -2483,7 +2491,12 @@ router.delete("/whatsapp/instance/logout/:instanceName", async (req, res) => {
     const result = await evoFetch(`/instance/logout/${encodeURIComponent(req.params.instanceName)}`, { method: "DELETE" });
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: (err as Error).message });
+    // If Evolution API returns 404, the instance is already gone — treat as success
+    const msg = (err as Error).message || "";
+    if (msg.includes("404") || msg.includes("not found") || msg.toLowerCase().includes("not exists")) {
+      return res.json({ ok: true, message: "Instance already removed from Evolution API" });
+    }
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -2495,6 +2508,32 @@ router.put("/whatsapp/instance/restart/:instanceName", async (req, res) => {
   try {
     const result = await evoFetch(`/instance/restart/${encodeURIComponent(req.params.instanceName)}`, { method: "PUT" });
     res.json(result);
+  } catch (err) {
+    const msg = (err as Error).message || "";
+    if (msg.includes("404") || msg.includes("not found") || msg.toLowerCase().includes("not exists")) {
+      return res.status(404).json({ error: "instance_not_found", message: "Instance no longer exists in Evolution API. Use Remove Instance to clean up, then create a new one." });
+    }
+    res.status(500).json({ error: msg });
+  }
+});
+
+/** Remove (delete) an instance — clears from Evolution API AND from the DB */
+router.delete("/whatsapp/instance/remove/:instanceName", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
+  if (landlord?.evolutionInstanceName !== req.params.instanceName) return res.status(403).json({ error: "forbidden" });
+  const inst = encodeURIComponent(req.params.instanceName);
+  // 1. Try to logout from Evolution API (ignore errors — instance may already be deleted externally)
+  try { await evoFetch(`/instance/logout/${inst}`, { method: "DELETE" }); } catch { }
+  // 2. Try to delete from Evolution API
+  try { await evoFetch(`/instance/delete/${inst}`, { method: "DELETE" }); } catch { }
+  // 3. Clear from DB — this is the critical part
+  try {
+    await db.landlord.update({
+      where: { id: authReq.landlordId },
+      data: { evolutionInstanceName: null },
+    });
+    res.json({ ok: true, message: "Instance removed. You can now create a new one." });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
