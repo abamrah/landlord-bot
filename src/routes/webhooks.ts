@@ -211,6 +211,46 @@ const pendingTenantReplies = new Map<
 >();
 const lastReplySentAt = new Map<string, number>();
 
+/**
+ * Create a persistent dashboard notification + push notification for a tenant message.
+ * This ensures ALL tenant activity appears in the landlord's notification panel.
+ */
+async function notifyLandlordDashboard(landlordId: string, opts: {
+  tenantName: string;
+  tenantId: string;
+  tenantPhone: string;
+  message: string;
+  category: string;
+  severity?: string;
+  autoReplySent?: boolean;
+  aiDraft?: string;
+  maintenanceId?: string;
+  extra?: Record<string, unknown>;
+}) {
+  if (!landlordId) return;
+  try {
+    const { createNotification } = require("../services/websocketService");
+    const bodyParts = [opts.message.substring(0, 300)];
+    if (opts.aiDraft) bodyParts.push(`\n\n🤖 AI: ${opts.autoReplySent ? "replied" : "drafted"}: ${opts.aiDraft.substring(0, 200)}`);
+    await createNotification(landlordId, {
+      type: "TENANT_MESSAGE",
+      title: `${opts.tenantName}: ${opts.category.replace(/_/g, " ")}`,
+      body: bodyParts.join(""),
+      data: {
+        tenantId: opts.tenantId,
+        tenantPhone: opts.tenantPhone,
+        category: opts.category,
+        severity: opts.severity || "normal",
+        autoReplySent: opts.autoReplySent || false,
+        maintenanceId: opts.maintenanceId,
+        ...opts.extra,
+      },
+    });
+  } catch (err) {
+    console.warn("notifyLandlordDashboard failed", (err as Error).message);
+  }
+}
+
 function normalizePhone(raw?: string) {
   if (!raw) return "";
   return raw.replace(/\D/g, "");
@@ -600,6 +640,16 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
       content: combinedMessage,
       meta: { channel: bucket.isGroup ? "whatsapp_group" : "whatsapp", landlordActiveSkip: true },
     });
+    // Still notify landlord dashboard so they see all tenant messages
+    await notifyLandlordDashboard(landlordId, {
+      tenantName: tenant.name,
+      tenantId: tenant.id,
+      tenantPhone: tenant.phone || bucket.replyTo,
+      message: combinedMessage,
+      category: "tenant_message",
+      autoReplySent: false,
+      extra: { skippedReason: "landlord_active" },
+    });
     return null;
   }
 
@@ -827,6 +877,19 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
         console.info("skipping duplicate landlord alert (agentic batch) — agent already called alert_landlord", { tenantId: tenant.id });
       }
 
+      // Dashboard notification for agentic batch
+      await notifyLandlordDashboard(landlordId, {
+        tenantName: tenant.name,
+        tenantId: tenant.id,
+        tenantPhone: tenant.phone || bucket.replyTo,
+        message: combinedMessage,
+        category: isHighCriticalBatch ? "urgent_maintenance" : "maintenance",
+        severity: batchSeverity,
+        autoReplySent: Boolean(draftText && canAutoReply && !isHighCriticalBatch),
+        aiDraft: draftText,
+        maintenanceId: latestRecord?.id,
+      });
+
       return null;
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -968,6 +1031,21 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
     for (const number of landlordNumbers()) {
       await whatsappService.sendWhatsAppText({ to: number, text: alert });
     }
+  }
+
+  // Dashboard notification for linear batch
+  if (landlordId) {
+    await notifyLandlordDashboard(landlordId, {
+      tenantName: tenant.name,
+      tenantId: tenant.id,
+      tenantPhone: tenant.phone || bucket.replyTo,
+      message: combinedMessage,
+      category: isHighCriticalLinearBatch ? "urgent_maintenance" : "maintenance",
+      severity: linearBatchSeverity,
+      autoReplySent: Boolean(draftText && canAutoReply && !isHighCriticalLinearBatch),
+      aiDraft: draftText,
+      maintenanceId: record?.id,
+    });
   }
 
   return record;
@@ -1884,6 +1962,17 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         tenantName: tenant.name,
         reason: `Queued — replying in ${Math.round(delayMs / 1000)}s`,
       });
+      // Dashboard notification for queued message
+      await notifyLandlordDashboard(tenantLandlordId, {
+        tenantName: tenant.name,
+        tenantId: tenant.id,
+        tenantPhone: tenant.phone || sender,
+        message: tenantMessage,
+        category: triageSeverity === "high" || triageSeverity === "critical" ? "urgent_maintenance" : "maintenance",
+        severity: triageSeverity,
+        maintenanceId: record?.id,
+        extra: { status: "queued", delayMs },
+      });
       return respond({ ok: true, routed: "tenant_queued", delayMs, llmInvoked, autoReplySent, autoReplyReason });
     }
 
@@ -2092,6 +2181,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           console.info("skipping duplicate landlord alert (agentic immediate) — agent already called alert_landlord", { tenantId: tenant.id });
         }
 
+        // Dashboard notification (agentic immediate)
+        if (tenantLandlordId) {
+          notifyLandlordDashboard(tenantLandlordId, {
+            tenantName: tenant.name, tenantId: tenant.id, tenantPhone: tenant.phone || sender,
+            message: tenantMessage, category: triage?.classification?.category || "maintenance",
+            severity: agentSeverity, autoReplySent, aiDraft: agentDraft || undefined,
+            maintenanceId: record?.id,
+          }).catch(() => {});
+        }
+
         return respond({ ok: true, routed: "tenant_agentic", llmInvoked, autoReplySent, autoReplyReason });
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -2201,6 +2300,16 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       for (const number of landlordNumbers()) {
         await whatsappService.sendWhatsAppText({ to: number, text: immAlert });
       }
+    }
+
+    // Dashboard notification (linear immediate)
+    if (tenantLandlordId) {
+      notifyLandlordDashboard(tenantLandlordId, {
+        tenantName: tenant.name, tenantId: tenant.id, tenantPhone: tenant.phone || sender,
+        message: tenantMessage, category: triage?.classification?.category || "maintenance",
+        severity: immSeverity, autoReplySent, aiDraft: draft || undefined,
+        maintenanceId: record?.id,
+      }).catch(() => {});
     }
 
     return respond({ ok: true, routed: "tenant", llmInvoked, autoReplySent, autoReplyReason });
