@@ -2167,50 +2167,71 @@ router.post("/whatsapp/instance/create", async (req, res) => {
     const { PLANS } = require("../services/planService");
     const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { plan: true, evolutionInstanceName: true, whatsappNumbers: true } });
     const plan = PLANS[(landlord?.plan || "FREE")] || PLANS.FREE;
-    const currentCount = (landlord?.whatsappNumbers?.length || 0) + (landlord?.evolutionInstanceName ? 1 : 0);
-    // If landlord already has an instance, allow reconnecting it; only block truly new ones.
-    if (landlord?.evolutionInstanceName && landlord.evolutionInstanceName !== instanceName) {
-      if (currentCount >= plan.maxWhatsAppNumbers) {
-        return res.status(403).json({ error: "plan_limit_reached", message: `Your ${landlord.plan || "FREE"} plan allows ${plan.maxWhatsAppNumbers} WhatsApp instance(s). Upgrade to add more.`, max: plan.maxWhatsAppNumbers });
+    // Only count actual Evolution instances, not landlord phone numbers
+    const hasExistingInstance = Boolean(landlord?.evolutionInstanceName);
+    // If landlord already has a DIFFERENT instance, check the plan limit.
+    // If no instance or same instance name → always allow (reconnecting).
+    if (hasExistingInstance && landlord!.evolutionInstanceName !== instanceName) {
+      if (plan.maxWhatsAppNumbers <= 1) {
+        return res.status(403).json({ error: "plan_limit_reached", message: `Your ${landlord?.plan || "FREE"} plan allows ${plan.maxWhatsAppNumbers} WhatsApp instance(s). Upgrade to add more.`, max: plan.maxWhatsAppNumbers });
       }
     }
     // Use WEBHOOK_URL (Railway internal) to avoid egress costs & HTTPS redirect issues
     const webhookBase = process.env.WEBHOOK_URL || process.env.APP_PUBLIC_URL || process.env.APP_URL || req.protocol + "://" + req.get("host");
     const webhookUrl = `${webhookBase}/webhooks/whatsapp/evolution`;
-    const result = await evoFetch("/instance/create", {
-      method: "POST",
-      body: {
-        instanceName,
-        integration: "WHATSAPP-BAILEYS",
-        qrcode: true,
-        rejectCall: false,
-        groupsIgnore: false, // Process group messages for unit group chats
-        alwaysOnline: true,
-        readMessages: true,
-        readStatus: true,
-        syncFullHistory: false,
-        webhook: {
-          url: webhookUrl,
-          byEvents: false,
-          base64: true,
-          events: [
-            "MESSAGES_UPSERT",
-            "MESSAGES_UPDATE",
-            "CONNECTION_UPDATE",
-            "QRCODE_UPDATED",
-          ],
+
+    let result: any;
+    try {
+      result = await evoFetch("/instance/create", {
+        method: "POST",
+        body: {
+          instanceName,
+          integration: "WHATSAPP-BAILEYS",
+          qrcode: true,
+          rejectCall: false,
+          groupsIgnore: false,
+          alwaysOnline: true,
+          readMessages: true,
+          readStatus: true,
+          syncFullHistory: false,
+          webhook: {
+            url: webhookUrl,
+            byEvents: false,
+            base64: true,
+            events: [
+              "MESSAGES_UPSERT",
+              "MESSAGES_UPDATE",
+              "CONNECTION_UPDATE",
+              "QRCODE_UPDATED",
+            ],
+          },
         },
-      },
-    });
+      });
+    } catch (createErr) {
+      const errMsg = (createErr as Error).message || "";
+      // If instance already exists in Evolution API, try to just connect to it
+      if (errMsg.includes("already") || errMsg.includes("exists") || errMsg.includes("403")) {
+        console.warn(`[WhatsApp] Instance ${instanceName} may already exist in Evolution API, attempting to connect instead:`, errMsg);
+        // Save the instance name to DB and return success so QR flow can proceed
+        await db.landlord.update({
+          where: { id: authReq.landlordId },
+          data: { evolutionInstanceName: instanceName },
+        }).catch(() => { });
+        return res.json({ instance: { instanceName }, reused: true });
+      }
+      throw createErr;
+    }
+
     // Save instance name to landlord record
-    if ((result as any)?.instance?.instanceName) {
+    if (result?.instance?.instanceName) {
       await db.landlord.update({
         where: { id: authReq.landlordId },
-        data: { evolutionInstanceName: (result as any).instance.instanceName },
+        data: { evolutionInstanceName: result.instance.instanceName },
       }).catch(() => { });
     }
     res.json(result);
   } catch (err) {
+    console.error("[WhatsApp] Instance create failed:", (err as Error).message);
     res.status(500).json({ error: (err as Error).message });
   }
 });
