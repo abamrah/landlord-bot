@@ -689,6 +689,36 @@ export async function setGlobalAutoReplyCooldownMinutes(params: { minutes: numbe
   }
 }
 
+export async function getLandlordActiveWindowMinutes(landlordId?: string) {
+  if (!isDbEnabled) return { minutes: 30, source: "default" as const };
+  try {
+    const record = await db.appSetting.findFirst({ where: { key: "landlord_active_window_minutes", landlordId: landlordId || null } });
+    if (!record) return { minutes: 30, source: "default" as const };
+    const parsed = Number(record.value);
+    if (Number.isNaN(parsed) || parsed < 0) return { minutes: 30, source: "default" as const };
+    return { minutes: parsed, source: "db" as const };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("get landlord active window failed", err);
+    return { minutes: 30, source: "default" as const };
+  }
+}
+
+export async function setLandlordActiveWindowMinutes(params: { minutes: number; landlordId?: string }) {
+  if (!isDbEnabled) return null;
+  try {
+    return await db.appSetting.upsert({
+      where: { key_landlordId: { key: "landlord_active_window_minutes", landlordId: params.landlordId || "" } },
+      create: { key: "landlord_active_window_minutes", value: String(params.minutes), landlordId: params.landlordId },
+      update: { value: String(params.minutes) },
+    });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("set landlord active window failed", err);
+    return null;
+  }
+}
+
 export async function deleteTenant(params: { id: string; hard?: boolean }) {
   if (!isDbEnabled || !params.id) return null;
   try {
@@ -1140,6 +1170,8 @@ export default {
   setGlobalAutoReplyDelayMinutes,
   getGlobalAutoReplyCooldownMinutes,
   setGlobalAutoReplyCooldownMinutes,
+  getLandlordActiveWindowMinutes,
+  setLandlordActiveWindowMinutes,
   // Multi-landlord
   findLandlordByWhatsApp,
   findLandlordForTenantPhone,

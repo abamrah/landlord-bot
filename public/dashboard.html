@@ -2710,6 +2710,12 @@
                   style="width:60px;padding:4px 8px;font-size:12px;" />
                 <span style="font-size:11px;color:var(--text-muted)">min</span>
               </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:12px;color:var(--text-muted)">Active Window</span>
+                <input id="landlordActiveWindowMinutes" type="number" min="0" max="240" step="1"
+                  style="width:60px;padding:4px 8px;font-size:12px;" title="If you message a tenant, auto-replies are paused for this many minutes" />
+                <span style="font-size:11px;color:var(--text-muted)">min</span>
+              </div>
               <button class="btn btn-secondary btn-sm" id="saveAutopilotSettings">Save</button>
             </div>
           </div>
@@ -4712,7 +4718,7 @@
 
     // ── STATE ──
     const ACTIVE_STATUSES = ['OPEN', 'PENDING', 'IN_TRIAGE', 'SCHEDULED', 'IN_PROGRESS'];
-    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
+    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, landlordActiveWindowMinutes: 30, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
 
     function severityOf(r) { return (r?.triageJson?.classification?.severity || r?.triage?.classification?.severity || 'unknown').toString().toLowerCase(); }
     function formatStatus(s) { return (s || '').replace(/_/g, ' '); }
@@ -4777,6 +4783,7 @@
     async function loadAutoReplySettings() { try { const r = await fetchJson('/admin/auto-reply'); state.autoReplyGlobalEnabled = r.enabled !== false; } catch { state.autoReplyGlobalEnabled = true; } renderGlobalAutoReply(); }
     async function loadAutoReplyDelay() { try { const r = await fetchJson('/admin/auto-reply-delay'); state.autoReplyDelayMinutes = Number(r.minutes) || 0; } catch { state.autoReplyDelayMinutes = 5; } renderAutoReplyDelay(); }
     async function loadAutoReplyCooldown() { try { const r = await fetchJson('/admin/auto-reply-cooldown'); state.autoReplyCooldownMinutes = Number(r.minutes) || 0; } catch { state.autoReplyCooldownMinutes = 60; } renderAutoReplyCooldown(); }
+    async function loadLandlordActiveWindow() { try { const r = await fetchJson('/admin/auto-reply-active-window'); state.landlordActiveWindowMinutes = Number(r.minutes) || 0; } catch { state.landlordActiveWindowMinutes = 30; } renderLandlordActiveWindow(); }
     async function loadContractors() { const { items } = await fetchJson('/admin/contractors'); state.contractors = items || []; renderContractors(); }
     async function loadMaintenance(filter) {
       filter = filter || {};
@@ -4902,6 +4909,7 @@
     }
     function renderAutoReplyDelay() { var el = document.getElementById('autoReplyDelayMinutes'); if (el) el.value = state.autoReplyDelayMinutes; }
     function renderAutoReplyCooldown() { var el = document.getElementById('autoReplyCooldownMinutes'); if (el) el.value = state.autoReplyCooldownMinutes; }
+    function renderLandlordActiveWindow() { var el = document.getElementById('landlordActiveWindowMinutes'); if (el) el.value = state.landlordActiveWindowMinutes; }
 
     function renderContractors() {
       var tbody = document.querySelector('#contractorTable tbody');
@@ -5877,10 +5885,12 @@
     document.getElementById('saveAutopilotSettings').addEventListener('click', async function () {
       var delay = Number(document.getElementById('autoReplyDelayMinutes').value);
       var cooldown = Number(document.getElementById('autoReplyCooldownMinutes').value);
+      var activeWindow = Number(document.getElementById('landlordActiveWindowMinutes').value);
       try {
         if (!isNaN(delay) && delay >= 0) await fetchJson('/admin/auto-reply-delay', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: delay }) });
         if (!isNaN(cooldown) && cooldown >= 0) await fetchJson('/admin/auto-reply-cooldown', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: cooldown }) });
-        state.autoReplyDelayMinutes = delay; state.autoReplyCooldownMinutes = cooldown;
+        if (!isNaN(activeWindow) && activeWindow >= 0) await fetchJson('/admin/auto-reply-active-window', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: activeWindow }) });
+        state.autoReplyDelayMinutes = delay; state.autoReplyCooldownMinutes = cooldown; state.landlordActiveWindowMinutes = activeWindow;
         toast('Settings saved');
       } catch (err) { toast('Failed: ' + err.message); }
     });
@@ -6491,7 +6501,7 @@
     function loadAll() {
       loadProperties().then(function () { fillPropertySelects(); });
       loadUnits().then(function () { fillUnitSelects(); });
-      loadTenants(); loadAutoReplySettings(); loadAutoReplyDelay(); loadAutoReplyCooldown();
+      loadTenants(); loadAutoReplySettings(); loadAutoReplyDelay(); loadAutoReplyCooldown(); loadLandlordActiveWindow();
       loadContractors(); loadMaintenance(); loadUtilities(); loadUtilCreds(); loadGreenButtonData();
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();

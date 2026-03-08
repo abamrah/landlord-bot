@@ -1167,6 +1167,22 @@ router.patch("/auto-reply-cooldown", async (req, res) => {
   res.json({ minutes: parsed.data.minutes });
 });
 
+router.get("/auto-reply-active-window", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const setting = await repo.getLandlordActiveWindowMinutes(authReq.landlordId);
+  res.json({ minutes: setting.minutes, source: setting.source });
+});
+
+router.patch("/auto-reply-active-window", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ minutes: z.number().min(0).max(240) });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.setLandlordActiveWindowMinutes({ minutes: parsed.data.minutes, landlordId: authReq.landlordId });
+  if (!updated) return res.status(500).json({ error: "active_window_update_failed" });
+  res.json({ minutes: parsed.data.minutes });
+});
+
 router.get("/health", async (_req, res) => {
   const whatsappReady = Boolean(process.env.EVOLUTION_API_BASE_URL && process.env.EVOLUTION_API_TOKEN);
   const llmReady = await agentService.pingLlm();

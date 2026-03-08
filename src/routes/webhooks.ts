@@ -623,10 +623,11 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
 
   // ── AGENTIC PATH ──
   // ── LANDLORD ACTIVE CHECK (batch path) ──
+  const activeWindowBatch = await repo.getLandlordActiveWindowMinutes(landlordId);
   const landlordActiveBatch = await conversationMemory.hasRecentLandlordReply({
     phone: tenant.phone || bucket.replyTo,
     landlordId,
-    windowMinutes: 30,
+    windowMinutes: activeWindowBatch.minutes,
   });
   if (landlordActiveBatch) {
     // eslint-disable-next-line no-console
@@ -1991,12 +1992,13 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     // ── LANDLORD ACTIVE CHECK ──
-    // If the landlord has sent a message to this tenant recently (within 30 min),
+    // If the landlord has sent a message to this tenant recently,
     // skip the auto-reply — the landlord is actively handling the conversation.
+    const activeWindowImm = await repo.getLandlordActiveWindowMinutes(tenantLandlordId);
     const landlordActive = await conversationMemory.hasRecentLandlordReply({
       phone: tenant.phone || sender,
       landlordId: tenantLandlordId,
-      windowMinutes: 30,
+      windowMinutes: activeWindowImm.minutes,
     });
     if (landlordActive) {
       // eslint-disable-next-line no-console
