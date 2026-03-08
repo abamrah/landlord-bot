@@ -2745,6 +2745,24 @@ router.delete("/account", async (req, res) => {
 //  NOTIFICATIONS — In-app + push notification management
 // ═══════════════════════════════════════════════════════════
 
+/** POST /admin/notifications/test — Send a test notification to verify the pipeline */
+router.post("/notifications/test", async (req, res) => {
+  try {
+    const authReq = req as AuthRequest;
+    const { createNotification } = require("../services/websocketService");
+    await createNotification(authReq.landlordId, {
+      type: "info",
+      title: "Test Notification",
+      body: "This is a test notification to verify your notification pipeline is working correctly.",
+      data: { test: true, timestamp: new Date().toISOString() },
+    });
+    res.json({ ok: true, message: "Test notification sent" });
+  } catch (err) {
+    console.error("Test notification failed", err);
+    res.status(500).json({ error: "test_notification_failed", message: (err as Error).message });
+  }
+});
+
 /** GET /admin/notifications — List notifications (paginated) */
 router.get("/notifications", async (req, res) => {
   try {

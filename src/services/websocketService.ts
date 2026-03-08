@@ -36,7 +36,8 @@ export type NotificationType =
   | "lease"
   | "utility"
   | "system"
-  | "info";
+  | "info"
+  | "TENANT_MESSAGE";
 
 export interface NotificationPayload {
   type: NotificationType;

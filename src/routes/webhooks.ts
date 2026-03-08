@@ -2190,7 +2190,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             message: tenantMessage, category: triage?.classification?.category || "maintenance",
             severity: agentSeverity, autoReplySent, aiDraft: agentDraft || undefined,
             maintenanceId: record?.id,
-          }).catch(() => {});
+          }).catch((err: unknown) => console.warn("notifyLandlordDashboard(agentic-imm) failed", (err as Error).message));
         }
 
         return respond({ ok: true, routed: "tenant_agentic", llmInvoked, autoReplySent, autoReplyReason });
@@ -2311,7 +2311,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         message: tenantMessage, category: triage?.classification?.category || "maintenance",
         severity: immSeverity, autoReplySent, aiDraft: draft || undefined,
         maintenanceId: record?.id,
-      }).catch(() => {});
+      }).catch((err: unknown) => console.warn("notifyLandlordDashboard(linear-imm) failed", (err as Error).message));
     }
 
     return respond({ ok: true, routed: "tenant", llmInvoked, autoReplySent, autoReplyReason });

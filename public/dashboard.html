@@ -2555,6 +2555,8 @@
                 <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
                   onclick="markAllNotificationsRead()">Mark all read</button>
                 <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
+                  onclick="sendTestNotification()">🧪 Test</button>
+                <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
                   onclick="enablePushNotifications()">🔔 Enable Push</button>
               </div>
             </div>
@@ -6730,6 +6732,7 @@
       loadUsageStats(); loadExpiringLeases();
       loadAgentChatHistory(); loadFinancialSummary(); loadFinancialRecords();
       loadRentData(); loadScreenings();
+      loadNotifications();
     }
 
     async function loadFinancialSummary() {
@@ -7617,6 +7620,15 @@
         renderNotifications();
         updateNotifBadge();
       } catch (e) { toast('Failed to mark as read'); }
+    }
+
+    async function sendTestNotification() {
+      try {
+        await fetchJson('/admin/notifications/test', { method: 'POST' });
+        toast('Test notification sent!');
+        // Reload notifications to show it
+        setTimeout(loadNotifications, 500);
+      } catch (e) { toast('Test notification failed: ' + e.message); }
     }
 
     function addNotificationToUI(notif) {
