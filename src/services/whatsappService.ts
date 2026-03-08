@@ -82,6 +82,7 @@ export function formatWhatsAppText(text: string): string {
  * Send a WhatsApp text message via Evolution API.
  * Now accepts optional landlordId for multi-tenant instance routing (future use).
  * Automatically applies WhatsApp rich text formatting.
+ * Includes retry logic for transient 500 errors (e.g. disconnected sessions).
  */
 export async function sendWhatsAppText(params: SendTextParams): Promise<SendResult> {
   const cfg = getConfig();
@@ -99,29 +100,62 @@ export async function sendWhatsAppText(params: SendTextParams): Promise<SendResu
   };
   // eslint-disable-next-line no-console
   console.info("sendWhatsAppText →", { url, to: payload.number, textLen: (params.text || "").length });
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        [cfg.tokenHeader]: cfg.token,
-      },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
+
+  const MAX_RETRIES = 2;
+  let lastError: SendResult = { ok: false, error: "unknown" };
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [cfg.tokenHeader]: cfg.token,
+        },
+        body: JSON.stringify(payload),
+      });
+      let data: any;
+      const rawBody = await res.text().catch(() => "");
+      try { data = JSON.parse(rawBody); } catch { data = { rawBody: rawBody?.substring(0, 500) }; }
+      if (!res.ok) {
+        const errorDetail = data?.error || data?.message || data?.response?.message || data?.rawBody || "unknown";
+        // eslint-disable-next-line no-console
+        console.error(`sendWhatsAppText FAILED (attempt ${attempt + 1}/${MAX_RETRIES + 1})`, {
+          status: res.status, error: errorDetail, url, instance: instanceName, fullResponse: JSON.stringify(data).substring(0, 500),
+        });
+        lastError = { ok: false, error: typeof errorDetail === "string" ? errorDetail : `send_failed_${res.status}`, response: data };
+
+        // Retry on 500/502/503 (transient errors, usually disconnected session)
+        if (res.status >= 500 && attempt < MAX_RETRIES) {
+          // On first 500 failure, attempt to reconnect the instance before retrying
+          if (attempt === 0) {
+            console.warn(`[AutoReconnect] Attempting instance restart for ${instanceName} after 500 error`);
+            try {
+              await attemptInstanceReconnect(instanceName);
+            } catch (reconnErr) {
+              console.warn(`[AutoReconnect] Reconnect attempt failed:`, (reconnErr as Error).message);
+            }
+          }
+          const backoffMs = (attempt + 1) * 2000;
+          await new Promise(r => setTimeout(r, backoffMs));
+          continue;
+        }
+        return lastError;
+      }
       // eslint-disable-next-line no-console
-      console.error("sendWhatsAppText FAILED", { status: res.status, error: data?.error || data?.message, url });
-      return { ok: false, error: data?.error || `send_failed_${res.status}`, response: data };
+      console.info("sendWhatsAppText OK", { to: payload.number, status: res.status, attempt: attempt + 1 });
+      return { ok: true, response: data };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(`sendWhatsAppText EXCEPTION (attempt ${attempt + 1}/${MAX_RETRIES + 1})`, { error: (err as Error).message, url });
+      lastError = { ok: false, error: (err as Error).message };
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+        continue;
+      }
     }
-    // eslint-disable-next-line no-console
-    console.info("sendWhatsAppText OK", { to: payload.number, status: res.status });
-    return { ok: true, response: data };
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error("sendWhatsAppText EXCEPTION", { error: (err as Error).message, url });
-    return { ok: false, error: (err as Error).message };
   }
+  return lastError;
 }
 
 // ── WhatsApp Group Management ──
@@ -199,26 +233,51 @@ export async function sendWhatsAppGroupText(params: {
     text: formatWhatsAppText(params.text),
   };
   console.info("sendWhatsAppGroupText →", { url, groupJid: params.groupJid, textLen: params.text.length });
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        [cfg.tokenHeader]: cfg.token,
-      },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      console.error("sendWhatsAppGroupText FAILED", { status: res.status, error: data?.error || data?.message });
-      return { ok: false, error: data?.error || `send_failed_${res.status}`, response: data };
+
+  const MAX_RETRIES = 2;
+  let lastError: SendResult = { ok: false, error: "unknown" };
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [cfg.tokenHeader]: cfg.token,
+        },
+        body: JSON.stringify(payload),
+      });
+      let data: any;
+      const rawBody = await res.text().catch(() => "");
+      try { data = JSON.parse(rawBody); } catch { data = { rawBody: rawBody?.substring(0, 500) }; }
+      if (!res.ok) {
+        const errorDetail = data?.error || data?.message || data?.rawBody || "unknown";
+        console.error(`sendWhatsAppGroupText FAILED (attempt ${attempt + 1}/${MAX_RETRIES + 1})`, {
+          status: res.status, error: errorDetail, url, instance: instanceName,
+          fullResponse: JSON.stringify(data).substring(0, 500),
+        });
+        lastError = { ok: false, error: typeof errorDetail === "string" ? errorDetail : `send_failed_${res.status}`, response: data };
+        if (res.status >= 500 && attempt < MAX_RETRIES) {
+          if (attempt === 0) {
+            try { await attemptInstanceReconnect(instanceName); } catch { }
+          }
+          await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+          continue;
+        }
+        return lastError;
+      }
+      console.info("sendWhatsAppGroupText OK", { groupJid: params.groupJid, status: res.status, attempt: attempt + 1 });
+      return { ok: true, response: data };
+    } catch (err) {
+      console.error(`sendWhatsAppGroupText EXCEPTION (attempt ${attempt + 1})`, { error: (err as Error).message });
+      lastError = { ok: false, error: (err as Error).message };
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+        continue;
+      }
     }
-    console.info("sendWhatsAppGroupText OK", { groupJid: params.groupJid, status: res.status });
-    return { ok: true, response: data };
-  } catch (err) {
-    console.error("sendWhatsAppGroupText EXCEPTION", { error: (err as Error).message });
-    return { ok: false, error: (err as Error).message };
   }
+  return lastError;
 }
 
 /**
@@ -312,6 +371,100 @@ export async function sendWhatsAppDocument(params: SendDocumentParams): Promise<
   } catch (err) {
     console.error("sendWhatsAppDocument EXCEPTION", { error: (err as Error).message });
     return { ok: false, error: (err as Error).message };
+  }
+}
+
+/**
+ * Attempt to reconnect a disconnected Evolution API instance.
+ * Tries restart first, then falls back to connect.
+ */
+export async function attemptInstanceReconnect(instanceName: string): Promise<{ ok: boolean; error?: string }> {
+  const cfg = getConfig();
+  if (!cfg.baseUrl || !cfg.token) return { ok: false, error: "not_configured" };
+  const base = cfg.baseUrl.replace(/\/+$/, "");
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    [cfg.tokenHeader]: cfg.token,
+  };
+  const inst = encodeURIComponent(instanceName);
+
+  // 1. Check current connection state
+  try {
+    const stateRes = await fetch(`${base}/instance/connectionState/${inst}`, { headers });
+    const stateData = await stateRes.json().catch(() => ({}));
+    const state = (stateData as any)?.instance?.state || "unknown";
+    console.info(`[AutoReconnect] Instance ${instanceName} state: ${state}`);
+    if (state === "open") return { ok: true }; // already connected
+  } catch { /* continue with restart attempt */ }
+
+  // 2. Try restart
+  try {
+    const restartRes = await fetch(`${base}/instance/restart/${inst}`, { method: "PUT", headers });
+    if (restartRes.ok) {
+      console.info(`[AutoReconnect] Instance ${instanceName} restarted successfully`);
+      // Wait for reconnection
+      await new Promise(r => setTimeout(r, 3000));
+      return { ok: true };
+    }
+    const restartData = await restartRes.json().catch(() => ({}));
+    console.warn(`[AutoReconnect] Restart failed for ${instanceName}:`, restartData);
+  } catch (err) {
+    console.warn(`[AutoReconnect] Restart exception for ${instanceName}:`, (err as Error).message);
+  }
+
+  // 3. Try connect endpoint as fallback
+  try {
+    const connectRes = await fetch(`${base}/instance/connect/${inst}`, { headers });
+    if (connectRes.ok) {
+      console.info(`[AutoReconnect] Instance ${instanceName} connect initiated`);
+      await new Promise(r => setTimeout(r, 3000));
+      return { ok: true };
+    }
+  } catch (err) {
+    console.warn(`[AutoReconnect] Connect exception for ${instanceName}:`, (err as Error).message);
+  }
+
+  return { ok: false, error: "reconnect_failed" };
+}
+
+/**
+ * Periodic health check for all Evolution API instances.
+ * Logs connection state and attempts reconnect for disconnected instances.
+ */
+export async function healthCheckAllInstances(): Promise<void> {
+  const cfg = getConfig();
+  if (!cfg.baseUrl || !cfg.token) return;
+  const { db: database } = require("../config/database");
+  try {
+    const landlords = await database.landlord.findMany({
+      where: { evolutionInstanceName: { not: null } },
+      select: { id: true, evolutionInstanceName: true, name: true },
+    });
+    if (!landlords.length) return;
+
+    const base = cfg.baseUrl.replace(/\/+$/, "");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      [cfg.tokenHeader]: cfg.token,
+    };
+
+    for (const ll of landlords) {
+      if (!ll.evolutionInstanceName) continue;
+      try {
+        const inst = encodeURIComponent(ll.evolutionInstanceName);
+        const res = await fetch(`${base}/instance/connectionState/${inst}`, { headers });
+        const data = await res.json().catch(() => ({}));
+        const state = (data as any)?.instance?.state || "unknown";
+        if (state !== "open") {
+          console.warn(`[HealthCheck] Instance ${ll.evolutionInstanceName} (${ll.name}) is ${state} — attempting reconnect`);
+          await attemptInstanceReconnect(ll.evolutionInstanceName);
+        }
+      } catch (err) {
+        console.warn(`[HealthCheck] Failed to check ${ll.evolutionInstanceName}:`, (err as Error).message);
+      }
+    }
+  } catch (err) {
+    console.warn("[HealthCheck] Instance health check failed:", (err as Error).message);
   }
 }
 
@@ -438,4 +591,6 @@ export default {
   sendWhatsAppGroupText,
   syncEvolutionInstanceSettings,
   syncAllInstanceSettings,
+  attemptInstanceReconnect,
+  healthCheckAllInstances,
 };

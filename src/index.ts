@@ -123,6 +123,18 @@ server.listen(port, async () => {
       console.warn("Evolution instance sync failed (non-blocking):", (err as Error).message);
     }
   }, 5000);
+
+  // Periodic Evolution API health check — every 5 minutes
+  // Checks all instances and attempts reconnect if disconnected
+  const EVOLUTION_HEALTH_CHECK_MS = 5 * 60 * 1000;
+  setInterval(async () => {
+    try {
+      const { healthCheckAllInstances } = require("./services/whatsappService");
+      await healthCheckAllInstances();
+    } catch (err) {
+      console.warn("[HealthCheck] Evolution health check failed (non-blocking):", (err as Error).message);
+    }
+  }, EVOLUTION_HEALTH_CHECK_MS);
 });
 
 const REMINDER_POLL_MS = 30 * 1000;

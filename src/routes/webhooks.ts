@@ -193,7 +193,7 @@ router.post("/twilio", async (req, res, next) => {
 });
 
 const SAFE_AUTOPILOT_SEVERITIES = new Set(["low", "normal"]);
-const CRITICAL_KEYWORDS = ["fire", "water leak", "gas leak", "gas", "no power", "no heat", "flood", "smoke"];
+const CRITICAL_KEYWORDS = ["fire", "water leak", "gas leak", "gas", "no power", "no heat", "flood", "smoke", "leak", "leaking", "burst pipe", "pipe burst", "no water", "no electricity", "mold", "mould", "bedbug", "bed bug", "cockroach"];
 const PAYMENT_KEYWORDS = ["paid", "payment sent", "transferred", "e-transfer", "etransfer", "e transfer", "here is proof", "sent the money", "rent paid", "paid rent", "paid my rent", "just paid", "already paid", "payment done", "payment made", "sent payment", "interac", "receipt", "proof of payment"];
 const DEFAULT_REPLY_DELAY_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes between replies per tenant (was 1 hour)
@@ -699,8 +699,31 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
         draftLength: draftText.length,
       });
       // Try to get severity from the latest maintenance record
-      const latestRecord = await repo.findLatestMaintenanceForTenantId(tenant.id);
-      const batchSeverity = ((latestRecord?.triageJson as any)?.classification?.severity || "normal").toString().toLowerCase();
+      let latestRecord = await repo.findLatestMaintenanceForTenantId(tenant.id);
+      let batchSeverity = ((latestRecord?.triageJson as any)?.classification?.severity || "normal").toString().toLowerCase();
+      // If message contains critical keywords but triage/agent missed it, override severity
+      if ((batchSeverity === "normal" || batchSeverity === "low") && containsCriticalKeyword(combinedMessage)) {
+        console.info("batch severity overridden — message contains critical keyword", {
+          tenantId: tenant.id, originalSeverity: batchSeverity, overriddenTo: "high",
+        });
+        batchSeverity = "high";
+      }
+      // If agent didn't create a ticket but message warrants one (HIGH/CRITICAL or critical keywords),
+      // create a ticket as a safety net so important issues don't get lost.
+      if (!latestRecord && (batchSeverity === "high" || batchSeverity === "critical" || containsCriticalKeyword(combinedMessage))) {
+        // eslint-disable-next-line no-console
+        console.info("batch flush fallback — creating ticket because agent did not", {
+          tenantId: tenant.id, severity: batchSeverity,
+        });
+        const resolvedUnitId = await resolveTenantUnitId(tenant.id);
+        latestRecord = await repo.createMaintenanceRequest({
+          tenantId: tenant.id,
+          unitId: resolvedUnitId,
+          landlordId,
+          message: combinedMessage,
+          autopilotEnabled: true,
+        });
+      }
       const isHighCriticalBatch = batchSeverity === "high" || batchSeverity === "critical";
 
       // ── Auto-reply status: generated (agentic batch) ──
@@ -777,21 +800,31 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
       }
 
       // Notify landlord about tenant message (batched agentic path)
-      const agentAlert = buildLandlordAlert({
-        tenantName: tenant.name,
-        tenantPhone: tenant.phone || bucket.replyTo,
-        message: combinedMessage,
-        severity: batchSeverity,
-        draft: draftText || "(agent handled)",
-        isNewTicket: !latestRecord,
-      });
-      if (landlordId) {
-        await whatsappService.alertLandlord(landlordId, agentAlert, {
-          type: batchSeverity === "high" || batchSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
-          maintenanceId: latestRecord?.id,
+      // Check if the agent already called alert_landlord during its tool loop
+      // to avoid sending duplicate notifications to the landlord
+      const agentAlreadyAlertedBatch = (agentResult.steps || []).some((step: any) =>
+        (step.toolCalls || []).some((tc: any) => tc.name === "alert_landlord")
+      );
+      if (!agentAlreadyAlertedBatch) {
+        const agentAlert = buildLandlordAlert({
+          tenantName: tenant.name,
           tenantPhone: tenant.phone || bucket.replyTo,
+          message: combinedMessage,
           severity: batchSeverity,
+          draft: draftText || "(agent handled)",
+          isNewTicket: !latestRecord,
         });
+        if (landlordId) {
+          await whatsappService.alertLandlord(landlordId, agentAlert, {
+            type: batchSeverity === "high" || batchSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
+            maintenanceId: latestRecord?.id,
+            tenantPhone: tenant.phone || bucket.replyTo,
+            severity: batchSeverity,
+          });
+        }
+      } else {
+        // eslint-disable-next-line no-console
+        console.info("skipping duplicate landlord alert (agentic batch) — agent already called alert_landlord", { tenantId: tenant.id });
       }
 
       return null;
@@ -1612,6 +1645,26 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", acknowledgement: true },
       });
 
+      // ── Create a lightweight notification for acknowledgement messages ──
+      // So the landlord can track all tenant activity, even simple "ok" or "thanks".
+      if (tenantLandlordId) {
+        try {
+          const { createNotification: createAckNotif } = require("../services/websocketService");
+          await createAckNotif(tenantLandlordId, {
+            type: "TENANT_MESSAGE",
+            title: `${tenant.name} acknowledged`,
+            body: `"${normalizedMsg}" — No action needed.`,
+            data: {
+              tenantId: tenant.id,
+              tenantPhone: tenant.phone || sender,
+              category: "acknowledgement",
+            },
+          });
+        } catch (ackNotifErr) {
+          console.warn("Failed to create ack notification", (ackNotifErr as Error).message);
+        }
+      }
+
       return respond({ ok: true, routed: "tenant_acknowledgement", llmInvoked: false, autoReplySent: false, autoReplyReason: "acknowledgement_skipped" });
     }
 
@@ -1623,7 +1676,28 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     llmInvoked = true;
 
     // ── NOT_MAINTENANCE detection — skip ticket creation for non-maintenance messages ──
-    const triageSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
+    let triageSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
+    // Override: if the LLM classified as normal/low but the message contains critical keywords,
+    // bump severity to at least HIGH so tickets get created and delay is skipped.
+    if ((triageSeverity === "normal" || triageSeverity === "low") && containsCriticalKeyword(tenantMessage)) {
+      // eslint-disable-next-line no-console
+      console.info("triage severity overridden — message contains critical keyword", {
+        tenantId: tenant.id,
+        originalSeverity: triageSeverity,
+        overriddenTo: "high",
+        message: tenantMessage.substring(0, 100),
+      });
+      triageSeverity = "high";
+      if (triage?.classification) triage.classification.severity = "high";
+    }
+    // eslint-disable-next-line no-console
+    console.info("webhook triage result", {
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+      severity: triageSeverity,
+      category: triage?.classification?.category,
+      summary: (triage?.summary || "").substring(0, 120),
+    });
     if (triageSeverity === "not_maintenance" && !record?.id) {
       // eslint-disable-next-line no-console
       console.info("triage classified as not_maintenance — skipping ticket creation", {
@@ -1642,6 +1716,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
 
       // Still run the agentic handler so the tenant gets a conversational reply
       // but no ticket is created.
+      let notMaintDraft = "";
       if (AGENTIC_MODE && tenantLandlordId) {
         try {
           const mediaParts = mediaResult?.base64
@@ -1662,20 +1737,65 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
             mediaDescription,
             mediaParts,
           });
+          llmInvoked = true;
 
-          let agentDraft = extractDraftReply(agentResult.finalAnswer || "");
-          if (isValidTenantDraft(agentDraft)) {
+          notMaintDraft = extractDraftReply(agentResult.finalAnswer || "");
+          if (isValidTenantDraft(notMaintDraft)) {
             const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
             const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
             if (canAutoReply) {
-              await whatsappService.sendWhatsAppText({ to: replyTo, text: agentDraft, landlordId: tenantLandlordId });
-              lastReplySentAt.set(tenant.id, Date.now());
+              const sendResult = await whatsappService.sendWhatsAppText({ to: replyTo, text: notMaintDraft, landlordId: tenantLandlordId });
+              if (sendResult.ok) {
+                lastReplySentAt.set(tenant.id, Date.now());
+                autoReplySent = true;
+                // Save AI reply to conversation memory
+                await conversationMemory.saveMessage({
+                  phone: tenant.phone || sender,
+                  landlordId: tenantLandlordId,
+                  role: "ai",
+                  content: notMaintDraft,
+                  meta: { channel: isGroup ? "whatsapp_group" : "whatsapp", notMaintenance: true },
+                });
+              }
             }
           }
-        } catch (_err) { /* non-critical */ }
+        } catch (_err) {
+          console.error("not_maintenance agent handler failed", (_err as Error).message);
+        }
       }
 
-      return respond({ ok: true, routed: "tenant_not_maintenance", llmInvoked, autoReplySent: false, autoReplyReason: "not_maintenance" });
+      // ── Create persistent notification for non-maintenance messages ──
+      // So the landlord can see ALL tenant messages in their notification area,
+      // even when no maintenance ticket is created.
+      if (tenantLandlordId) {
+        try {
+          const { createNotification: createNotif } = require("../services/websocketService");
+          await createNotif(tenantLandlordId, {
+            type: "TENANT_MESSAGE",
+            title: `Message from ${tenant.name}`,
+            body: `${(tenantMessage || "").substring(0, 300)}${notMaintDraft ? "\n\n🤖 AI replied: " + notMaintDraft.substring(0, 200) : ""}`,
+            data: {
+              tenantId: tenant.id,
+              tenantPhone: tenant.phone || sender,
+              category: "not_maintenance",
+              triageSummary: triage?.summary || "",
+              autoReplySent,
+              aiDraft: (notMaintDraft || "").substring(0, 500),
+            },
+          });
+        } catch (notifErr) {
+          console.warn("Failed to create not_maintenance notification", (notifErr as Error).message);
+        }
+        // Also alert landlord via WhatsApp so they know what's happening
+        const nmAlert = `💬 TENANT MESSAGE (Non-maintenance)\n👤 ${tenant.name} (${tenant.phone || sender})\n📝 ${(tenantMessage || "").substring(0, 300)}${notMaintDraft ? "\n\n🤖 AI replied automatically." : "\n\nℹ️ No auto-reply was sent."}`;
+        await whatsappService.alertLandlord(tenantLandlordId, nmAlert, {
+          type: "TENANT_MESSAGE",
+          tenantPhone: tenant.phone || sender,
+          severity: "info",
+        });
+      }
+
+      return respond({ ok: true, routed: "tenant_not_maintenance", llmInvoked, autoReplySent, autoReplyReason: "not_maintenance" });
     }
 
     const delayMs = await computeDelayMs(
@@ -1704,6 +1824,26 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       // Only create a ticket in linear mode — in agentic mode, the agent
       // decides whether to create one via the create_maintenance_request tool,
       // avoiding duplicate tickets.
+      record = await repo.createMaintenanceRequest({
+        tenantId: tenant.id,
+        unitId: immediateUnitId,
+        landlordId: tenantLandlordId,
+        message: inboundContent || tenantMessage,
+        triage,
+        autopilotEnabled: true,
+      });
+    } else if (AGENTIC_MODE && (triageSeverity === "high" || triageSeverity === "critical")) {
+      // HIGH/CRITICAL in agentic mode: create ticket immediately in the webhook
+      // instead of relying on the agent to call create_maintenance_request.
+      // The agent may skip or delay ticket creation, but for HIGH/CRITICAL issues
+      // (leaks, fires, no heat, etc.) we must guarantee a ticket exists.
+      // eslint-disable-next-line no-console
+      console.info("HIGH/CRITICAL triage — creating ticket immediately (agentic mode)", {
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        severity: triageSeverity,
+        summary: triage?.summary,
+      });
       record = await repo.createMaintenanceRequest({
         tenantId: tenant.id,
         unitId: immediateUnitId,
@@ -1925,21 +2065,31 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         });
 
         // Notify landlord about tenant message (agentic path)
-        const agentAlert = buildLandlordAlert({
-          tenantName: tenant.name,
-          tenantPhone: tenant.phone || sender,
-          message: tenantMessage,
-          severity: agentSeverity,
-          draft: agentDraft || "(agent handled)",
-          isNewTicket: !record,
-        });
-        if (tenantLandlordId) {
-          await whatsappService.alertLandlord(tenantLandlordId, agentAlert, {
-            type: agentSeverity === "high" || agentSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
-            maintenanceId: record?.id,
+        // Check if the agent already called alert_landlord during its tool loop
+        // to avoid sending duplicate notifications to the landlord
+        const agentAlreadyAlertedImm = (agentResult.steps || []).some((step: any) =>
+          (step.toolCalls || []).some((tc: any) => tc.name === "alert_landlord")
+        );
+        if (!agentAlreadyAlertedImm) {
+          const agentAlert = buildLandlordAlert({
+            tenantName: tenant.name,
             tenantPhone: tenant.phone || sender,
+            message: tenantMessage,
             severity: agentSeverity,
+            draft: agentDraft || "(agent handled)",
+            isNewTicket: !record,
           });
+          if (tenantLandlordId) {
+            await whatsappService.alertLandlord(tenantLandlordId, agentAlert, {
+              type: agentSeverity === "high" || agentSeverity === "critical" ? "APPROVAL_REQUEST" : "MAINTENANCE_NEW",
+              maintenanceId: record?.id,
+              tenantPhone: tenant.phone || sender,
+              severity: agentSeverity,
+            });
+          }
+        } else {
+          // eslint-disable-next-line no-console
+          console.info("skipping duplicate landlord alert (agentic immediate) — agent already called alert_landlord", { tenantId: tenant.id });
         }
 
         return respond({ ok: true, routed: "tenant_agentic", llmInvoked, autoReplySent, autoReplyReason });
