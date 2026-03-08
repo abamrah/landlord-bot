@@ -1513,23 +1513,9 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         console.info("whatsapp routed contractor message", { sender, remoteJid, participant, isGroup });
         return respond({ ok: true, routed: "contractor", llmInvoked, autoReplySent, autoReplyReason });
       }
-      // Notify landlord about unknown sender instead of silently ignoring
+      // Unknown sender — log but do NOT create a notification (only registered tenants trigger notifications)
       // eslint-disable-next-line no-console
-      console.warn("whatsapp unknown sender — notifying landlord", { sender, remoteJid, participant, isGroup });
-      // Try to find which landlord this instance belongs to and alert them
-      if (landlordId) {
-        try {
-          await db.notification.create({
-            data: {
-              landlordId,
-              type: "info",
-              title: "Message from unregistered number",
-              body: `An unregistered number (${sender}) sent a message: "${(inboundContent || "").substring(0, 200)}". Register them as a tenant to enable AI responses.`,
-              data: { phone: sender, message: (inboundContent || "").substring(0, 500) } as any,
-            },
-          });
-        } catch (e) { console.warn("failed to create unknown-sender notification", e); }
-      }
+      console.warn("whatsapp unknown sender — ignoring (no notification)", { sender, remoteJid, participant, isGroup });
       return respond({ ok: true, ignored: "unknown_sender", llmInvoked, autoReplySent, autoReplyReason });
     }
 

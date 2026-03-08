@@ -2553,7 +2553,7 @@
               <strong style="font-size:15px;">Notifications</strong>
               <div style="display:flex;gap:8px;align-items:center;">
                 <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
-                  onclick="markAllNotificationsRead()">Mark all read</button>
+                  onclick="markAllNotificationsRead()">Clear all</button>
                 <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
                   onclick="sendTestNotification()">🧪 Test</button>
                 <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
@@ -2792,15 +2792,6 @@
           </div>
         </div>
 
-        <!-- ACTIVITY FEED -->
-        <div class="chart-panel">
-          <div class="panel-header">
-            <h3>Recent Activity</h3>
-            <button class="btn btn-ghost btn-sm" onclick="showView('maintenance')">View All →</button>
-          </div>
-          <div id="notifications" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:0;">
-          </div>
-        </div>
       </section>
 
       <!-- ═══════════════════ MAINTENANCE ═══════════════════ -->
@@ -4590,7 +4581,9 @@
       <strong>Notifications</strong>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
-          onclick="markAllNotificationsRead()">Mark all read</button>
+          onclick="markAllNotificationsRead()">Clear all</button>
+        <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
+          onclick="sendTestNotification()">🧪 Test</button>
         <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;" onclick="enablePushNotifications()">🔔
           Push</button>
       </div>
@@ -5293,33 +5286,7 @@
         options: { ...chartOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#27272a' } }, y: { grid: { display: false } } }, onClick: function () { showView('units'); } }
       });
 
-      // Activity feed — improved with relative timestamps and severity chips
-      var feed = document.getElementById('notifications');
-      var items = state.maintenance.slice(0, 10);
-      feed.innerHTML = items.map(function (m) {
-        var tenant = resolveTenant(m); var unit = resolveUnit(m);
-        var triage = m.triageJson || {};
-        var sev = severityOf(m);
-        var summary = (triage.classification && triage.classification.summary) || (triage.summary) || m.message || '';
-        if (summary.length > 120) summary = summary.substring(0, 120) + '\u2026';
-        var isActive = ACTIVE_STATUSES.includes(m.status);
-        var sevColor = { low: '#3b82f6', normal: '#71717a', high: '#f59e0b', critical: '#ef4444' }[sev] || '#52525b';
-        return '<div onclick="openMaintDrawer(\'' + m.id + '\')" style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'var(--surface-2)\'" onmouseleave="this.style.background=\'transparent\'">' +
-          '<div style="width:10px;height:10px;border-radius:50%;background:' + (isActive ? 'var(--accent)' : 'var(--text-muted)') + ';margin-top:5px;flex-shrink:0;' + (isActive ? 'box-shadow:0 0 6px rgba(0,200,150,.4);' : '') + '"></div>' +
-          '<div style="flex:1;min-width:0;">' +
-          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
-          '<div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (tenant.name || '?') + ' \u00B7 ' + (unit.label || '\u2014') + '</div>' +
-          '<span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">' + timeAgo(m.updatedAt || m.createdAt) + '</span>' +
-          '</div>' +
-          '<div style="font-size:13px;color:var(--text-secondary);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (summary || 'No details') + '</div>' +
-          '<div style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap;">' +
-          '<span class="chip ' + (isActive ? 'chip-accent' : 'chip-muted') + '" style="font-size:10px;padding:2px 8px;">' + formatStatus(m.status) + '</span>' +
-          '<span style="font-size:10px;font-weight:600;color:' + sevColor + ';background:' + sevColor + '18;padding:2px 8px;border-radius:100px;">' + sev + '</span>' +
-          autoReplyBadge(m.id, m.tenantId) +
-          '</div>' +
-          '</div>' +
-          '</div>';
-      }).join('') || '<div style="padding:24px;color:var(--text-muted);text-align:center;">No activity yet<br><span style="font-size:13px;">Tickets will appear here as they come in</span></div>';
+      // Activity feed removed — notifications use the bell dropdown
     }
 
     function renderUtilities() {
@@ -7548,7 +7515,7 @@
 
     async function loadNotifications() {
       try {
-        var data = await fetchJson('/admin/notifications?limit=50');
+        var data = await fetchJson('/admin/notifications?limit=50&unread=true');
         _notifications = data.notifications || [];
         renderNotifications();
         updateNotifBadge();
@@ -7557,15 +7524,15 @@
 
     function renderNotifications() {
       var list = document.getElementById('notificationList');
-      if (!_notifications.length) {
+      var unread = _notifications.filter(function (n) { return !n.read; });
+      if (!unread.length) {
         list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No notifications yet</div>';
         return;
       }
-      list.innerHTML = _notifications.map(function (n) {
-        var icon = n.type === 'maintenance' ? '🛠️' : n.type === 'approval_request' ? '✅' : n.type === 'contractor' ? '🧰' : n.type === 'lease' ? '📋' : n.type === 'utility' ? '💡' : '📢';
-        var readClass = n.read ? 'opacity:0.6;' : 'font-weight:500;';
+      list.innerHTML = unread.map(function (n) {
+        var icon = n.type === 'maintenance' ? '🛠️' : n.type === 'approval_request' ? '✅' : n.type === 'contractor' ? '🧰' : n.type === 'lease' ? '📋' : n.type === 'utility' ? '💡' : n.type === 'TENANT_MESSAGE' ? '💬' : '📢';
         var time = new Date(n.createdAt).toLocaleString();
-        return '<div style="padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;' + readClass + '" onclick="markNotificationRead(\'' + n.id + '\')">' +
+        return '<div style="padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;font-weight:500;" onclick="markNotificationRead(\'' + n.id + '\')">' +
           '<div style="display:flex;align-items:flex-start;gap:8px;">' +
           '<span style="font-size:16px;">' + icon + '</span>' +
           '<div style="flex:1;min-width:0;">' +
@@ -7616,9 +7583,10 @@
     async function markAllNotificationsRead() {
       try {
         await fetchJson('/admin/notifications/read-all', { method: 'POST' });
-        _notifications.forEach(function (n) { n.read = true; });
+        _notifications = [];
         renderNotifications();
         updateNotifBadge();
+        toast('All notifications cleared');
       } catch (e) { toast('Failed to mark as read'); }
     }
 
@@ -8064,13 +8032,14 @@
       window._renderMobileNotifications = function () {
         var list = document.getElementById('mobileNotifList');
         if (!list) return;
-        if (!_notifications.length) {
+        var unread = _notifications.filter(function (n) { return !n.read; });
+        if (!unread.length) {
           list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No notifications yet</div>';
         } else {
-          var iconMap = { maintenance: '🛠️', approval_request: '✅', contractor: '🧰', lease: '📋', utility: '💡' };
-          list.innerHTML = _notifications.map(function (n) {
+          var iconMap = { maintenance: '🛠️', approval_request: '✅', contractor: '🧰', lease: '📋', utility: '💡', TENANT_MESSAGE: '💬' };
+          list.innerHTML = unread.map(function (n) {
             var icon = iconMap[n.type] || '📢';
-            return '<div class="mobile-notif-item' + (n.read ? '' : ' unread') + '" onclick="markNotificationRead(\'' + n.id + '\')">' +
+            return '<div class="mobile-notif-item unread" onclick="markNotificationRead(\'' + n.id + '\')">' +
               '<div style="display:flex;gap:8px;align-items:flex-start;">' +
               '<span style="font-size:16px;">' + icon + '</span>' +
               '<div style="flex:1;min-width:0;">' +
