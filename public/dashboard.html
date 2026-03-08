@@ -2547,21 +2547,32 @@
           </button>
           <!-- Notification Dropdown -->
           <div id="notificationPanel"
-            style="display:none;position:absolute;right:0;top:42px;width:380px;max-height:480px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:1000;overflow:hidden;">
-            <div
-              style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);">
-              <strong style="font-size:15px;">Notifications</strong>
-              <div style="display:flex;gap:8px;align-items:center;">
+            style="display:none;position:absolute;right:0;top:42px;width:380px;max-height:520px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:1000;overflow:hidden;">
+            <!-- Notification Tab / Upcoming Tab -->
+            <div style="display:flex;border-bottom:1px solid var(--border);">
+              <button id="bellTabNotif" class="btn btn-ghost" style="flex:1;border-radius:0;font-size:12px;font-weight:600;padding:10px 8px;border-bottom:2px solid var(--accent);color:var(--accent);" onclick="switchBellTab('notif')">🔔 Notifications</button>
+              <button id="bellTabTasks" class="btn btn-ghost" style="flex:1;border-radius:0;font-size:12px;font-weight:600;padding:10px 8px;border-bottom:2px solid transparent;color:var(--text-muted);" onclick="switchBellTab('tasks')">📅 Upcoming</button>
+            </div>
+            <!-- Notifications content -->
+            <div id="bellNotifContent">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;">
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
+                    onclick="markAllNotificationsRead()">Clear all</button>
+                  <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
+                    onclick="sendTestNotification()">🧪 Test</button>
+                </div>
                 <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
-                  onclick="markAllNotificationsRead()">Clear all</button>
-                <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
-                  onclick="sendTestNotification()">🧪 Test</button>
-                <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;"
-                  onclick="enablePushNotifications()">🔔 Enable Push</button>
+                  onclick="enablePushNotifications()">🔔 Push</button>
+              </div>
+              <div id="notificationList" style="max-height:400px;overflow-y:auto;padding:4px 0;">
+                <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No notifications yet</div>
               </div>
             </div>
-            <div id="notificationList" style="max-height:400px;overflow-y:auto;padding:4px 0;">
-              <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No notifications yet
+            <!-- Upcoming Tasks content -->
+            <div id="bellTasksContent" style="display:none;">
+              <div id="bellUpcomingList" style="max-height:440px;overflow-y:auto;padding:4px 0;">
+                <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Loading…</div>
               </div>
             </div>
           </div>
@@ -7623,6 +7634,52 @@
     function toggleNotificationPanel() {
       var panel = document.getElementById('notificationPanel');
       panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      // Refresh upcoming tasks when opening
+      if (panel.style.display !== 'none') renderBellUpcoming();
+    }
+
+    function switchBellTab(tab) {
+      var notifBtn = document.getElementById('bellTabNotif');
+      var tasksBtn = document.getElementById('bellTabTasks');
+      var notifContent = document.getElementById('bellNotifContent');
+      var tasksContent = document.getElementById('bellTasksContent');
+      if (tab === 'tasks') {
+        notifBtn.style.borderBottomColor = 'transparent'; notifBtn.style.color = 'var(--text-muted)';
+        tasksBtn.style.borderBottomColor = 'var(--accent)'; tasksBtn.style.color = 'var(--accent)';
+        notifContent.style.display = 'none'; tasksContent.style.display = '';
+        renderBellUpcoming();
+      } else {
+        tasksBtn.style.borderBottomColor = 'transparent'; tasksBtn.style.color = 'var(--text-muted)';
+        notifBtn.style.borderBottomColor = 'var(--accent)'; notifBtn.style.color = 'var(--accent)';
+        tasksContent.style.display = 'none'; notifContent.style.display = '';
+      }
+    }
+
+    function renderBellUpcoming() {
+      var el = document.getElementById('bellUpcomingList');
+      if (!el) return;
+      if (!_upcomingTasks || !_upcomingTasks.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">🎉 All clear — no upcoming tasks!</div>';
+        return;
+      }
+      el.innerHTML = _upcomingTasks.slice(0, 12).map(function (t) {
+        var urgentStyle = t.urgent ? 'border-left:3px solid #ef4444;' : 'border-left:3px solid transparent;';
+        var dateStr = '';
+        if (t.daysUntil !== undefined) {
+          dateStr = t.daysUntil === 0 ? 'Today' : t.daysUntil === 1 ? 'Tomorrow' : 'In ' + t.daysUntil + ' days';
+        } else if (t.date) {
+          dateStr = timeAgo(t.date);
+        }
+        var clickAction = t.type === 'maintenance' ? 'openMaintDrawer(\'' + t.id + '\')' : '';
+        return '<div style="padding:8px 12px;' + urgentStyle + 'border-bottom:1px solid var(--border);' + (clickAction ? 'cursor:pointer;' : '') + '" ' +
+          (clickAction ? 'onclick="' + clickAction + '"' : '') + '>' +
+          '<div style="display:flex;gap:8px;align-items:flex-start;">' +
+          '<span style="font-size:15px;">' + (t.icon || '📌') + '</span>' +
+          '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (t.label || '').replace(/</g, '&lt;') + '</div>' +
+          '<span style="font-size:11px;color:var(--text-muted);">' + dateStr + '</span>' +
+          '</div></div></div>';
+      }).join('');
     }
 
     // Close notification panel when clicking outside
