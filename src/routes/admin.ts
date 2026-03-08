@@ -2742,6 +2742,103 @@ router.delete("/account", async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════
+//  UPCOMING TASKS — Calendar / task feed for dashboard
+// ═══════════════════════════════════════════════════════════
+
+/** GET /admin/upcoming-tasks — Aggregated upcoming tasks for the dashboard */
+router.get("/upcoming-tasks", async (req, res) => {
+  try {
+    const authReq = req as AuthRequest;
+    const landlordId = authReq.landlordId;
+    const now = new Date();
+    const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const in90Days = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+
+    // 1. Rent reminders due soon (next occurrence based on dayOfMonth)
+    const reminders = await db.reminder.findMany({
+      where: { landlordId, active: true },
+      include: { unit: true },
+    });
+    const rentDue: any[] = [];
+    for (const r of reminders) {
+      const nextDate = new Date(now.getFullYear(), now.getMonth(), r.dayOfMonth);
+      if (nextDate < now) nextDate.setMonth(nextDate.getMonth() + 1);
+      if (nextDate <= in30Days) {
+        const daysUntil = Math.ceil((nextDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        rentDue.push({
+          id: r.id,
+          type: "rent_due",
+          label: `Rent due — ${r.unit?.label || "Unit"}`,
+          date: nextDate.toISOString(),
+          daysUntil,
+          detail: r.amountCents ? `$${(r.amountCents / 100).toFixed(2)}` : undefined,
+          icon: "💰",
+        });
+      }
+    }
+
+    // 2. Expiring leases (within 90 days)
+    const expiringLeases = await db.unitTenant.findMany({
+      where: {
+        unit: { landlordId },
+        endDate: { gte: now, lte: in90Days },
+      },
+      include: { tenant: true, unit: true },
+    });
+    const leaseExpiries = expiringLeases.map((ut: any) => {
+      const daysUntil = Math.ceil(((ut.endDate as Date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return {
+        id: ut.id,
+        type: "lease_expiry",
+        label: `Lease expires — ${ut.tenant?.name || "Tenant"} (${ut.unit?.label || "Unit"})`,
+        date: (ut.endDate as Date).toISOString(),
+        daysUntil,
+        detail: daysUntil <= 30 ? "Action needed" : undefined,
+        icon: "📋",
+        urgent: daysUntil <= 30,
+      };
+    });
+
+    // 3. Open/Pending/Scheduled maintenance
+    const openMaint = await db.maintenanceRequest.findMany({
+      where: {
+        landlordId,
+        status: { in: ["OPEN", "PENDING", "IN_TRIAGE", "SCHEDULED", "IN_PROGRESS"] },
+      },
+      include: { tenant: true, unit: true },
+      orderBy: { updatedAt: "desc" },
+      take: 15,
+    });
+    const maintTasks = openMaint.map((m: any) => {
+      const triage = (m.triageJson as any) || {};
+      const sev = triage.severity || triage.classification?.severity || "normal";
+      return {
+        id: m.id,
+        type: "maintenance",
+        label: `${m.status === "SCHEDULED" ? "Scheduled" : m.status === "IN_PROGRESS" ? "In progress" : "Open"}: ${m.tenant?.name || "?"} — ${(triage.classification?.summary || m.message || "").substring(0, 60)}`,
+        date: m.updatedAt?.toISOString() || m.createdAt?.toISOString(),
+        status: m.status,
+        severity: sev,
+        icon: sev === "critical" || sev === "high" ? "🔴" : m.status === "SCHEDULED" ? "📅" : "🛠️",
+        urgent: sev === "critical" || sev === "high",
+      };
+    });
+
+    // Combine and sort: urgent first, then by date
+    const tasks = [...rentDue, ...leaseExpiries, ...maintTasks].sort((a, b) => {
+      if (a.urgent && !b.urgent) return -1;
+      if (!a.urgent && b.urgent) return 1;
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+
+    res.json({ tasks, total: tasks.length });
+  } catch (err) {
+    console.error("Failed to load upcoming tasks", err);
+    res.status(500).json({ error: "upcoming_tasks_failed", message: (err as Error).message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
 //  NOTIFICATIONS — In-app + push notification management
 // ═══════════════════════════════════════════════════════════
 

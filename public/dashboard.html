@@ -2792,6 +2792,17 @@
           </div>
         </div>
 
+        <!-- UPCOMING TASKS / CALENDAR -->
+        <div class="chart-panel" style="margin-top:16px;">
+          <div class="panel-header">
+            <h3>📅 Upcoming Tasks</h3>
+            <button class="btn btn-ghost btn-sm" onclick="loadUpcomingTasks()">↻ Refresh</button>
+          </div>
+          <div id="upcomingTasksList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:0;">
+            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading tasks…</div>
+          </div>
+        </div>
+
       </section>
 
       <!-- ═══════════════════ MAINTENANCE ═══════════════════ -->
@@ -5289,6 +5300,58 @@
       // Activity feed removed — notifications use the bell dropdown
     }
 
+    // ── UPCOMING TASKS ──
+    var _upcomingTasks = [];
+
+    async function loadUpcomingTasks() {
+      try {
+        var data = await fetchJson('/admin/upcoming-tasks');
+        _upcomingTasks = (data && data.tasks) || [];
+        renderUpcomingTasks();
+      } catch (e) {
+        console.warn('Failed to load upcoming tasks', e);
+        document.getElementById('upcomingTasksList').innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Could not load tasks</div>';
+      }
+    }
+
+    function renderUpcomingTasks() {
+      var el = document.getElementById('upcomingTasksList');
+      if (!_upcomingTasks.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">🎉 All clear — no upcoming tasks!</div>';
+        return;
+      }
+      el.innerHTML = _upcomingTasks.map(function (t) {
+        var urgentStyle = t.urgent ? 'border-left:3px solid #ef4444;' : 'border-left:3px solid transparent;';
+        var dateStr = '';
+        if (t.daysUntil !== undefined) {
+          dateStr = t.daysUntil === 0 ? 'Today' : t.daysUntil === 1 ? 'Tomorrow' : 'In ' + t.daysUntil + ' days';
+        } else if (t.date) {
+          dateStr = timeAgo(t.date);
+        }
+        var statusChip = '';
+        if (t.status) {
+          var chipColor = t.status === 'SCHEDULED' ? '#3b82f6' : t.status === 'IN_PROGRESS' ? '#f59e0b' : 'var(--accent)';
+          statusChip = '<span style="font-size:10px;font-weight:600;color:' + chipColor + ';background:' + chipColor + '18;padding:2px 8px;border-radius:100px;">' + t.status.replace(/_/g, ' ') + '</span>';
+        }
+        if (t.severity && (t.severity === 'high' || t.severity === 'critical')) {
+          statusChip += '<span style="font-size:10px;font-weight:600;color:#ef4444;background:#ef444418;padding:2px 8px;border-radius:100px;">' + t.severity + '</span>';
+        }
+        var clickAction = t.type === 'maintenance' ? 'openMaintDrawer(\'' + t.id + '\')' : '';
+        return '<div style="padding:10px 14px;' + urgentStyle + 'border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;' + (clickAction ? 'cursor:pointer;' : '') + 'transition:background .15s;" ' +
+          (clickAction ? 'onclick="' + clickAction + '" onmouseenter="this.style.background=\'var(--surface-2)\'" onmouseleave="this.style.background=\'transparent\'"' : '') + '>' +
+          '<span style="font-size:18px;flex-shrink:0;margin-top:1px;">' + (t.icon || '📌') + '</span>' +
+          '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (t.label || '').replace(/</g, '&lt;') + '</div>' +
+          '<div style="display:flex;gap:6px;align-items:center;margin-top:3px;flex-wrap:wrap;">' +
+          '<span style="font-size:11px;color:var(--text-muted);">' + dateStr + '</span>' +
+          (t.detail ? '<span style="font-size:11px;font-weight:600;color:var(--text-secondary);">' + t.detail + '</span>' : '') +
+          statusChip +
+          '</div>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
     function renderUtilities() {
       var tbody = document.querySelector('#utilityTable tbody');
       if (!state.utilityBills.length) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted)">No bills</td></tr>'; return; }
@@ -6700,6 +6763,7 @@
       loadAgentChatHistory(); loadFinancialSummary(); loadFinancialRecords();
       loadRentData(); loadScreenings();
       loadNotifications();
+      loadUpcomingTasks();
     }
 
     async function loadFinancialSummary() {
