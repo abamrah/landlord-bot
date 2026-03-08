@@ -2216,17 +2216,60 @@ router.post("/whatsapp/instance/create", async (req, res) => {
       });
     } catch (createErr) {
       const errMsg = (createErr as Error).message || "";
-      // If instance already exists in Evolution API, try to just connect to it
+      // If instance already exists in Evolution API, try to delete it first and create fresh
       if (errMsg.includes("already") || errMsg.includes("exists") || errMsg.includes("in use") || errMsg.includes("403") || errMsg.includes("Forbidden")) {
-        console.warn(`[WhatsApp] Instance ${instanceName} already exists in Evolution API — reusing it. Error was:`, errMsg);
-        // Save the instance name to DB and return success so QR flow can proceed
-        await db.landlord.update({
-          where: { id: authReq.landlordId },
-          data: { evolutionInstanceName: instanceName },
-        }).catch(() => { });
-        return res.json({ instance: { instanceName }, reused: true });
+        console.warn(`[WhatsApp] Instance ${instanceName} already exists — attempting to delete and recreate. Error was:`, errMsg);
+
+        // Try to force-delete the stale instance
+        const inst = encodeURIComponent(instanceName);
+        try { await evoFetch(`/instance/logout/${inst}`, { method: "DELETE" }); } catch { }
+        try { await evoFetch(`/instance/delete/${inst}`, { method: "DELETE" }); } catch { }
+
+        // Wait for cleanup
+        await new Promise(r => setTimeout(r, 2000));
+
+        // Retry create with the same name
+        try {
+          result = await evoFetch("/instance/create", {
+            method: "POST",
+            body: {
+              instanceName,
+              integration: "WHATSAPP-BAILEYS",
+              qrcode: true,
+              rejectCall: false,
+              groupsIgnore: false,
+              alwaysOnline: true,
+              readMessages: true,
+              readStatus: true,
+              syncFullHistory: false,
+              webhook: { url: webhookUrl, byEvents: false, base64: true, events: ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"] },
+            },
+          });
+          console.info(`[WhatsApp] Instance ${instanceName} recreated after delete`);
+        } catch (retryErr) {
+          // If still failing, create with a new unique name
+          const suffix = Date.now().toString(36);
+          const newName = `nestmind-${authReq.landlordId.substring(0, 8)}-${suffix}`;
+          console.warn(`[WhatsApp] Retry with same name failed, creating with new name: ${newName}`);
+          result = await evoFetch("/instance/create", {
+            method: "POST",
+            body: {
+              instanceName: newName,
+              integration: "WHATSAPP-BAILEYS",
+              qrcode: true,
+              rejectCall: false,
+              groupsIgnore: false,
+              alwaysOnline: true,
+              readMessages: true,
+              readStatus: true,
+              syncFullHistory: false,
+              webhook: { url: webhookUrl, byEvents: false, base64: true, events: ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"] },
+            },
+          });
+        }
+      } else {
+        throw createErr;
       }
-      throw createErr;
     }
 
     // Save instance name to landlord record
@@ -2551,17 +2594,44 @@ router.delete("/whatsapp/instance/remove/:instanceName", async (req, res) => {
   const landlord = await db.landlord.findUnique({ where: { id: authReq.landlordId }, select: { evolutionInstanceName: true } });
   if (landlord?.evolutionInstanceName !== req.params.instanceName) return res.status(403).json({ error: "forbidden" });
   const inst = encodeURIComponent(req.params.instanceName);
-  // 1. Try to logout from Evolution API (ignore errors — instance may already be deleted externally)
-  try { await evoFetch(`/instance/logout/${inst}`, { method: "DELETE" }); } catch { }
-  // 2. Try to delete from Evolution API
-  try { await evoFetch(`/instance/delete/${inst}`, { method: "DELETE" }); } catch { }
-  // 3. Clear from DB — this is the critical part
+  const deleteResults: string[] = [];
+
+  // 1. Try to logout (disconnect WhatsApp session)
+  try {
+    await evoFetch(`/instance/logout/${inst}`, { method: "DELETE" });
+    deleteResults.push("logout: ok");
+  } catch (e) { deleteResults.push(`logout: ${(e as Error).message?.substring(0, 80)}`); }
+
+  // 2. Try DELETE method to fully remove the instance
+  try {
+    await evoFetch(`/instance/delete/${inst}`, { method: "DELETE" });
+    deleteResults.push("delete: ok");
+  } catch (e) { deleteResults.push(`delete: ${(e as Error).message?.substring(0, 80)}`); }
+
+  // 3. Some Evolution API versions use POST or different paths
+  if (!deleteResults.some(r => r.includes(": ok"))) {
+    try {
+      await evoFetch(`/instance/delete/${inst}`, { method: "POST", body: {} });
+      deleteResults.push("delete-post: ok");
+    } catch (e) { deleteResults.push(`delete-post: ${(e as Error).message?.substring(0, 80)}`); }
+  }
+
+  console.info(`[WhatsApp] Remove instance ${req.params.instanceName} results:`, deleteResults);
+
+  // 4. Clear from DB — this is the critical part
   try {
     await db.landlord.update({
       where: { id: authReq.landlordId },
       data: { evolutionInstanceName: null },
     });
-    res.json({ ok: true, message: "Instance removed. You can now create a new one." });
+    const evoSuccess = deleteResults.some(r => r.includes(": ok"));
+    res.json({
+      ok: true,
+      message: evoSuccess
+        ? "Instance fully removed. You can now create a new one."
+        : "Instance cleared from database. Note: Evolution API deletion may have failed — if you see issues creating a new instance, check the Evolution API Manager.",
+      details: deleteResults,
+    });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
