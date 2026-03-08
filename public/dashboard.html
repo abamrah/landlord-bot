@@ -2518,6 +2518,7 @@
     <a class="nav-item" data-target="whatsapp">💬 <span>WhatsApp</span></a>
     <a class="nav-item" data-target="reminders">⏰ <span>Reminders</span></a>
     <a class="nav-item" data-target="usage">📈 <span>AI Usage</span></a>
+    <a class="nav-item" data-target="settings">⚙️ <span>Settings</span></a>
     <div class="nav-title">Help</div>
     <a class="nav-item" data-target="guides">📖 <span>Tips & Guides</span></a>
     <div class="nav-spacer"></div>
@@ -4326,6 +4327,118 @@
         </div>
       </section>
 
+      <!-- ═══ SETTINGS SECTION ═══ -->
+      <section id="settings" class="section">
+        <div class="section-header">
+          <h2>⚙️ Settings</h2>
+        </div>
+
+        <!-- Autopilot Settings -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>🤖 Autopilot</h3>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <span style="font-weight:600;">Auto-Reply</span>
+            <label class="toggle" title="Toggle global auto-reply">
+              <input type="checkbox" id="globalAutoReplyToggleSettings" />
+              <span class="slider"></span>
+            </label>
+            <span class="chip chip-muted" id="globalAutoReplyStatusSettings">—</span>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+            When enabled, the AI auto-replies to tenant messages. High/critical severity issues are always held for your approval.
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Reply Delay</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">How long the AI waits before replying (batches multiple messages)</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input id="settingsDelayMinutes" type="number" min="0" max="120" step="1"
+                  style="width:70px;padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);" />
+                <span style="font-size:13px;color:var(--text-muted)">min</span>
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Cooldown</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Minimum time between auto-replies to the same tenant</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input id="settingsCooldownMinutes" type="number" min="0" max="240" step="1"
+                  style="width:70px;padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);" />
+                <span style="font-size:13px;color:var(--text-muted)">min</span>
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Active Window</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Auto-replies pause when you message a tenant within this window</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input id="settingsActiveWindowMinutes" type="number" min="0" max="240" step="1"
+                  style="width:70px;padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);" />
+                <span style="font-size:13px;color:var(--text-muted)">min</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary btn-sm" id="saveSettingsAutopilot">Save Autopilot Settings</button>
+          </div>
+        </div>
+
+        <!-- Lease & Reminder Timing -->
+        <div class="panel" style="margin-top:20px;">
+          <div class="panel-header">
+            <h3>⏰ Lease & Reminder Timing</h3>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+            Control when follow-up nudges are sent for unpaid reminders and how far ahead lease expiry alerts go out.
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Follow-up After</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Send a payment nudge after this many hours with no confirmation</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input id="settingsNudgeHours" type="number" min="1" max="168" step="1"
+                  style="width:70px;padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);" />
+                <span style="font-size:13px;color:var(--text-muted)">hrs</span>
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Stop Nudging After</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Stop sending follow-ups after this many hours</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input id="settingsMaxHours" type="number" min="1" max="336" step="1"
+                  style="width:70px;padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);" />
+                <span style="font-size:13px;color:var(--text-muted)">hrs</span>
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Lease Expiry Alert</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Alert you this many days before a lease expires</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input id="settingsLeaseExpiryDays" type="number" min="7" max="365" step="1"
+                  style="width:70px;padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);" />
+                <span style="font-size:13px;color:var(--text-muted)">days</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary btn-sm" id="saveSettingsTiming">Save Timing Settings</button>
+          </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="panel" style="margin-top:20px;">
+          <div class="panel-header">
+            <h3>🎨 Appearance</h3>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:14px;">Theme</span>
+            <button class="btn btn-secondary btn-sm" onclick="toggleDashTheme()">
+              <span id="settingsThemeIcon">☀️</span> <span id="settingsThemeLabel">Light Mode</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -4370,6 +4483,7 @@
         <a class="mobile-nav-item" data-section="whatsapp"><span class="nav-emoji">💬</span> WhatsApp</a>
         <a class="mobile-nav-item" data-section="reminders"><span class="nav-emoji">⏰</span> Reminders</a>
         <a class="mobile-nav-item" data-section="usage"><span class="nav-emoji">📈</span> AI Usage</a>
+        <a class="mobile-nav-item" data-section="settings"><span class="nav-emoji">⚙️</span> Settings</a>
         <a class="mobile-nav-item" data-section="guides"><span class="nav-emoji">📖</span> Tips & Guides</a>
         <a class="mobile-nav-item" data-section="account"><span class="nav-emoji">👤</span> Account</a>
         <div style="height:16px;"></div>
@@ -4552,6 +4666,7 @@
       navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
       closeSidebar();
       if (id === 'guides') updateGuidesChecklist();
+      if (id === 'settings' && typeof renderSettingsPage === 'function') renderSettingsPage();
     }
     navItems.forEach(n => n.addEventListener('click', () => showView(n.dataset.target)));
 
@@ -4743,6 +4858,8 @@
       if (tl) tl.textContent = label;
       if (mi) mi.textContent = icon;
       if (ml) ml.textContent = label;
+      var si = document.getElementById('settingsThemeIcon'); if (si) si.textContent = icon;
+      var sl = document.getElementById('settingsThemeLabel'); if (sl) sl.textContent = label;
     }
 
     // ── STATE ──
@@ -4938,13 +5055,17 @@
       if (toggleMission) toggleMission.checked = state.autoReplyGlobalEnabled;
       if (statusMission) statusMission.textContent = state.autoReplyGlobalEnabled ? 'Active' : 'Paused';
       if (statusMission) statusMission.className = 'chip ' + (state.autoReplyGlobalEnabled ? 'chip-success' : 'chip-muted');
+      // Settings page toggle
+      var togS = document.getElementById('globalAutoReplyToggleSettings'); if (togS) togS.checked = state.autoReplyGlobalEnabled;
+      var statS = document.getElementById('globalAutoReplyStatusSettings');
+      if (statS) { statS.textContent = state.autoReplyGlobalEnabled ? 'Active' : 'Paused'; statS.className = 'chip ' + (state.autoReplyGlobalEnabled ? 'chip-success' : 'chip-muted'); }
     }
-    function renderAutoReplyDelay() { var el = document.getElementById('autoReplyDelayMinutes'); if (el) el.value = state.autoReplyDelayMinutes; }
-    function renderAutoReplyCooldown() { var el = document.getElementById('autoReplyCooldownMinutes'); if (el) el.value = state.autoReplyCooldownMinutes; }
-    function renderLandlordActiveWindow() { var el = document.getElementById('landlordActiveWindowMinutes'); if (el) el.value = state.landlordActiveWindowMinutes; }
-    function renderFollowUpNudgeHours() { var el = document.getElementById('followUpNudgeHours'); if (el) el.value = state.followUpNudgeHours; }
-    function renderFollowUpMaxHours() { var el = document.getElementById('followUpMaxHours'); if (el) el.value = state.followUpMaxHours; }
-    function renderLeaseExpiryDays() { var el = document.getElementById('leaseExpiryDays'); if (el) el.value = state.leaseExpiryDays; }
+    function renderAutoReplyDelay() { var el = document.getElementById('autoReplyDelayMinutes'); if (el) el.value = state.autoReplyDelayMinutes; var s = document.getElementById('settingsDelayMinutes'); if (s) s.value = state.autoReplyDelayMinutes; }
+    function renderAutoReplyCooldown() { var el = document.getElementById('autoReplyCooldownMinutes'); if (el) el.value = state.autoReplyCooldownMinutes; var s = document.getElementById('settingsCooldownMinutes'); if (s) s.value = state.autoReplyCooldownMinutes; }
+    function renderLandlordActiveWindow() { var el = document.getElementById('landlordActiveWindowMinutes'); if (el) el.value = state.landlordActiveWindowMinutes; var s = document.getElementById('settingsActiveWindowMinutes'); if (s) s.value = state.landlordActiveWindowMinutes; }
+    function renderFollowUpNudgeHours() { var el = document.getElementById('followUpNudgeHours'); if (el) el.value = state.followUpNudgeHours; var s = document.getElementById('settingsNudgeHours'); if (s) s.value = state.followUpNudgeHours; }
+    function renderFollowUpMaxHours() { var el = document.getElementById('followUpMaxHours'); if (el) el.value = state.followUpMaxHours; var s = document.getElementById('settingsMaxHours'); if (s) s.value = state.followUpMaxHours; }
+    function renderLeaseExpiryDays() { var el = document.getElementById('leaseExpiryDays'); if (el) el.value = state.leaseExpiryDays; var s = document.getElementById('settingsLeaseExpiryDays'); if (s) s.value = state.leaseExpiryDays; }
 
     function renderContractors() {
       var tbody = document.querySelector('#contractorTable tbody');
@@ -5939,6 +6060,59 @@
         if (!isNaN(maxHrs) && maxHrs >= 1) await fetchJson('/admin/follow-up-max-hours', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hours: maxHrs }) });
         if (!isNaN(leaseDays) && leaseDays >= 7) await fetchJson('/admin/lease-expiry-days', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ days: leaseDays }) });
         state.followUpNudgeHours = nudgeHrs; state.followUpMaxHours = maxHrs; state.leaseExpiryDays = leaseDays;
+        toast('Timing settings saved');
+      } catch (err) { toast('Failed: ' + err.message); }
+    });
+
+    // ── SETTINGS PAGE ──
+    function renderSettingsPage() {
+      var d = document.getElementById('settingsDelayMinutes'); if (d) d.value = state.autoReplyDelayMinutes;
+      var c = document.getElementById('settingsCooldownMinutes'); if (c) c.value = state.autoReplyCooldownMinutes;
+      var a = document.getElementById('settingsActiveWindowMinutes'); if (a) a.value = state.landlordActiveWindowMinutes;
+      var n = document.getElementById('settingsNudgeHours'); if (n) n.value = state.followUpNudgeHours;
+      var m = document.getElementById('settingsMaxHours'); if (m) m.value = state.followUpMaxHours;
+      var l = document.getElementById('settingsLeaseExpiryDays'); if (l) l.value = state.leaseExpiryDays;
+      // Sync the toggle
+      var tog = document.getElementById('globalAutoReplyToggleSettings');
+      if (tog) tog.checked = state.autoReplyGlobalEnabled;
+      var stat = document.getElementById('globalAutoReplyStatusSettings');
+      if (stat) { stat.textContent = state.autoReplyGlobalEnabled ? 'Active' : 'Paused'; stat.className = 'chip ' + (state.autoReplyGlobalEnabled ? 'chip-success' : 'chip-muted'); }
+      // Theme label
+      var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+      var ti = document.getElementById('settingsThemeIcon'); if (ti) ti.textContent = theme === 'dark' ? '☀️' : '🌙';
+      var tl = document.getElementById('settingsThemeLabel'); if (tl) tl.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    }
+
+    // Hook the settings autopilot toggle
+    (function () {
+      var tog = document.getElementById('globalAutoReplyToggleSettings');
+      if (tog) tog.addEventListener('change', function (e) { handleAutoReplyToggle(e.target.checked); });
+    })();
+
+    document.getElementById('saveSettingsAutopilot').addEventListener('click', async function () {
+      var delay = Number(document.getElementById('settingsDelayMinutes').value);
+      var cooldown = Number(document.getElementById('settingsCooldownMinutes').value);
+      var activeWindow = Number(document.getElementById('settingsActiveWindowMinutes').value);
+      try {
+        if (!isNaN(delay) && delay >= 0) await fetchJson('/admin/auto-reply-delay', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: delay }) });
+        if (!isNaN(cooldown) && cooldown >= 0) await fetchJson('/admin/auto-reply-cooldown', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: cooldown }) });
+        if (!isNaN(activeWindow) && activeWindow >= 0) await fetchJson('/admin/auto-reply-active-window', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ minutes: activeWindow }) });
+        state.autoReplyDelayMinutes = delay; state.autoReplyCooldownMinutes = cooldown; state.landlordActiveWindowMinutes = activeWindow;
+        renderAutoReplyDelay(); renderAutoReplyCooldown(); renderLandlordActiveWindow(); renderSettingsPage();
+        toast('Autopilot settings saved');
+      } catch (err) { toast('Failed: ' + err.message); }
+    });
+
+    document.getElementById('saveSettingsTiming').addEventListener('click', async function () {
+      var nudgeHrs = Number(document.getElementById('settingsNudgeHours').value);
+      var maxHrs = Number(document.getElementById('settingsMaxHours').value);
+      var leaseDays = Number(document.getElementById('settingsLeaseExpiryDays').value);
+      try {
+        if (!isNaN(nudgeHrs) && nudgeHrs >= 1) await fetchJson('/admin/follow-up-nudge-hours', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hours: nudgeHrs }) });
+        if (!isNaN(maxHrs) && maxHrs >= 1) await fetchJson('/admin/follow-up-max-hours', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hours: maxHrs }) });
+        if (!isNaN(leaseDays) && leaseDays >= 7) await fetchJson('/admin/lease-expiry-days', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ days: leaseDays }) });
+        state.followUpNudgeHours = nudgeHrs; state.followUpMaxHours = maxHrs; state.leaseExpiryDays = leaseDays;
+        renderFollowUpNudgeHours(); renderFollowUpMaxHours(); renderLeaseExpiryDays(); renderSettingsPage();
         toast('Timing settings saved');
       } catch (err) { toast('Failed: ' + err.message); }
     });
@@ -7935,7 +8109,8 @@
         mission: 'Dashboard', maintenance: 'Maintenance', tenants: 'Tenants',
         units: 'Units', contractors: 'Contractors', utilities: 'Utilities', financials: 'Financials',
         agent: 'AI Agent', usage: 'AI Usage', whatsapp: 'WhatsApp',
-        reminders: 'Reminders', leases: 'Leases', guides: 'Tips & Guides', account: 'Account'
+        reminders: 'Reminders', leases: 'Leases', guides: 'Tips & Guides', account: 'Account',
+        settings: 'Settings', 'rent-collection': 'Rent Collection', screening: 'Screening'
       };
       title.textContent = titles[sectionId] || sectionId;
 
@@ -7951,6 +8126,7 @@
 
       // Re-fill any unit dropdowns that depend on loaded state
       if (typeof fillUnitSelects === 'function') fillUnitSelects();
+      if (sectionId === 'settings' && typeof renderSettingsPage === 'function') renderSettingsPage();
     }
 
     function closeMobileOverlay() {
