@@ -2396,7 +2396,7 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
         console.log("[WhatsApp] Direct approaches failed. Restarting instance connection for clean pairing code...");
         try {
           // Restart the instance to get a clean socket state
-          await evoFetch(`/instance/restart/${instName}`, { method: "POST", body: {} }).catch(() => {});
+          await evoFetch(`/instance/restart/${instName}`, { method: "POST", body: {} }).catch(() => { });
           // Wait for instance to fully restart and reach "connecting" state
           await new Promise((resolve) => setTimeout(resolve, 4000));
 
