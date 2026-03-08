@@ -2158,7 +2158,9 @@ async function evoFetch(path: string, opts: { method?: string; body?: unknown } 
   try { data = JSON.parse(rawText); } catch { data = { rawBody: rawText?.substring(0, 500) }; }
   if (!res.ok) {
     console.error(`[evoFetch] ${opts.method || "GET"} ${path} → ${res.status}`, { response: rawText?.substring(0, 500), tokenPrefix: cfg.token?.substring(0, 8) + "..." });
-    throw new Error(data?.message || data?.error || data?.response?.message || `Evolution API error ${res.status}`);
+    // Build a detailed error message including nested response messages
+    const msgs = [data?.message, data?.error, ...(Array.isArray(data?.response?.message) ? data.response.message : [data?.response?.message])].filter(Boolean);
+    throw new Error(msgs.join(" — ") || `Evolution API error ${res.status}`);
   }
   return data;
 }
@@ -2215,8 +2217,8 @@ router.post("/whatsapp/instance/create", async (req, res) => {
     } catch (createErr) {
       const errMsg = (createErr as Error).message || "";
       // If instance already exists in Evolution API, try to just connect to it
-      if (errMsg.includes("already") || errMsg.includes("exists") || errMsg.includes("403")) {
-        console.warn(`[WhatsApp] Instance ${instanceName} may already exist in Evolution API, attempting to connect instead:`, errMsg);
+      if (errMsg.includes("already") || errMsg.includes("exists") || errMsg.includes("in use") || errMsg.includes("403") || errMsg.includes("Forbidden")) {
+        console.warn(`[WhatsApp] Instance ${instanceName} already exists in Evolution API — reusing it. Error was:`, errMsg);
         // Save the instance name to DB and return success so QR flow can proceed
         await db.landlord.update({
           where: { id: authReq.landlordId },
