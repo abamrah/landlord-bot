@@ -426,7 +426,26 @@ export async function runFollowUpNudges(now = new Date()): Promise<ReminderResul
   const results: ReminderResult[] = [];
 
   try {
-    const cutoff = new Date(now.getTime() - 48 * 60 * 60 * 1000); // 48 hours ago
+    // Build a per-landlord cache of nudge settings to avoid repeated DB lookups
+    const nudgeHoursCache = new Map<string, number>();
+    const maxHoursCache = new Map<string, number>();
+
+    async function getNudgeHours(landlordId: string): Promise<number> {
+      if (nudgeHoursCache.has(landlordId)) return nudgeHoursCache.get(landlordId)!;
+      const setting = await repo.getFollowUpNudgeHours(landlordId);
+      nudgeHoursCache.set(landlordId, setting.hours);
+      return setting.hours;
+    }
+    async function getMaxHours(landlordId: string): Promise<number> {
+      if (maxHoursCache.has(landlordId)) return maxHoursCache.get(landlordId)!;
+      const setting = await repo.getFollowUpMaxHours(landlordId);
+      maxHoursCache.set(landlordId, setting.hours);
+      return setting.hours;
+    }
+
+    // Use the global default for the initial query (48h), but we'll filter per-landlord below
+    const globalNudge = await repo.getFollowUpNudgeHours();
+    const cutoff = new Date(now.getTime() - globalNudge.hours * 60 * 60 * 1000);
 
     // Find reminders that were sent but NOT confirmed (or confirmed before last send)
     const reminders = await db.reminder.findMany({
@@ -448,11 +467,17 @@ export async function runFollowUpNudges(now = new Date()): Promise<ReminderResul
     });
 
     for (const reminder of needsNudge) {
-      // Prevent sending nudge more than once per cycle:
-      // We set lastSentAt when we nudge too, but offset by 1min to differentiate
-      // Actually, better to check time: if it's been less than 49hrs, don't re-nudge
+      const landlordId = reminder.landlordId || "";
+
+      // Per-landlord nudge window & max age
+      const nudgeHrs = await getNudgeHours(landlordId);
+      const maxHrs = await getMaxHours(landlordId);
+
       const hoursSinceSent = (now.getTime() - (reminder.lastSentAt?.getTime() || 0)) / (1000 * 60 * 60);
-      if (hoursSinceSent > 72) continue; // Too old, skip (wait for next cycle)
+      // Too early — hasn't reached the nudge window yet
+      if (hoursSinceSent < nudgeHrs) continue;
+      // Too old — stop nudging
+      if (hoursSinceSent > maxHrs) continue;
 
       let sent = 0;
       let failed = 0;

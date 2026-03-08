@@ -719,6 +719,90 @@ export async function setLandlordActiveWindowMinutes(params: { minutes: number; 
   }
 }
 
+export async function getFollowUpNudgeHours(landlordId?: string) {
+  if (!isDbEnabled) return { hours: 48, source: "default" as const };
+  try {
+    const record = await db.appSetting.findFirst({ where: { key: "follow_up_nudge_hours", landlordId: landlordId || null } });
+    if (!record) return { hours: 48, source: "default" as const };
+    const parsed = Number(record.value);
+    if (Number.isNaN(parsed) || parsed < 0) return { hours: 48, source: "default" as const };
+    return { hours: parsed, source: "db" as const };
+  } catch (err) {
+    console.warn("get follow-up nudge hours failed", err);
+    return { hours: 48, source: "default" as const };
+  }
+}
+
+export async function setFollowUpNudgeHours(params: { hours: number; landlordId?: string }) {
+  if (!isDbEnabled) return null;
+  try {
+    return await db.appSetting.upsert({
+      where: { key_landlordId: { key: "follow_up_nudge_hours", landlordId: params.landlordId || "" } },
+      create: { key: "follow_up_nudge_hours", value: String(params.hours), landlordId: params.landlordId },
+      update: { value: String(params.hours) },
+    });
+  } catch (err) {
+    console.warn("set follow-up nudge hours failed", err);
+    return null;
+  }
+}
+
+export async function getFollowUpMaxHours(landlordId?: string) {
+  if (!isDbEnabled) return { hours: 72, source: "default" as const };
+  try {
+    const record = await db.appSetting.findFirst({ where: { key: "follow_up_max_hours", landlordId: landlordId || null } });
+    if (!record) return { hours: 72, source: "default" as const };
+    const parsed = Number(record.value);
+    if (Number.isNaN(parsed) || parsed < 0) return { hours: 72, source: "default" as const };
+    return { hours: parsed, source: "db" as const };
+  } catch (err) {
+    console.warn("get follow-up max hours failed", err);
+    return { hours: 72, source: "default" as const };
+  }
+}
+
+export async function setFollowUpMaxHours(params: { hours: number; landlordId?: string }) {
+  if (!isDbEnabled) return null;
+  try {
+    return await db.appSetting.upsert({
+      where: { key_landlordId: { key: "follow_up_max_hours", landlordId: params.landlordId || "" } },
+      create: { key: "follow_up_max_hours", value: String(params.hours), landlordId: params.landlordId },
+      update: { value: String(params.hours) },
+    });
+  } catch (err) {
+    console.warn("set follow-up max hours failed", err);
+    return null;
+  }
+}
+
+export async function getLeaseExpiryLookAheadDays(landlordId?: string) {
+  if (!isDbEnabled) return { days: 60, source: "default" as const };
+  try {
+    const record = await db.appSetting.findFirst({ where: { key: "lease_expiry_look_ahead_days", landlordId: landlordId || null } });
+    if (!record) return { days: 60, source: "default" as const };
+    const parsed = Number(record.value);
+    if (Number.isNaN(parsed) || parsed < 0) return { days: 60, source: "default" as const };
+    return { days: parsed, source: "db" as const };
+  } catch (err) {
+    console.warn("get lease expiry look-ahead days failed", err);
+    return { days: 60, source: "default" as const };
+  }
+}
+
+export async function setLeaseExpiryLookAheadDays(params: { days: number; landlordId?: string }) {
+  if (!isDbEnabled) return null;
+  try {
+    return await db.appSetting.upsert({
+      where: { key_landlordId: { key: "lease_expiry_look_ahead_days", landlordId: params.landlordId || "" } },
+      create: { key: "lease_expiry_look_ahead_days", value: String(params.days), landlordId: params.landlordId },
+      update: { value: String(params.days) },
+    });
+  } catch (err) {
+    console.warn("set lease expiry look-ahead days failed", err);
+    return null;
+  }
+}
+
 export async function deleteTenant(params: { id: string; hard?: boolean }) {
   if (!isDbEnabled || !params.id) return null;
   try {
@@ -1172,6 +1256,12 @@ export default {
   setGlobalAutoReplyCooldownMinutes,
   getLandlordActiveWindowMinutes,
   setLandlordActiveWindowMinutes,
+  getFollowUpNudgeHours,
+  setFollowUpNudgeHours,
+  getFollowUpMaxHours,
+  setFollowUpMaxHours,
+  getLeaseExpiryLookAheadDays,
+  setLeaseExpiryLookAheadDays,
   // Multi-landlord
   findLandlordByWhatsApp,
   findLandlordForTenantPhone,

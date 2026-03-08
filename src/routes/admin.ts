@@ -1183,6 +1183,57 @@ router.patch("/auto-reply-active-window", async (req, res) => {
   res.json({ minutes: parsed.data.minutes });
 });
 
+// ── Follow-Up Nudge Hours ──
+router.get("/follow-up-nudge-hours", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const setting = await repo.getFollowUpNudgeHours(authReq.landlordId);
+  res.json({ hours: setting.hours, source: setting.source });
+});
+
+router.patch("/follow-up-nudge-hours", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ hours: z.number().min(1).max(168) });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.setFollowUpNudgeHours({ hours: parsed.data.hours, landlordId: authReq.landlordId });
+  if (!updated) return res.status(500).json({ error: "follow_up_nudge_update_failed" });
+  res.json({ hours: parsed.data.hours });
+});
+
+// ── Follow-Up Max Hours ──
+router.get("/follow-up-max-hours", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const setting = await repo.getFollowUpMaxHours(authReq.landlordId);
+  res.json({ hours: setting.hours, source: setting.source });
+});
+
+router.patch("/follow-up-max-hours", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ hours: z.number().min(1).max(336) });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.setFollowUpMaxHours({ hours: parsed.data.hours, landlordId: authReq.landlordId });
+  if (!updated) return res.status(500).json({ error: "follow_up_max_update_failed" });
+  res.json({ hours: parsed.data.hours });
+});
+
+// ── Lease Expiry Look-Ahead Days ──
+router.get("/lease-expiry-days", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const setting = await repo.getLeaseExpiryLookAheadDays(authReq.landlordId);
+  res.json({ days: setting.days, source: setting.source });
+});
+
+router.patch("/lease-expiry-days", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ days: z.number().min(7).max(365) });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.setLeaseExpiryLookAheadDays({ days: parsed.data.days, landlordId: authReq.landlordId });
+  if (!updated) return res.status(500).json({ error: "lease_expiry_days_update_failed" });
+  res.json({ days: parsed.data.days });
+});
+
 router.get("/health", async (_req, res) => {
   const whatsappReady = Boolean(process.env.EVOLUTION_API_BASE_URL && process.env.EVOLUTION_API_TOKEN);
   const llmReady = await agentService.pingLlm();

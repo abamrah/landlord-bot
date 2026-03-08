@@ -2718,6 +2718,31 @@
               </div>
               <button class="btn btn-secondary btn-sm" id="saveAutopilotSettings">Save</button>
             </div>
+            <!-- Lease & Reminder Timing -->
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;">Lease & Reminder Timing</div>
+              <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:12px;color:var(--text-muted)">Follow-up After</span>
+                  <input id="followUpNudgeHours" type="number" min="1" max="168" step="1"
+                    style="width:60px;padding:4px 8px;font-size:12px;" title="Hours after a reminder before sending a follow-up nudge" />
+                  <span style="font-size:11px;color:var(--text-muted)">hrs</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:12px;color:var(--text-muted)">Stop After</span>
+                  <input id="followUpMaxHours" type="number" min="1" max="336" step="1"
+                    style="width:60px;padding:4px 8px;font-size:12px;" title="Stop sending follow-ups after this many hours" />
+                  <span style="font-size:11px;color:var(--text-muted)">hrs</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:12px;color:var(--text-muted)">Lease Alert</span>
+                  <input id="leaseExpiryDays" type="number" min="7" max="365" step="1"
+                    style="width:60px;padding:4px 8px;font-size:12px;" title="Alert you this many days before a lease expires" />
+                  <span style="font-size:11px;color:var(--text-muted)">days</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="saveTimingSettings">Save</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4075,9 +4100,13 @@
                 the AI waits before replying (allows batching multiple messages).</div>
               <div class="guide-step"><span class="guide-num">3</span> Set the <strong>Cooldown</strong> — minimum time
                 between auto-replies to the same tenant.</div>
-              <div class="guide-step"><span class="guide-num">4</span> The AI automatically holds replies for
+              <div class="guide-step"><span class="guide-num">4</span> Set the <strong>Active Window</strong> — when you manually
+                message a tenant, auto-replies pause for this many minutes.</div>
+              <div class="guide-step"><span class="guide-num">5</span> The AI automatically holds replies for
                 <strong>High</strong> and <strong>Critical</strong> severity issues for your approval.
               </div>
+              <div class="guide-step"><span class="guide-num">6</span> Under <strong>Lease & Reminder Timing</strong>, configure when
+                follow-up nudges are sent and how far ahead you get lease expiry alerts.</div>
               <div class="guide-tip">💡 A 2-minute delay is recommended. This gives tenants time to send follow-up
                 details before the AI responds.</div>
             </div>
@@ -4718,7 +4747,7 @@
 
     // ── STATE ──
     const ACTIVE_STATUSES = ['OPEN', 'PENDING', 'IN_TRIAGE', 'SCHEDULED', 'IN_PROGRESS'];
-    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, landlordActiveWindowMinutes: 30, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
+    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, landlordActiveWindowMinutes: 30, followUpNudgeHours: 48, followUpMaxHours: 72, leaseExpiryDays: 60, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
 
     function severityOf(r) { return (r?.triageJson?.classification?.severity || r?.triage?.classification?.severity || 'unknown').toString().toLowerCase(); }
     function formatStatus(s) { return (s || '').replace(/_/g, ' '); }
@@ -4784,6 +4813,9 @@
     async function loadAutoReplyDelay() { try { const r = await fetchJson('/admin/auto-reply-delay'); state.autoReplyDelayMinutes = Number(r.minutes) || 0; } catch { state.autoReplyDelayMinutes = 5; } renderAutoReplyDelay(); }
     async function loadAutoReplyCooldown() { try { const r = await fetchJson('/admin/auto-reply-cooldown'); state.autoReplyCooldownMinutes = Number(r.minutes) || 0; } catch { state.autoReplyCooldownMinutes = 60; } renderAutoReplyCooldown(); }
     async function loadLandlordActiveWindow() { try { const r = await fetchJson('/admin/auto-reply-active-window'); state.landlordActiveWindowMinutes = Number(r.minutes) || 0; } catch { state.landlordActiveWindowMinutes = 30; } renderLandlordActiveWindow(); }
+    async function loadFollowUpNudgeHours() { try { const r = await fetchJson('/admin/follow-up-nudge-hours'); state.followUpNudgeHours = Number(r.hours) || 48; } catch { state.followUpNudgeHours = 48; } renderFollowUpNudgeHours(); }
+    async function loadFollowUpMaxHours() { try { const r = await fetchJson('/admin/follow-up-max-hours'); state.followUpMaxHours = Number(r.hours) || 72; } catch { state.followUpMaxHours = 72; } renderFollowUpMaxHours(); }
+    async function loadLeaseExpiryDays() { try { const r = await fetchJson('/admin/lease-expiry-days'); state.leaseExpiryDays = Number(r.days) || 60; } catch { state.leaseExpiryDays = 60; } renderLeaseExpiryDays(); }
     async function loadContractors() { const { items } = await fetchJson('/admin/contractors'); state.contractors = items || []; renderContractors(); }
     async function loadMaintenance(filter) {
       filter = filter || {};
@@ -4910,6 +4942,9 @@
     function renderAutoReplyDelay() { var el = document.getElementById('autoReplyDelayMinutes'); if (el) el.value = state.autoReplyDelayMinutes; }
     function renderAutoReplyCooldown() { var el = document.getElementById('autoReplyCooldownMinutes'); if (el) el.value = state.autoReplyCooldownMinutes; }
     function renderLandlordActiveWindow() { var el = document.getElementById('landlordActiveWindowMinutes'); if (el) el.value = state.landlordActiveWindowMinutes; }
+    function renderFollowUpNudgeHours() { var el = document.getElementById('followUpNudgeHours'); if (el) el.value = state.followUpNudgeHours; }
+    function renderFollowUpMaxHours() { var el = document.getElementById('followUpMaxHours'); if (el) el.value = state.followUpMaxHours; }
+    function renderLeaseExpiryDays() { var el = document.getElementById('leaseExpiryDays'); if (el) el.value = state.leaseExpiryDays; }
 
     function renderContractors() {
       var tbody = document.querySelector('#contractorTable tbody');
@@ -5895,6 +5930,19 @@
       } catch (err) { toast('Failed: ' + err.message); }
     });
 
+    document.getElementById('saveTimingSettings').addEventListener('click', async function () {
+      var nudgeHrs = Number(document.getElementById('followUpNudgeHours').value);
+      var maxHrs = Number(document.getElementById('followUpMaxHours').value);
+      var leaseDays = Number(document.getElementById('leaseExpiryDays').value);
+      try {
+        if (!isNaN(nudgeHrs) && nudgeHrs >= 1) await fetchJson('/admin/follow-up-nudge-hours', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hours: nudgeHrs }) });
+        if (!isNaN(maxHrs) && maxHrs >= 1) await fetchJson('/admin/follow-up-max-hours', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hours: maxHrs }) });
+        if (!isNaN(leaseDays) && leaseDays >= 7) await fetchJson('/admin/lease-expiry-days', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ days: leaseDays }) });
+        state.followUpNudgeHours = nudgeHrs; state.followUpMaxHours = maxHrs; state.leaseExpiryDays = leaseDays;
+        toast('Timing settings saved');
+      } catch (err) { toast('Failed: ' + err.message); }
+    });
+
     // Maintenance view toggle
     document.getElementById('maintViewToggle').addEventListener('click', function () {
       var btn = document.getElementById('maintViewToggle');
@@ -6502,6 +6550,7 @@
       loadProperties().then(function () { fillPropertySelects(); });
       loadUnits().then(function () { fillUnitSelects(); });
       loadTenants(); loadAutoReplySettings(); loadAutoReplyDelay(); loadAutoReplyCooldown(); loadLandlordActiveWindow();
+      loadFollowUpNudgeHours(); loadFollowUpMaxHours(); loadLeaseExpiryDays();
       loadContractors(); loadMaintenance(); loadUtilities(); loadUtilCreds(); loadGreenButtonData();
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();
