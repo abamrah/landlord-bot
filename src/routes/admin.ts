@@ -2153,8 +2153,13 @@ async function evoFetch(path: string, opts: { method?: string; body?: unknown } 
     },
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as any)?.message || (data as any)?.error || `Evolution API error ${res.status}`);
+  const rawText = await res.text().catch(() => "");
+  let data: any;
+  try { data = JSON.parse(rawText); } catch { data = { rawBody: rawText?.substring(0, 500) }; }
+  if (!res.ok) {
+    console.error(`[evoFetch] ${opts.method || "GET"} ${path} → ${res.status}`, { response: rawText?.substring(0, 500), tokenPrefix: cfg.token?.substring(0, 8) + "..." });
+    throw new Error(data?.message || data?.error || data?.response?.message || `Evolution API error ${res.status}`);
+  }
   return data;
 }
 
