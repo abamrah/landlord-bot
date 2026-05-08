@@ -12,32 +12,10 @@ const contactSchema = z.object({
   message: z.string().trim().max(5000).optional().default(""),
 });
 
-function buildEmailText(data: { name: string; phone: string; email: string; message?: string }) {
+async function sendViaFormSubmit(data: { name: string; phone: string; email: string; message?: string }): Promise<void> {
   const subject = `[DataNest Inquiry] ${data.name} — ${data.email}`;
-  const text = [
-    "New inquiry from DataNest contact form",
-    "",
-    `Name:    ${data.name}`,
-    `Phone:   ${data.phone}`,
-    `Email:   ${data.email}`,
-    "",
-    "Message:",
-    data.message || "(no message provided)",
-  ].join("\n");
-  return { subject, text };
-}
 
-async function sendViaFormspree(data: { name: string; phone: string; email: string; message?: string }): Promise<void> {
-  const formId = process.env.FORMSPREE_FORM_ID || "";
-  const endpoint = process.env.FORMSPREE_ENDPOINT || (formId ? `https://formspree.io/f/${formId}` : "");
-
-  if (!endpoint) {
-    throw new Error("Formspree is not configured. Set FORMSPREE_FORM_ID or FORMSPREE_ENDPOINT.");
-  }
-
-  const { subject, text } = buildEmailText(data);
-
-  const response = await fetch(endpoint, {
+  const response = await fetch(`https://formsubmit.co/ajax/${CONTACT_TO_EMAIL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -48,17 +26,15 @@ async function sendViaFormspree(data: { name: string; phone: string; email: stri
       phone: data.phone,
       email: data.email,
       message: data.message || "",
-      subject,
-      inquiry_text: text,
-      _replyto: data.email,
       _subject: subject,
-      contact_to: CONTACT_TO_EMAIL,
+      _replyto: data.email,
+      _captcha: "false",
     }),
   });
 
   if (!response.ok) {
     const payload = await response.text();
-    throw new Error(`Formspree request failed (${response.status}): ${payload.slice(0, 200)}`);
+    throw new Error(`FormSubmit request failed (${response.status}): ${payload.slice(0, 200)}`);
   }
 }
 
@@ -69,13 +45,13 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    await sendViaFormspree(parsed.data);
+    await sendViaFormSubmit(parsed.data);
     return res.json({ ok: true });
   } catch (error) {
-    console.error("Formspree contact submit failed:", error);
+    console.error("FormSubmit contact submit failed:", error);
     return res.status(503).json({
       ok: false,
-      error: "Unable to send inquiry. Configure Formspree by setting FORMSPREE_FORM_ID (or FORMSPREE_ENDPOINT) in Railway variables.",
+      error: "Unable to send inquiry. Please try again later.",
     });
   }
 });
