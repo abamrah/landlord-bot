@@ -1,5 +1,5 @@
 ﻿<!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="UTF-8" />
@@ -4829,13 +4829,13 @@
     // ── THEME TOGGLE ──
     (function initTheme() {
       var stored = localStorage.getItem('nestmind-theme');
-      var preferred = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      var preferred = stored || 'light';
       document.documentElement.setAttribute('data-theme', preferred);
       updateThemeLabels(preferred);
     })();
 
     function toggleDashTheme() {
-      var current = document.documentElement.getAttribute('data-theme') || 'dark';
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
       var next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('nestmind-theme', next);
@@ -6101,7 +6101,7 @@
       var stat = document.getElementById('globalAutoReplyStatusSettings');
       if (stat) { stat.textContent = state.autoReplyGlobalEnabled ? 'Active' : 'Paused'; stat.className = 'chip ' + (state.autoReplyGlobalEnabled ? 'chip-success' : 'chip-muted'); }
       // Theme label
-      var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+      var theme = document.documentElement.getAttribute('data-theme') || 'light';
       var ti = document.getElementById('settingsThemeIcon'); if (ti) ti.textContent = theme === 'dark' ? '☀️' : '🌙';
       var tl = document.getElementById('settingsThemeLabel'); if (tl) tl.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
     }

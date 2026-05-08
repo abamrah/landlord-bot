@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -1039,8 +1039,8 @@
                 <a href="/login">Login</a>
                 <a href="/datanest">DataNest</a>
                 <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
-                    <span class="theme-toggle-option" data-theme-val="light">☀️</span>
-                    <span class="theme-toggle-option active" data-theme-val="dark">🌙</span>
+                    <span class="theme-toggle-option active" data-theme-val="light">☀️</span>
+                    <span class="theme-toggle-option" data-theme-val="dark">🌙</span>
                 </div>
                 <a href="/signup" class="nav-cta">Get Started</a>
             </div>
@@ -1468,7 +1468,7 @@
         (function () {
             var html = document.documentElement;
             var stored = localStorage.getItem('nestmind-theme');
-            var preferred = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            var preferred = stored || 'light';
             html.setAttribute('data-theme', preferred);
             updateToggleUI(preferred);
 
