@@ -8,6 +8,7 @@ import webhooksRouter from "./routes/webhooks";
 import apiRouter from "./routes/api";
 import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
+import contactRouter from "./routes/contact";
 import maintenanceRouter from "./routes/maintenance";
 import maintenanceListRouter from "./routes/maintenance-list";
 import { runDueReminders, runFollowUpNudges } from "./services/reminderService";
@@ -72,6 +73,9 @@ app.get("/onboarding", (_req, res) => {
 app.get("/datanest", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "datanest.html"));
 });
+app.get("/contact", (_req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "contact.html"));
+});
 
 // ── Public tenant payment pages (no auth) ──
 app.get("/pay/success", (_req, res) => {
@@ -102,6 +106,7 @@ app.post("/webhooks/singlekey", express.json(), async (req, res) => {
 // API routes
 app.use("/auth", authRateLimit, authRouter);
 app.use("/webhooks", webhooksRouter);
+app.use("/api/contact", apiRateLimit, contactRouter);
 app.use("/api", apiRateLimit, apiRouter);
 app.use("/admin", apiRateLimit, adminRouter);
 app.use("/maintenance/list", apiRateLimit, requireAuth, maintenanceListRouter);

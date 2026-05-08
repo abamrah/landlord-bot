@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact DataNest</title>
+    <meta name="description" content="Contact DataNest for AI product and service inquiries.">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root, [data-theme="dark"] {
+            --bg: #000000;
+            --surface: #111111;
+            --surface-2: #1a1a1a;
+            --border: #222222;
+            --border-light: #333333;
+            --text: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent: #00c896;
+            --accent-hover: #00e6ad;
+            --gradient: linear-gradient(135deg, #00c896, #7c5cff);
+            --nav-bg: rgba(0, 0, 0, 0.75);
+            --toggle-bg: #222;
+        }
+
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --surface: #f4f4f5;
+            --surface-2: #e4e4e7;
+            --border: #d4d4d8;
+            --border-light: #a1a1aa;
+            --text: #09090b;
+            --text-secondary: #3f3f46;
+            --text-muted: #71717a;
+            --accent: #00a07a;
+            --accent-hover: #008f6d;
+            --gradient: linear-gradient(135deg, #00a07a, #6d4de0);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --toggle-bg: #e4e4e7;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 200, 150, 0.08), transparent 30%),
+                        radial-gradient(circle at 90% 15%, rgba(124, 92, 255, 0.07), transparent 35%),
+                        var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color .3s, color .3s;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .nav-logo-dn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+        .nav-link {
+            font-size: 14px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            background: var(--toggle-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px;
+            cursor: pointer;
+            gap: 0;
+        }
+
+        .theme-toggle-option {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .theme-toggle-option.active {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 128px 24px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            font-size: 48px;
+            line-height: 1.1;
+            letter-spacing: -1.2px;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            max-width: 620px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            padding: 30px;
+        }
+
+        form { display: grid; gap: 18px; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: .3px;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            color: var(--text);
+            padding: 12px 14px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        input:focus, textarea:focus { border-color: var(--accent); }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            background: var(--accent);
+            color: #000;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover { background: var(--accent-hover); }
+        button:disabled { opacity: .65; cursor: wait; }
+
+        .status {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .status.success { color: #1fbf7b; }
+        .status.error { color: #ff6b6b; }
+
+        .note {
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 34px; }
+            .header p { font-size: 16px; }
+            .card { padding: 20px; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="/datanest" class="nav-logo">
+                <div class="nav-logo-dn">DN</div>
+                <span>DataNest</span>
+            </a>
+            <div class="nav-actions">
+                <a class="nav-link" href="/datanest">Back to DataNest</a>
+                <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                    <span class="theme-toggle-option" data-theme-val="light">☀️</span>
+                    <span class="theme-toggle-option active" data-theme-val="dark">🌙</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="header">
+            <span class="eyebrow">Contact</span>
+            <h1>Let's Build With DataNest</h1>
+            <p>Share your inquiry and we will follow up. Every form submission is emailed directly to arsh.bamrah27@gmail.com.</p>
+        </div>
+
+        <div class="card">
+            <form id="contactForm" novalidate>
+                <div class="grid-2">
+                    <div>
+                        <label for="name">Name</label>
+                        <input id="name" name="name" type="text" autocomplete="name" required maxlength="120" />
+                    </div>
+                    <div>
+                        <label for="phone">Phone</label>
+                        <input id="phone" name="phone" type="tel" autocomplete="tel" required maxlength="40" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" />
+                </div>
+
+                <div>
+                    <label for="message">Message (optional)</label>
+                    <textarea id="message" name="message" placeholder="Tell us what you need..."></textarea>
+                </div>
+
+                <div class="submit-row">
+                    <button type="submit" id="submitBtn">Send Inquiry</button>
+                    <span class="status" id="formStatus"></span>
+                </div>
+            </form>
+            <div class="note">Required fields: Name, Phone, Email.</div>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            var html = document.documentElement;
+            var stored = localStorage.getItem('nestmind-theme');
+            var preferred = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            html.setAttribute('data-theme', preferred);
+            updateToggleUI(preferred);
+
+            document.getElementById('themeToggle').addEventListener('click', function (e) {
+                var option = e.target.closest('.theme-toggle-option');
+                if (!option) return;
+                var theme = option.getAttribute('data-theme-val');
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('nestmind-theme', theme);
+                updateToggleUI(theme);
+            });
+
+            function updateToggleUI(theme) {
+                document.querySelectorAll('.theme-toggle-option').forEach(function (el) {
+                    el.classList.toggle('active', el.getAttribute('data-theme-val') === theme);
+                });
+            }
+        })();
+
+        (function () {
+            var form = document.getElementById('contactForm');
+            var status = document.getElementById('formStatus');
+            var submitBtn = document.getElementById('submitBtn');
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                status.textContent = '';
+                status.className = 'status';
+                submitBtn.disabled = true;
+
+                var payload = {
+                    name: form.name.value.trim(),
+                    phone: form.phone.value.trim(),
+                    email: form.email.value.trim(),
+                    message: form.message.value.trim()
+                };
+
+                if (!payload.name || !payload.phone || !payload.email) {
+                    status.textContent = 'Please fill Name, Phone, and Email.';
+                    status.className = 'status error';
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    var response = await fetch('/api/contact', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    var result = await response.json().catch(function () { return {}; });
+                    if (!response.ok || !result.ok) {
+                        throw new Error(result.error || 'Unable to send inquiry.');
+                    }
+
+                    form.reset();
+                    status.textContent = 'Inquiry sent successfully. We will contact you soon.';
+                    status.className = 'status success';
+                } catch (error) {
+                    status.textContent = error.message || 'Failed to send inquiry.';
+                    status.className = 'status error';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
