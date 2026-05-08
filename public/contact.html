@@ -370,14 +370,6 @@
                         throw new Error(result.error || 'Unable to send inquiry.');
                     }
 
-                    if (result.mode === 'mailto' && result.mailtoUrl) {
-                        window.location.href = result.mailtoUrl;
-                        status.textContent = 'Opening your email app to send the inquiry.';
-                        status.className = 'status success';
-                        submitBtn.disabled = false;
-                        return;
-                    }
-
                     form.reset();
                     status.textContent = 'Inquiry sent successfully. We will contact you soon.';
                     status.className = 'status success';

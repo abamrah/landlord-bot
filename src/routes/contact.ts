@@ -11,28 +11,23 @@ const contactSchema = z.object({
   message: z.string().trim().max(5000).optional().default(""),
 });
 
-function buildMailtoLink(data: { name: string; phone: string; email: string; message?: string }, to: string): string {
-  const subject = `[DataNest Inquiry] ${data.name} (${data.email})`;
-  const body = [
-    "New inquiry from DataNest contact form",
-    "",
-    `Name: ${data.name}`,
-    `Phone: ${data.phone}`,
-    `Email: ${data.email}`,
-    "",
-    "Message:",
-    data.message || "(no message provided)",
-  ].join("\n");
-
-  return `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
 function getSmtpConfig() {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = Number(process.env.SMTP_PORT || 587);
   const secure = String(process.env.SMTP_SECURE || "false").toLowerCase() === "true";
-  const user = process.env.SMTP_USER || "";
-  const pass = process.env.SMTP_PASS || "";
+  const user =
+    process.env.SMTP_USER ||
+    process.env.SMTP_USERNAME ||
+    process.env.EMAIL_USER ||
+    process.env.GMAIL_USER ||
+    "";
+  const pass =
+    process.env.SMTP_PASS ||
+    process.env.SMTP_PASSWORD ||
+    process.env.EMAIL_PASS ||
+    process.env.GMAIL_PASS ||
+    process.env.GMAIL_APP_PASSWORD ||
+    "";
   const to = process.env.CONTACT_EMAIL_TO || "arsh.bamrah27@gmail.com";
   const from = process.env.CONTACT_EMAIL_FROM || user || "no-reply@datanest.ca";
 
@@ -50,11 +45,9 @@ router.post("/", async (req, res) => {
 
   const cfg = getSmtpConfig();
   if (!cfg.user || !cfg.pass) {
-    return res.json({
-      ok: true,
-      mode: "mailto",
-      mailtoUrl: buildMailtoLink(parsed.data, cfg.to),
-      message: "Email service is not configured. Opening your email client as fallback.",
+    return res.status(503).json({
+      ok: false,
+      error: "Email service is not configured. Set SMTP_USER/SMTP_PASS (or SMTP_USERNAME/SMTP_PASSWORD).",
     });
   }
 
