@@ -11,6 +11,22 @@ const contactSchema = z.object({
   message: z.string().trim().max(5000).optional().default(""),
 });
 
+function buildMailtoLink(data: { name: string; phone: string; email: string; message?: string }, to: string): string {
+  const subject = `[DataNest Inquiry] ${data.name} (${data.email})`;
+  const body = [
+    "New inquiry from DataNest contact form",
+    "",
+    `Name: ${data.name}`,
+    `Phone: ${data.phone}`,
+    `Email: ${data.email}`,
+    "",
+    "Message:",
+    data.message || "(no message provided)",
+  ].join("\n");
+
+  return `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 function getSmtpConfig() {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = Number(process.env.SMTP_PORT || 587);
@@ -34,9 +50,11 @@ router.post("/", async (req, res) => {
 
   const cfg = getSmtpConfig();
   if (!cfg.user || !cfg.pass) {
-    return res.status(503).json({
-      ok: false,
-      error: "Email service is not configured. Set SMTP_USER and SMTP_PASS.",
+    return res.json({
+      ok: true,
+      mode: "mailto",
+      mailtoUrl: buildMailtoLink(parsed.data, cfg.to),
+      message: "Email service is not configured. Opening your email client as fallback.",
     });
   }
 

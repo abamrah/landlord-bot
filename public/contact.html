@@ -274,7 +274,7 @@
         <div class="header">
             <span class="eyebrow">Contact</span>
             <h1>Let's Build With DataNest</h1>
-            <p>Share your inquiry and we will follow up. Every form submission is emailed directly to arsh.bamrah27@gmail.com.</p>
+            <p>Share your inquiry and we will get in touch with you shortly.</p>
         </div>
 
         <div class="card">
@@ -368,6 +368,14 @@
                     var result = await response.json().catch(function () { return {}; });
                     if (!response.ok || !result.ok) {
                         throw new Error(result.error || 'Unable to send inquiry.');
+                    }
+
+                    if (result.mode === 'mailto' && result.mailtoUrl) {
+                        window.location.href = result.mailtoUrl;
+                        status.textContent = 'Opening your email app to send the inquiry.';
+                        status.className = 'status success';
+                        submitBtn.disabled = false;
+                        return;
                     }
 
                     form.reset();
