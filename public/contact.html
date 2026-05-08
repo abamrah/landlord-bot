@@ -337,7 +337,7 @@
             var form = document.getElementById('contactForm');
             var status = document.getElementById('formStatus');
             var submitBtn = document.getElementById('submitBtn');
-            var CONTACT_FORM_VERSION = '2026-05-07-no-mailto-fallback';
+            var FORMSUBMIT_ENDPOINT = 'https://formsubmit.co/ajax/arsh.bamrah27@gmail.com';
 
             form.addEventListener('submit', async function (event) {
                 event.preventDefault();
@@ -360,15 +360,27 @@
                 }
 
                 try {
-                    var response = await fetch('/api/contact', {
+                    var response = await fetch(FORMSUBMIT_ENDPOINT, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: payload.name,
+                            phone: payload.phone,
+                            email: payload.email,
+                            message: payload.message,
+                            _subject: '[DataNest Inquiry] ' + payload.name + ' - ' + payload.email,
+                            _replyto: payload.email,
+                            _captcha: 'false'
+                        })
                     });
 
                     var result = await response.json().catch(function () { return {}; });
-                    if (!response.ok || !result.ok) {
-                        throw new Error(result.error || 'Unable to send inquiry.');
+                    var serviceSuccess = String(result.success || '').toLowerCase() === 'true';
+                    if (!response.ok || !serviceSuccess) {
+                        throw new Error(result.message || 'Unable to send inquiry.');
                     }
 
                     form.reset();
