@@ -69,6 +69,10 @@ app.get("/onboarding", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "onboarding.html"));
 });
 
+app.get("/datanest", (_req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "datanest.html"));
+});
+
 // ── Public tenant payment pages (no auth) ──
 app.get("/pay/success", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "pay-success.html"));

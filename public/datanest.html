@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataNest Canada — AI Solutions Built from Enterprise Experience</title>
+    <meta name="description" content="DataNest Canada builds AI-powered products and services — from agentic GenAI platforms to predictive maintenance, fintech bots, and property management AI.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/logo.svg">
+    <style>
+        /* ── RESET ── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ── DARK THEME (default) ── */
+        :root, [data-theme="dark"] {
+            --bg: #000000;
+            --bg-2: #050505;
+            --surface: #111111;
+            --surface-2: #1a1a1a;
+            --border: #222222;
+            --border-light: #333333;
+            --text: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent: #00c896;
+            --accent-hover: #00e6ad;
+            --accent-glow: rgba(0,200,150,.12);
+            --accent-2: #7c5cff;
+            --accent-2-glow: rgba(124,92,255,.10);
+            --gradient: linear-gradient(135deg, #00c896, #7c5cff);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 2px 20px rgba(0,0,0,.3);
+            --card-bg: #111111;
+            --card-hover: #161616;
+            --nav-bg: rgba(0,0,0,0.75);
+            --badge-bg: rgba(0,200,150,.08);
+            --badge-border: rgba(0,200,150,.25);
+            --toggle-bg: #222;
+            --beauty-accent: #e879a0;
+            --beauty-glow: rgba(232,121,160,.12);
+        }
+
+        /* ── LIGHT THEME ── */
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --bg-2: #fafafa;
+            --surface: #f4f4f5;
+            --surface-2: #e4e4e7;
+            --border: #d4d4d8;
+            --border-light: #a1a1aa;
+            --text: #09090b;
+            --text-secondary: #3f3f46;
+            --text-muted: #71717a;
+            --accent: #00a07a;
+            --accent-hover: #008f6d;
+            --accent-glow: rgba(0,160,122,.10);
+            --accent-2: #6d4de0;
+            --accent-2-glow: rgba(109,77,224,.08);
+            --gradient: linear-gradient(135deg, #00a07a, #6d4de0);
+            --shadow: 0 2px 20px rgba(0,0,0,.08);
+            --card-bg: #ffffff;
+            --card-hover: #f9f9fb;
+            --nav-bg: rgba(255,255,255,0.85);
+            --badge-bg: rgba(0,160,122,.08);
+            --badge-border: rgba(0,160,122,.3);
+            --toggle-bg: #e4e4e7;
+            --beauty-accent: #c2185b;
+            --beauty-glow: rgba(194,24,91,.10);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background-color .3s, color .3s;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 40px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: background .3s;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .nav-logo-dn {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        .nav-cta {
+            background: var(--accent);
+            color: #000 !important;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav-cta:hover { background: var(--accent-hover); }
+
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* ── THEME TOGGLE ── */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            background: var(--toggle-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px;
+            cursor: pointer;
+            gap: 0;
+            transition: background .3s, border-color .3s;
+        }
+
+        .theme-toggle-option {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 13px;
+            transition: background .2s, color .2s;
+            color: var(--text-muted);
+        }
+
+        .theme-toggle-option.active {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 160px 40px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px; left: 50%; transform: translateX(-50%);
+            width: 900px; height: 600px;
+            background: radial-gradient(ellipse, rgba(0,200,150,.07) 0%, rgba(124,92,255,.05) 50%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.3); }
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 800;
+            letter-spacing: -2.5px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+        }
+
+        .gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-lg {
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-filled {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-filled:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+        .btn-outline {
+            border: 1px solid var(--border-light);
+            color: var(--text);
+            background: transparent;
+        }
+
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ── MARQUEE ── */
+        .marquee-wrap {
+            overflow: hidden;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 0;
+            background: var(--surface);
+        }
+
+        .marquee {
+            display: inline-flex;
+            gap: 32px;
+            white-space: nowrap;
+            animation: marquee 30s linear infinite;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: .3px;
+        }
+
+        .dot-sep { color: var(--text-muted); }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* ── SECTIONS ── */
+        .section {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .section-sub {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin-bottom: 56px;
+            line-height: 1.7;
+        }
+
+        /* ── CARDS GRID ── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: border-color .2s, background .2s, transform .2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card:hover {
+            border-color: var(--border-light);
+            background: var(--card-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .card-icon.teal { background: var(--accent-glow); }
+        .card-icon.purple { background: var(--accent-2-glow); }
+        .card-icon.beauty { background: var(--beauty-glow); }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .tag {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 100px;
+            background: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            color: var(--accent);
+        }
+
+        .tag.purple {
+            background: var(--accent-2-glow);
+            border-color: rgba(124,92,255,.25);
+            color: var(--accent-2);
+        }
+
+        .tag.beauty {
+            background: var(--beauty-glow);
+            border-color: rgba(232,121,160,.25);
+            color: var(--beauty-accent);
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            transition: gap .2s;
+            margin-top: 4px;
+        }
+
+        .card-link:hover { gap: 10px; }
+
+        .card-link.beauty { color: var(--beauty-accent); }
+
+        .card.beauty-card {
+            border-color: rgba(232,121,160,.2);
+        }
+
+        .card.beauty-card:hover {
+            border-color: rgba(232,121,160,.4);
+        }
+
+        /* ── PRODUCT CARDS ── */
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            transition: border-color .2s, background .2s, transform .2s;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .product-card:hover {
+            border-color: var(--border-light);
+            background: var(--card-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .product-card.featured {
+            border-color: rgba(0,200,150,.3);
+            background: linear-gradient(135deg, rgba(0,200,150,.04), rgba(124,92,255,.04));
+        }
+
+        .product-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 100px;
+            background: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            color: var(--accent);
+            width: fit-content;
+        }
+
+        .product-badge.purple {
+            background: var(--accent-2-glow);
+            border-color: rgba(124,92,255,.25);
+            color: var(--accent-2);
+        }
+
+        .product-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -.4px;
+        }
+
+        .product-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        /* ── TIMELINE ── */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px; top: 8px; bottom: 8px;
+            width: 2px;
+            background: var(--border-light);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 0 0 48px 40px;
+        }
+
+        .timeline-item:last-child { padding-bottom: 0; }
+
+        .timeline-dot {
+            position: absolute;
+            left: -25px; top: 6px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--gradient);
+            border: 3px solid var(--bg);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .timeline-company {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-role {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+            margin-bottom: 16px;
+        }
+
+        .timeline-bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .timeline-bullets li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .timeline-bullets li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        /* ── CTA BANNER ── */
+        .cta-banner {
+            margin: 0 40px 80px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 80px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0,200,150,.05), rgba(124,92,255,.05));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner h2 {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+        }
+
+        .cta-banner p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-banner-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 40px;
+            background: var(--surface);
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand { max-width: 300px; }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            line-height: 1.7;
+        }
+
+        .footer-links h4 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-muted);
+            font-size: 15px;
+            padding: 5px 0;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--text); }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 72px; left: 0; right: 0;
+                flex-direction: column;
+                background: var(--nav-bg);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                padding: 24px 20px;
+                gap: 16px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-links.open { display: flex; }
+            .nav-links a { font-size: 18px; padding: 8px 0; }
+            .nav-cta { text-align: center; display: block; }
+            .mobile-menu { display: block; }
+
+            .hero { padding: 120px 20px 60px; }
+            .hero h1 { font-size: 42px; letter-spacing: -1px; }
+            .hero p { font-size: 17px; }
+            .hero-buttons { flex-direction: column; align-items: stretch; }
+            .btn-lg { text-align: center; padding: 16px 28px; }
+
+            .section { padding: 60px 20px; }
+            .section-title { font-size: 32px; }
+
+            .cards-grid { grid-template-columns: 1fr; }
+
+            .timeline { padding-left: 16px; }
+            .timeline-item { padding-left: 28px; }
+            .timeline-dot { left: -17px; }
+
+            .cta-banner { margin: 0 20px 60px; padding: 60px 20px; }
+            .cta-banner h2 { font-size: 28px; }
+
+            .footer-inner { flex-direction: column; gap: 32px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-inner">
+            <a href="/datanest" class="nav-logo">
+                <div class="nav-logo-dn">DN</div>
+                <span>DataNest</span>
+            </a>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#products">Products</a>
+                <a href="#experience">Experience</a>
+                <a href="/">NestMind AI ↗</a>
+                <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                    <span class="theme-toggle-option" data-theme-val="light">☀️</span>
+                    <span class="theme-toggle-option active" data-theme-val="dark">🌙</span>
+                </div>
+                <a href="mailto:arshdeep@datanest.ca" class="nav-cta">Get in Touch</a>
+            </div>
+            <button class="mobile-menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge"><span class="dot"></span> DataNest Canada Inc.</div>
+        <h1>
+            AI Solutions Built<br />
+            From <span class="gradient">Real Enterprise</span><br />
+            Experience
+        </h1>
+        <p>DataNest Canada builds intelligent products and services grounded in years of hands-on work at Sanofi and Apotex — from agentic GenAI platforms to predictive maintenance, fintech automation, and AI property management.</p>
+        <div class="hero-buttons">
+            <a href="#products" class="btn-lg btn-filled">Explore Our Products →</a>
+            <a href="#services" class="btn-lg btn-outline">Our Services</a>
+        </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap">
+        <div class="marquee">
+            <span>Agentic AI</span><span class="dot-sep">·</span>
+            <span>GenAI Platforms</span><span class="dot-sep">·</span>
+            <span>Predictive Maintenance</span><span class="dot-sep">·</span>
+            <span>Pharma Commercial AI</span><span class="dot-sep">·</span>
+            <span>RAG Pipelines</span><span class="dot-sep">·</span>
+            <span>Fintech Bots</span><span class="dot-sep">·</span>
+            <span>Semantic Search</span><span class="dot-sep">·</span>
+            <span>AI Property Management</span><span class="dot-sep">·</span>
+            <span>LLM Orchestration</span><span class="dot-sep">·</span>
+            <span>Bridal Artistry</span><span class="dot-sep">·</span>
+            <span>Agentic AI</span><span class="dot-sep">·</span>
+            <span>GenAI Platforms</span><span class="dot-sep">·</span>
+            <span>Predictive Maintenance</span><span class="dot-sep">·</span>
+            <span>Pharma Commercial AI</span><span class="dot-sep">·</span>
+            <span>RAG Pipelines</span><span class="dot-sep">·</span>
+            <span>Fintech Bots</span><span class="dot-sep">·</span>
+            <span>Semantic Search</span><span class="dot-sep">·</span>
+            <span>AI Property Management</span><span class="dot-sep">·</span>
+            <span>LLM Orchestration</span><span class="dot-sep">·</span>
+            <span>Bridal Artistry</span><span class="dot-sep">·</span>
+        </div>
+    </div>
+
+    <!-- SERVICES -->
+    <section class="section" id="services">
+        <div class="section-label">What We Do</div>
+        <h2 class="section-title">Services &amp; Expertise</h2>
+        <p class="section-sub">We deliver production-grade AI across industries — each service backed by real deployments in enterprise environments.</p>
+
+        <div class="cards-grid">
+
+            <!-- 1 -->
+            <div class="card">
+                <div class="card-icon teal">🤖</div>
+                <h3>Agentic AI &amp; GenAI Solutions</h3>
+                <p>Design and deploy multi-agent systems with LLM orchestration, RAG feedback loops, and multi-step reasoning. We have defined agentic AI standards at enterprise scale and delivered audio insight platforms with LLM-generated scripts and multi-voice TTS for commercial decision support.</p>
+                <div class="card-tags">
+                    <span class="tag">LLMs</span>
+                    <span class="tag">RAG</span>
+                    <span class="tag">TTS</span>
+                    <span class="tag">Multi-Agent</span>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="card">
+                <div class="card-icon teal">🏭</div>
+                <h3>Predictive Maintenance for Manufacturing</h3>
+                <p>Time-series anomaly detection and downtime risk scoring for critical assets. We have led IIoT integrations with Snowflake feature pipelines, SAP PM data, and BERT-based NLP to extract FMEA entities from maintenance logs — reducing unplanned downtime at pharmaceutical manufacturing sites.</p>
+                <div class="card-tags">
+                    <span class="tag">Time-Series</span>
+                    <span class="tag">IIoT</span>
+                    <span class="tag">Snowflake</span>
+                    <span class="tag">BERT NLP</span>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="card">
+                <div class="card-icon purple">💊</div>
+                <h3>Pharma Commercial AI</h3>
+                <p>Enterprise decision support systems for commercial pharma teams — grounding, data quality controls, and validation frameworks for reliable AI outputs. Delivered AI platforms that integrate LLMs with pharma commercial workflows at Sanofi.</p>
+                <div class="card-tags">
+                    <span class="tag purple">Enterprise AI</span>
+                    <span class="tag purple">Validation</span>
+                    <span class="tag purple">Sanofi</span>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="card">
+                <div class="card-icon purple">🔍</div>
+                <h3>Semantic Search &amp; Knowledge Systems</h3>
+                <p>Transformer-based semantic search engines using GPT and BERT embeddings for large document corpora. Built at Apotex to enable engineers to query years of maintenance records, SOPs, and technical documents with natural language.</p>
+                <div class="card-tags">
+                    <span class="tag purple">BERT</span>
+                    <span class="tag purple">GPT Embeddings</span>
+                    <span class="tag purple">Azure ML</span>
+                </div>
+            </div>
+
+            <!-- 5 -->
+            <div class="card">
+                <div class="card-icon teal">🏠</div>
+                <h3>AI Property Management</h3>
+                <p>Autonomous property management agents that handle tenant communication, rent collection, screening, maintenance triage, utilities, and legal compliance — all through WhatsApp. Delivered as NestMind AI, now live and serving landlords.</p>
+                <div class="card-tags">
+                    <span class="tag">WhatsApp AI</span>
+                    <span class="tag">Agentic</span>
+                    <span class="tag">PropTech</span>
+                </div>
+            </div>
+
+            <!-- 6 -->
+            <div class="card">
+                <div class="card-icon teal">📈</div>
+                <h3>Fintech &amp; Financial Bots</h3>
+                <p>AI-powered financial automation — portfolio tracking, investment insights, and intelligent financial assistants. Built full-stack fintech applications with real-time data pipelines and conversational AI interfaces for personal and commercial finance.</p>
+                <div class="card-tags">
+                    <span class="tag">Fintech</span>
+                    <span class="tag">Financial AI</span>
+                    <span class="tag">Real-Time Data</span>
+                </div>
+            </div>
+
+            <!-- 7 — Sheetal Bamrah Artistry -->
+            <div class="card beauty-card">
+                <div class="card-icon beauty">💄</div>
+                <h3>Bridal &amp; Beauty — Sheetal Bamrah Artistry</h3>
+                <p>Luxury bridal and event hair &amp; makeup by Sheetal Bamrah — a professional artist known for refined, soft-glam looks that enhance natural beauty with elegance and precision. Serving brides across the GTA with on-location and studio services for Wedding, Reception, Semi-Bridal, and Non-Bridal occasions.</p>
+                <div class="card-tags">
+                    <span class="tag beauty">Bridal Makeup</span>
+                    <span class="tag beauty">Hair Styling</span>
+                    <span class="tag beauty">GTA</span>
+                </div>
+                <a href="https://www.sheetalbamrahartistry.ca/" target="_blank" rel="noopener" class="card-link beauty">Visit Sheetal Bamrah Artistry →</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section style="background: var(--surface); padding: 1px 0;">
+        <div class="section" id="products">
+            <div class="section-label">What We've Built</div>
+            <h2 class="section-title">Our Products</h2>
+            <p class="section-sub">End-to-end products built and deployed by DataNest — from AI property management to fintech and enterprise knowledge systems.</p>
+
+            <div class="cards-grid">
+
+                <!-- NestMind -->
+                <div class="product-card featured">
+                    <span class="product-badge">Live Product</span>
+                    <h3>NestMind AI</h3>
+                    <p>Autonomous AI property management agent. Handles tenant communication, rent collection, tenant screening, maintenance triage, utility scraping, and Ontario RTA legal compliance — all through WhatsApp. Landlords manage entire portfolios hands-free.</p>
+                    <div class="card-tags">
+                        <span class="tag">Agentic AI</span>
+                        <span class="tag">WhatsApp</span>
+                        <span class="tag">Stripe</span>
+                        <span class="tag">Ontario RTA</span>
+                    </div>
+                    <a href="https://nestmind-ai.up.railway.app/" target="_blank" rel="noopener" class="card-link">Visit NestMind AI →</a>
+                </div>
+
+                <!-- Fintech App -->
+                <div class="product-card">
+                    <span class="product-badge">Live Product</span>
+                    <h3>Fintech App</h3>
+                    <p>AI-powered financial assistant built for personal and portfolio finance. Provides intelligent insights, real-time market data analysis, and conversational finance management — demonstrating full-stack fintech development from backend APIs to polished UI.</p>
+                    <div class="card-tags">
+                        <span class="tag">Fintech</span>
+                        <span class="tag">AI Assistant</span>
+                        <span class="tag">Real-Time</span>
+                    </div>
+                    <a href="https://fintech-backend-production-67a9.up.railway.app/home.html" target="_blank" rel="noopener" class="card-link">Visit Fintech App →</a>
+                </div>
+
+                <!-- Enterprise Chatbot -->
+                <div class="product-card">
+                    <span class="product-badge purple">Enterprise</span>
+                    <h3>Enterprise Concierge Chatbot</h3>
+                    <p>An agentic knowledge assistant for large organizations — connecting email, Workday, SharePoint, HR documents, and company policy docs into a single conversational interface. Employees ask questions and get accurate, policy-grounded answers instantly. Built on a custom agentic framework with enterprise security controls.</p>
+                    <div class="card-tags">
+                        <span class="tag purple">Agentic</span>
+                        <span class="tag purple">SharePoint</span>
+                        <span class="tag purple">Workday</span>
+                        <span class="tag purple">HR AI</span>
+                    </div>
+                    <span style="font-size:13px;color:var(--text-muted);margin-top:4px;display:inline-block;">Deployed internally — demo available on request</span>
+                </div>
+
+                <!-- Portfolio -->
+                <div class="product-card">
+                    <span class="product-badge">Developer Profile</span>
+                    <h3>Portfolio &amp; Open Source</h3>
+                    <p>A curated showcase of projects, experiments, and open-source work by Arshdeep Bamrah — spanning ML, agentic AI, full-stack development, and data engineering. Includes code samples, write-ups, and project documentation.</p>
+                    <div class="card-tags">
+                        <span class="tag">GitHub</span>
+                        <span class="tag">Open Source</span>
+                        <span class="tag">Projects</span>
+                    </div>
+                    <a href="https://abamrah.github.io/" target="_blank" rel="noopener" class="card-link">Visit Portfolio →</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section" id="experience">
+        <div class="section-label">Track Record</div>
+        <h2 class="section-title">Enterprise Experience</h2>
+        <p class="section-sub">DataNest is built on real enterprise deployments — not demos. Every service we offer has been proven in production at scale.</p>
+
+        <div class="timeline">
+
+            <!-- Sanofi GenAI -->
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Aug 2025 — Present</div>
+                <div class="timeline-company">Sanofi</div>
+                <div class="timeline-role">Data Scientist — Commercial GenAI</div>
+                <ul class="timeline-bullets">
+                    <li>Defined enterprise-wide agentic AI standards covering orchestration, multi-step reasoning, and RAG feedback loops</li>
+                    <li>Designed GenAI products integrating LLMs, RAG pipelines, and TTS for commercial decision support</li>
+                    <li>Delivered an audio insight platform with LLM-generated scripts and multi-voice TTS synthesis</li>
+                    <li>Established grounding, data quality, and validation controls for reliable AI outputs at scale</li>
+                </ul>
+            </div>
+
+            <!-- Sanofi Reliability -->
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Aug 2024 — Aug 2025</div>
+                <div class="timeline-company">Sanofi</div>
+                <div class="timeline-role">Reliability AI / Predictive Maintenance Engineer</div>
+                <ul class="timeline-bullets">
+                    <li>Led vendor collaboration to deploy time-series anomaly detection for critical manufacturing assets</li>
+                    <li>Built Snowflake feature pipelines integrating IIoT sensor data, alarms, and SAP PM for downtime risk scoring</li>
+                    <li>Developed BERT-based NLP pipeline to extract FMEA entities from maintenance logs</li>
+                    <li>Delivered reliability dashboards and weekly AI insights for executive leadership</li>
+                </ul>
+            </div>
+
+            <!-- Apotex -->
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">May 2021 — Aug 2024</div>
+                <div class="timeline-company">Apotex</div>
+                <div class="timeline-role">Reliability Data Scientist</div>
+                <ul class="timeline-bullets">
+                    <li>Built Azure ML pipelines for data ingestion, feature engineering, and controlled model deployments</li>
+                    <li>Created a transformer-based semantic search engine using GPT/BERT embeddings over large document corpora</li>
+                    <li>Deployed XGBoost anomaly detection with real-time process deviation alerts for manufacturing lines</li>
+                    <li>Implemented Docker CI/CD retraining pipelines for production ML lifecycle management</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <div class="cta-banner">
+        <h2>Ready to work with <span class="gradient">DataNest</span>?</h2>
+        <p>Whether you need an AI agent, a predictive maintenance platform, or a custom GenAI solution — let's build it together.</p>
+        <div class="cta-banner-buttons">
+            <a href="mailto:arshdeep@datanest.ca" class="btn-lg btn-filled">Get in Touch →</a>
+            <a href="#products" class="btn-lg btn-outline">See Our Work</a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <a href="/datanest" class="nav-logo" style="margin-bottom:8px">
+                    <div class="nav-logo-dn">DN</div>
+                    <span>DataNest Canada Inc.</span>
+                </a>
+                <p>AI-powered products and services — built from real enterprise experience across pharma, manufacturing, fintech, and real estate.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Products</h4>
+                <a href="https://nestmind-ai.up.railway.app/" target="_blank" rel="noopener">NestMind AI</a>
+                <a href="https://fintech-backend-production-67a9.up.railway.app/home.html" target="_blank" rel="noopener">Fintech App</a>
+                <a href="https://abamrah.github.io/" target="_blank" rel="noopener">Portfolio</a>
+                <a href="https://www.sheetalbamrahartistry.ca/" target="_blank" rel="noopener">Sheetal Bamrah Artistry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Services</h4>
+                <a href="#services">Agentic AI</a>
+                <a href="#services">Predictive Maintenance</a>
+                <a href="#services">Pharma AI</a>
+                <a href="#services">Fintech Bots</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="#experience">Experience</a>
+                <a href="/">NestMind AI</a>
+                <a href="mailto:arshdeep@datanest.ca">Contact</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 DataNest Canada Inc. All rights reserved.</div>
+    </footer>
+
+    <script>
+        // ── Theme Toggle ──
+        (function () {
+            var html = document.documentElement;
+            var stored = localStorage.getItem('nestmind-theme');
+            var preferred = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            html.setAttribute('data-theme', preferred);
+            updateToggleUI(preferred);
+
+            document.getElementById('themeToggle').addEventListener('click', function (e) {
+                var option = e.target.closest('.theme-toggle-option');
+                if (!option) return;
+                var theme = option.getAttribute('data-theme-val');
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('nestmind-theme', theme);
+                updateToggleUI(theme);
+            });
+
+            function updateToggleUI(theme) {
+                document.querySelectorAll('.theme-toggle-option').forEach(function (el) {
+                    el.classList.toggle('active', el.getAttribute('data-theme-val') === theme);
+                });
+            }
+        })();
+    </script>
+
+</body>
+</html>
