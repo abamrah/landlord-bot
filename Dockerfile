@@ -51,7 +51,7 @@ RUN npx prisma generate
 COPY . .
 
 # Build TypeScript at build time (much faster startup)
-RUN npx tsc || true
+RUN rm -rf dist && npm run build
 
 # ── Runtime ──────────────────────────────────────────────────
 ENV NODE_ENV=production
