@@ -30,6 +30,17 @@ registerPlugin(propertyManagementPlugin);
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 3000;
+const datanestHosts = new Set(["datanestai.ca", "www.datanestai.ca"]);
+
+app.use((req, res, next) => {
+  const host = (req.headers.host || "").split(":")[0].toLowerCase();
+
+  if (req.path === "/" && datanestHosts.has(host)) {
+    return res.sendFile(path.join(process.cwd(), "public", "datanest.html"));
+  }
+
+  return next();
+});
 
 // Initialize WebSocket server
 initWebSocket(server);
