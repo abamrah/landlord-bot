@@ -6006,6 +6006,46 @@
 
     /** Mobile: request pairing code using phone number */
     async function dashRequestPairingCode() {
+      function normalizePairingCode(v) {
+        if (typeof v !== 'string') return null;
+        var compact = v.trim().replace(/[\s-]+/g, '').toUpperCase();
+        if (!/^[A-Z0-9]{8}$/.test(compact)) return null;
+        return compact.slice(0, 4) + '-' + compact.slice(4);
+      }
+
+      function extractPairingCode(result) {
+        if (!result) return null;
+        var candidates = [
+          result.pairingCode,
+          result.code,
+          result.data && (result.data.pairingCode || result.data.code),
+          result.raw && result.raw.pairingCode,
+          result.raw && result.raw.code,
+          result.raw && result.raw.data && (result.raw.data.pairingCode || result.raw.data.code),
+          result.raw && result.raw.response && (result.raw.response.pairingCode || result.raw.response.code)
+        ];
+        for (var i = 0; i < candidates.length; i++) {
+          var n = normalizePairingCode(candidates[i]);
+          if (n) return n;
+        }
+
+        var seen = new Set();
+        function scan(obj, depth) {
+          if (!obj || depth > 4) return null;
+          if (typeof obj === 'string') return normalizePairingCode(obj);
+          if (typeof obj !== 'object') return null;
+          if (seen.has(obj)) return null;
+          seen.add(obj);
+          var keys = Object.keys(obj);
+          for (var j = 0; j < keys.length; j++) {
+            var found = scan(obj[keys[j]], depth + 1);
+            if (found) return found;
+          }
+          return null;
+        }
+        return scan(result, 0);
+      }
+
       var phoneEl = document.getElementById('dashPairingPhone');
       var phone = (phoneEl.value || '').replace(/[^0-9+]/g, '');
       if (phone.length < 8) { phoneEl.style.borderColor = 'var(--error-border)'; return; }
@@ -6038,16 +6078,7 @@
         requestBtn.disabled = false;
         requestBtn.textContent = 'Get Code';
 
-        // Extract pairing code from multiple possible fields
-        var code = result?.pairingCode || result?.code;
-        if (!code && result?.raw) {
-          code = result.raw.pairingCode || result.raw.code || result.raw?.data?.pairingCode || result.raw?.data?.code;
-        }
-        // Only accept short 8-digit pairing codes, not long QR data strings
-        if (code && code.length > 20) {
-          console.warn('Got long QR string instead of 8-digit pairing code, length:', code.length);
-          code = null;
-        }
+        var code = extractPairingCode(result);
         if (code) {
           pairingEl.style.display = 'block';
           document.getElementById('waPairingText').textContent = code;
@@ -6068,6 +6099,49 @@
               }
             } catch { }
           }, 4000);
+        } else if (!result?.base64) {
+          // Stale instance recovery: recreate once and retry code generation.
+          loading.style.display = 'block';
+          loading.innerHTML = '⏳ Refreshing WhatsApp instance and retrying…';
+          try {
+            await fetchJson('/admin/whatsapp/instance/remove/' + encodeURIComponent(dashQrInstance), { method: 'DELETE' });
+          } catch { }
+
+          var recreated = await fetchJson('/admin/whatsapp/instance/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          });
+          dashQrInstance = recreated?.instance?.instanceName || dashQrInstance;
+
+          var retry = await fetchJson('/admin/whatsapp/instance/connect/' + encodeURIComponent(dashQrInstance) + '?number=' + encodeURIComponent(phone));
+          loading.style.display = 'none';
+          code = extractPairingCode(retry);
+          if (code) {
+            pairingEl.style.display = 'block';
+            document.getElementById('waPairingText').textContent = code;
+            phoneInput.style.display = 'none';
+            stateChip.textContent = 'Enter code in WhatsApp';
+            stateChip.className = 'chip chip-warn';
+
+            if (dashQrPollTimer) clearInterval(dashQrPollTimer);
+            dashQrPollTimer = setInterval(async function () {
+              try {
+                var retryState = await fetchJson('/admin/whatsapp/instance/state/' + encodeURIComponent(dashQrInstance));
+                if (retryState?.instance?.state === 'open') {
+                  clearInterval(dashQrPollTimer);
+                  dashQrPollTimer = null;
+                  dashCheckState();
+                  toast('WhatsApp connected!');
+                }
+              } catch { }
+            }, 4000);
+            return;
+          }
+
+          if (retry?.base64) {
+            result = retry;
+          }
         } else if (result?.base64) {
           var container = document.getElementById('waQrContainer');
           container.style.display = 'block';
