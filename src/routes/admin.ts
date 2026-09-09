@@ -1,7 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import repo from "../services/repository";
-import { MaintenanceStatus, UtilityType, UnitUtilityType, Prisma } from "@prisma/client";
+import { MaintenanceStatus, UtilityType, UnitUtilityType } from "@prisma/client";
 import whatsappService from "../services/whatsappService";
 import agentService from "../services/agentService";
 import { getWebhookStatus } from "../services/webhookStatus";
@@ -3454,10 +3454,7 @@ router.get("/approval-queue", async (req, res) => {
       where: {
         landlordId: authReq.landlordId,
         status: { in: [MaintenanceStatus.OPEN, MaintenanceStatus.IN_TRIAGE, MaintenanceStatus.PENDING] },
-        AND: [
-          { NOT: { aiDraft: Prisma.AnyNull } },
-          { NOT: { autopilotStatus: "landlord_skipped" } },
-        ],
+        NOT: { autopilotStatus: "landlord_skipped" },
       },
       include: {
         tenant: { select: { id: true, name: true, phone: true } },
@@ -3466,6 +3463,7 @@ router.get("/approval-queue", async (req, res) => {
       orderBy: { createdAt: "asc" },
     });
     const queue = requests.filter((r) => {
+      if (r.aiDraft === null) return false;
       const chatLog = Array.isArray(r.chatLog) ? (r.chatLog as any[]) : [];
       if (chatLog.length === 0) return true;
       const last = chatLog[chatLog.length - 1];
