@@ -2519,22 +2519,41 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
       const extractBase64 = (r: any): string | null =>
         r?.base64 || r?.data?.base64 || null;
 
-      // ── Strategy 1: Single POST call with number in body ──────────────
-      // Evolution API v2 expects the number in the POST body. The API
-      // internally waits ~5s for the WS to be ready, then calls
-      // Baileys' requestPairingCode(number).
-      console.log("[WhatsApp] Pairing code: trying POST /instance/connect with body { number }...", { instName: req.params.instanceName, phoneNumber });
-      try {
-        const r1 = await evoFetch(`/instance/connect/${instName}`, {
-          method: "POST",
-          body: { number: phoneNumber },
+      // ── Strategy 1: POST call(s) with common payload variants ──────────
+      // Different Evolution builds expect different field names.
+      const postBodies = [
+        { number: phoneNumber },
+        { phone: phoneNumber },
+        { phoneNumber: phoneNumber },
+      ];
+      for (const body of postBodies) {
+        if (pairingCode) break;
+        const bodyKey = Object.keys(body)[0];
+        console.log("[WhatsApp] Pairing code: trying POST /instance/connect with body...", {
+          instName: req.params.instanceName,
+          bodyKey,
+          phoneNumber,
         });
-        allRawResults.push({ method: "POST-body", result: r1 });
-        pairingCode = extractPairingCode(r1);
-        base64 = extractBase64(r1);
-        console.log("[WhatsApp] POST body result:", { keys: r1 ? Object.keys(r1) : [], pairingCode, hasBase64: !!base64 });
-      } catch (e1) {
-        console.warn("[WhatsApp] POST connect with body failed:", (e1 as Error).message);
+        try {
+          const r1 = await evoFetch(`/instance/connect/${instName}`, {
+            method: "POST",
+            body,
+          });
+          allRawResults.push({ method: `POST-${bodyKey}`, result: r1 });
+          pairingCode = extractPairingCode(r1);
+          if (!base64) base64 = extractBase64(r1);
+          console.log("[WhatsApp] POST body result:", {
+            bodyKey,
+            keys: r1 ? Object.keys(r1) : [],
+            pairingCode,
+            hasBase64: !!base64,
+          });
+        } catch (e1) {
+          console.warn("[WhatsApp] POST connect with body failed:", {
+            bodyKey,
+            error: (e1 as Error).message,
+          });
+        }
       }
 
       // ── Strategy 2: GET with query param (some v2 builds, v1 compat) ──

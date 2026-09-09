@@ -6068,6 +6068,28 @@
               }
             } catch { }
           }, 4000);
+        } else if (result?.base64) {
+          var container = document.getElementById('waQrContainer');
+          container.style.display = 'block';
+          document.getElementById('waQrImg').innerHTML = '<img src="' + result.base64 + '" alt="QR" style="width:240px;height:240px;" />';
+          phoneInput.style.display = 'none';
+          stateChip.textContent = 'Scan QR in WhatsApp';
+          stateChip.className = 'chip chip-warn';
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Your server returned a QR code but no 8-character pairing code. Scan this QR to connect.';
+
+          if (dashQrPollTimer) clearInterval(dashQrPollTimer);
+          dashQrPollTimer = setInterval(async function () {
+            try {
+              var state = await fetchJson('/admin/whatsapp/instance/state/' + encodeURIComponent(dashQrInstance));
+              if (state?.instance?.state === 'open') {
+                clearInterval(dashQrPollTimer);
+                dashQrPollTimer = null;
+                dashCheckState();
+                toast('WhatsApp connected!');
+              }
+            } catch { }
+          }, 4000);
         } else {
           console.log('Pairing code response:', JSON.stringify(result));
           throw new Error('No pairing code returned. Response: ' + Object.keys(result || {}).join(', '));
