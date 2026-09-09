@@ -8585,7 +8585,7 @@
         if (!name) return toast('Name required');
         var body = { name: name, phone: phone || undefined, email: email || undefined, unitId: unitId || undefined };
         if (leaseEnd) body.leaseEnd = leaseEnd;
-        if (rentAmountStr) body.rentAmount = Math.round(parseFloat(rentAmountStr) * 100);
+        if (rentAmountStr) body.rentAmountCents = Math.round(parseFloat(rentAmountStr) * 100);
         try {
           await fetchJson('/admin/tenants', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
           toast('Tenant created');

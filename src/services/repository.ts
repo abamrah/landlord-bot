@@ -495,7 +495,7 @@ export async function createTenant(params: {
   landlordId?: string;
   autoReplyEnabled?: boolean;
   leaseEnd?: string | Date | null;
-  rentAmount?: number | null;
+  rentAmountCents?: number | null;
   rentDueDay?: number | null;
 }) {
   if (!isDbEnabled) return null;
@@ -519,7 +519,7 @@ export async function createTenant(params: {
           unitId: params.unitId,
           tenantId: record.id,
           leaseEnd: params.leaseEnd ? new Date(params.leaseEnd) : undefined,
-          rentAmount: params.rentAmount ?? undefined,
+          rentAmountCents: params.rentAmountCents ?? undefined,
           rentDueDay: params.rentDueDay ?? undefined,
         },
       });

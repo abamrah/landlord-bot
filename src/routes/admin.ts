@@ -1,7 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import repo from "../services/repository";
-import { MaintenanceStatus, UtilityType, UnitUtilityType } from "@prisma/client";
+import { MaintenanceStatus, UtilityType, UnitUtilityType, Prisma } from "@prisma/client";
 import whatsappService from "../services/whatsappService";
 import agentService from "../services/agentService";
 import { getWebhookStatus } from "../services/webhookStatus";
@@ -3453,7 +3453,7 @@ router.get("/approval-queue", async (req, res) => {
     const requests = await db.maintenanceRequest.findMany({
       where: {
         landlordId: authReq.landlordId,
-        aiDraft: { not: null },
+        NOT: { aiDraft: Prisma.AnyNull },
         status: { in: [MaintenanceStatus.OPEN, MaintenanceStatus.IN_TRIAGE, MaintenanceStatus.PENDING] },
         NOT: { autopilotStatus: "landlord_skipped" },
       },
