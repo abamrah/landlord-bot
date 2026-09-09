@@ -2472,7 +2472,7 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
         if (typeof v !== "string") return null;
         const raw = v.trim();
         if (!raw) return null;
-        const compact = raw.replace(/[\s-]+/g, "").toUpperCase();
+        const compact = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (!/^[A-Z0-9]{8}$/.test(compact)) return null;
         return `${compact.slice(0, 4)}-${compact.slice(4)}`;
       };

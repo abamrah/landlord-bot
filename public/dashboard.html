@@ -6008,7 +6008,7 @@
     async function dashRequestPairingCode() {
       function normalizePairingCode(v) {
         if (typeof v !== 'string') return null;
-        var compact = v.trim().replace(/[\s-]+/g, '').toUpperCase();
+        var compact = v.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (!/^[A-Z0-9]{8}$/.test(compact)) return null;
         return compact.slice(0, 4) + '-' + compact.slice(4);
       }
