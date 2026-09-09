@@ -2467,26 +2467,44 @@ router.get("/whatsapp/instance/connect/:instanceName", async (req, res) => {
       let base64: string | null = null;
       const allRawResults: any[] = [];
 
-      // Helper: check if a value looks like a real 8-digit pairing code
-      const isShortPairingCode = (v: any) =>
-        typeof v === "string" && v.length >= 8 && v.length <= 20 &&
-        /^[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(v.trim());
+      // Helper: normalize different provider formats into XXXX-XXXX
+      const normalizePairingCode = (v: any): string | null => {
+        if (typeof v !== "string") return null;
+        const raw = v.trim();
+        if (!raw) return null;
+        const compact = raw.replace(/[\s-]+/g, "").toUpperCase();
+        if (!/^[A-Z0-9]{8}$/.test(compact)) return null;
+        return `${compact.slice(0, 4)}-${compact.slice(4)}`;
+      };
 
       // Helper: deep-extract pairing code from any result object
       const extractPairingCode = (r: any): string | null => {
         if (!r) return null;
         // Check all known field locations
         const candidates = [
-          r?.pairingCode, r?.code, r?.data?.pairingCode, r?.data?.code,
-          r?.instance?.pairingCode, r?.response?.pairingCode,
+          r?.pairingCode,
+          r?.code,
+          r?.data?.pairingCode,
+          r?.data?.code,
+          r?.instance?.pairingCode,
+          r?.response?.pairingCode,
+          r?.response?.code,
+          r?.pairing?.code,
+          r?.pairing?.pairingCode,
+          r?.result?.pairingCode,
+          r?.result?.code,
         ];
         for (const c of candidates) {
-          if (isShortPairingCode(c)) return c.trim();
+          const normalized = normalizePairingCode(c);
+          if (normalized) return normalized;
         }
         // Brute-force scan all string values in the result
         const scanObj = (obj: any, depth = 0): string | null => {
           if (depth > 3 || !obj) return null;
-          if (typeof obj === "string" && isShortPairingCode(obj)) return obj.trim();
+          if (typeof obj === "string") {
+            const normalized = normalizePairingCode(obj);
+            if (normalized) return normalized;
+          }
           if (typeof obj === "object") {
             for (const key of Object.keys(obj)) {
               const found = scanObj(obj[key], depth + 1);

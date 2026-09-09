@@ -6011,7 +6011,12 @@
       if (phone.length < 8) { phoneEl.style.borderColor = 'var(--error-border)'; return; }
       phoneEl.style.borderColor = 'var(--border)';
 
-      if (!dashQrInstance) { dashInitQR(); return; }
+      if (!dashQrInstance) {
+        await dashInitQR();
+        if (!dashQrInstance) {
+          throw new Error('Could not initialize WhatsApp instance. Please try again.');
+        }
+      }
 
       var loading = document.getElementById('waQrLoading');
       var pairingEl = document.getElementById('waPairingCode');
