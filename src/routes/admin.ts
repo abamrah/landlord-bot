@@ -3453,9 +3453,11 @@ router.get("/approval-queue", async (req, res) => {
     const requests = await db.maintenanceRequest.findMany({
       where: {
         landlordId: authReq.landlordId,
-        NOT: { aiDraft: Prisma.AnyNull },
         status: { in: [MaintenanceStatus.OPEN, MaintenanceStatus.IN_TRIAGE, MaintenanceStatus.PENDING] },
-        NOT: { autopilotStatus: "landlord_skipped" },
+        AND: [
+          { NOT: { aiDraft: Prisma.AnyNull } },
+          { NOT: { autopilotStatus: "landlord_skipped" } },
+        ],
       },
       include: {
         tenant: { select: { id: true, name: true, phone: true } },
