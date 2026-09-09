@@ -605,7 +605,7 @@
                 <span class="logo-text">NestMind AI</span>
             </a>
             <h1>Welcome aboard!</h1>
-            <p>Let's set up your AI property manager step by step.</p>
+            <p>Let's set up your AI property manager in minutes. You can skip steps and finish them later.</p>
         </div>
 
         <div class="progress-bar">
@@ -712,6 +712,7 @@
                     unit details in the next step.</div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(0)">← Back</button>
+                    <button class="btn btn-ghost" onclick="completeStep(1)">Skip for now</button>
                     <button class="btn btn-primary" onclick="createProperty()">Add Property & Next →</button>
                 </div>
             </div>
@@ -750,6 +751,7 @@
                     Add at least one unit to continue.</div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
+                    <button class="btn btn-ghost" onclick="completeStep(2)">Skip for now</button>
                     <button class="btn btn-primary" id="unitsNextBtn" onclick="completeStep(2)" disabled>Next →</button>
                 </div>
             </div>
@@ -772,6 +774,7 @@
 
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+                    <button class="btn btn-ghost" onclick="completeStep(3)">Skip for now</button>
                     <button class="btn btn-primary" id="tenantsNextBtn" onclick="saveTenants()" disabled>Save & Next
                         →</button>
                 </div>
@@ -794,6 +797,7 @@
 
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goStep(3)">← Back</button>
+                    <button class="btn btn-ghost" onclick="completeStep(4)">Skip for now</button>
                     <button class="btn btn-primary" onclick="saveUtilityConfig()">Save & Finish →</button>
                 </div>
             </div>
@@ -838,7 +842,7 @@
 
                 <div style="margin-top:20px;">
                     <button class="btn btn-primary" style="width:100%;padding:16px;"
-                        onclick="window.location.href='/dashboard'">
+                        onclick="finalizeAndGoDashboard()">
                         Go to Dashboard →
                     </button>
                 </div>
@@ -862,7 +866,7 @@
         </div>
 
         <div class="skip-link">
-            <a href="/dashboard">Skip setup, go to dashboard →</a>
+            <a href="#" onclick="finalizeAndGoDashboard();return false;">Skip setup, go to dashboard →</a>
         </div>
     </div>
 
@@ -882,10 +886,49 @@
         };
 
         var TOTAL_STEPS = 6;
+        var ONBOARDING_STATE_KEY = 'nestmind-onboarding-state-v1';
         var currentStep = 0;
         var createdPropertyId = null;
         var createdUnits = [];       // [{ id, label, utilityType }]
         var pendingTenants = {};     // unitId -> [{ name, phone, email, role, sharePercent, saved, tenantId }]
+
+        function persistOnboardingState() {
+            try {
+                localStorage.setItem(ONBOARDING_STATE_KEY, JSON.stringify({
+                    currentStep: currentStep,
+                    createdPropertyId: createdPropertyId,
+                    createdUnits: createdUnits,
+                    pendingTenants: pendingTenants,
+                    savedAt: new Date().toISOString()
+                }));
+            } catch (e) { }
+        }
+
+        function restoreOnboardingState() {
+            try {
+                var raw = localStorage.getItem(ONBOARDING_STATE_KEY);
+                if (!raw) return false;
+                var parsed = JSON.parse(raw);
+                createdPropertyId = parsed.createdPropertyId || null;
+                createdUnits = Array.isArray(parsed.createdUnits) ? parsed.createdUnits : [];
+                pendingTenants = parsed.pendingTenants && typeof parsed.pendingTenants === 'object' ? parsed.pendingTenants : {};
+                currentStep = Number(parsed.currentStep);
+                if (!Number.isFinite(currentStep) || currentStep < 0 || currentStep > (TOTAL_STEPS - 1)) currentStep = 0;
+                renderUnitsList();
+                goStep(currentStep);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function finalizeAndGoDashboard() {
+            try {
+                localStorage.setItem('nestmind-onboarding-completed-at', new Date().toISOString());
+                localStorage.removeItem(ONBOARDING_STATE_KEY);
+            } catch (e) { }
+            window.location.href = '/dashboard';
+        }
 
         // ── Navigation ──
         function goStep(n) {
@@ -899,6 +942,7 @@
             currentStep = n;
             document.getElementById('progressFill').style.width = Math.round((n / (TOTAL_STEPS - 1)) * 100) + '%';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            persistOnboardingState();
 
             // Build dynamic sections when reaching them
             if (n === 3) renderTenantSections();
@@ -920,6 +964,7 @@
             try {
                 var result = await API('/admin/properties', { method: 'POST', body: JSON.stringify({ address: address }) });
                 createdPropertyId = result.property ? result.property.id : result.id;
+                persistOnboardingState();
                 goStep(2);
             } catch (err) { showError(err.message); }
         }
@@ -952,6 +997,7 @@
                 pendingTenants[unit.id] = [];
                 document.getElementById('newUnitLabel').value = '';
                 renderUnitsList();
+                persistOnboardingState();
             } catch (err) { showError(err.message); }
         }
 
@@ -961,6 +1007,7 @@
             delete pendingTenants[unit.id];
             createdUnits.splice(idx, 1);
             renderUnitsList();
+            persistOnboardingState();
         }
 
         // ── STEP 4: Tenants & Residents ──
@@ -998,11 +1045,13 @@
             if (!pendingTenants[unitId]) pendingTenants[unitId] = [];
             pendingTenants[unitId].push({ name: name.trim(), phone: phone.trim(), email: email.trim(), role: role, sharePercent: null, saved: false, tenantId: null });
             renderTenantSections();
+            persistOnboardingState();
         }
 
         function removeOccupant(unitId, idx) {
             pendingTenants[unitId].splice(idx, 1);
             renderTenantSections();
+            persistOnboardingState();
         }
 
         async function saveTenants() {
@@ -1028,6 +1077,7 @@
             }
             btn.textContent = 'Save & Next →'; btn.disabled = false;
             if (errors.length) return showError('Some tenants failed: ' + errors.join('; '));
+            persistOnboardingState();
             goStep(4);
         }
 
@@ -1142,6 +1192,7 @@
             }
 
             if (errors.length) return showError(errors.join('; '));
+            persistOnboardingState();
             goStep(5);
         }
 
@@ -1328,6 +1379,7 @@
 
         // Auto-init QR on page load
         initWhatsAppQR();
+        restoreOnboardingState();
 
         // Mobile: show pairing code hints, hide QR hints
         (function () {

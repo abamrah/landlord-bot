@@ -4,6 +4,22 @@ import { encrypt, decrypt } from "./encryption";
 
 const isDbEnabled = Boolean(process.env.DATABASE_URL);
 
+export type AutoReplyApprovalPolicy = "high_critical" | "all" | "off";
+export type WhatsAppRoutingMode = "per_landlord" | "shared_number";
+
+function normalizeApprovalPolicy(value?: string): AutoReplyApprovalPolicy {
+  const normalized = (value || "").trim().toLowerCase();
+  if (normalized === "all") return "all";
+  if (normalized === "off") return "off";
+  return "high_critical";
+}
+
+function normalizeRoutingMode(value?: string): WhatsAppRoutingMode {
+  const normalized = (value || "").trim().toLowerCase();
+  if (normalized === "shared_number") return "shared_number";
+  return "per_landlord";
+}
+
 // ── Landlord helpers ────────────────────────────────────
 
 export async function findLandlordByWhatsApp(phone: string) {
@@ -700,6 +716,60 @@ export async function setGlobalAutoReplyCooldownMinutes(params: { minutes: numbe
   }
 }
 
+export async function getAutoReplyApprovalPolicy(landlordId?: string) {
+  if (!isDbEnabled) return { policy: "high_critical" as AutoReplyApprovalPolicy, source: "default" as const };
+  try {
+    const record = await db.appSetting.findFirst({ where: { key: "auto_reply_approval_policy", landlordId: landlordId || null } });
+    if (!record) return { policy: "high_critical" as AutoReplyApprovalPolicy, source: "default" as const };
+    return { policy: normalizeApprovalPolicy(record.value), source: "db" as const };
+  } catch (err) {
+    console.warn("get auto-reply approval policy failed", err);
+    return { policy: "high_critical" as AutoReplyApprovalPolicy, source: "default" as const };
+  }
+}
+
+export async function setAutoReplyApprovalPolicy(params: { policy: AutoReplyApprovalPolicy; landlordId?: string }) {
+  if (!isDbEnabled) return null;
+  const policy = normalizeApprovalPolicy(params.policy);
+  try {
+    return await db.appSetting.upsert({
+      where: { key_landlordId: { key: "auto_reply_approval_policy", landlordId: params.landlordId || "" } },
+      create: { key: "auto_reply_approval_policy", value: policy, landlordId: params.landlordId },
+      update: { value: policy },
+    });
+  } catch (err) {
+    console.warn("set auto-reply approval policy failed", err);
+    return null;
+  }
+}
+
+export async function getWhatsAppRoutingMode(landlordId?: string) {
+  if (!isDbEnabled) return { mode: "per_landlord" as WhatsAppRoutingMode, source: "default" as const };
+  try {
+    const record = await db.appSetting.findFirst({ where: { key: "whatsapp_routing_mode", landlordId: landlordId || null } });
+    if (!record) return { mode: "per_landlord" as WhatsAppRoutingMode, source: "default" as const };
+    return { mode: normalizeRoutingMode(record.value), source: "db" as const };
+  } catch (err) {
+    console.warn("get whatsapp routing mode failed", err);
+    return { mode: "per_landlord" as WhatsAppRoutingMode, source: "default" as const };
+  }
+}
+
+export async function setWhatsAppRoutingMode(params: { mode: WhatsAppRoutingMode; landlordId?: string }) {
+  if (!isDbEnabled) return null;
+  const mode = normalizeRoutingMode(params.mode);
+  try {
+    return await db.appSetting.upsert({
+      where: { key_landlordId: { key: "whatsapp_routing_mode", landlordId: params.landlordId || "" } },
+      create: { key: "whatsapp_routing_mode", value: mode, landlordId: params.landlordId },
+      update: { value: mode },
+    });
+  } catch (err) {
+    console.warn("set whatsapp routing mode failed", err);
+    return null;
+  }
+}
+
 export async function getLandlordActiveWindowMinutes(landlordId?: string) {
   if (!isDbEnabled) return { minutes: 30, source: "default" as const };
   try {
@@ -1023,6 +1093,25 @@ export async function findTenantByPhone(phone?: string, landlordId?: string) {
   }
 }
 
+export async function findTenantsByPhone(phone?: string, landlordId?: string) {
+  if (!isDbEnabled || !phone) return [];
+  const trimmed = phone.trim();
+  if (!trimmed) return [];
+  const normalized = trimmed.replace(/\D/g, "");
+  const withPlus = normalized ? `+${normalized}` : "";
+  const candidates = Array.from(new Set([trimmed, normalized, withPlus].filter(Boolean)));
+  try {
+    const where: Prisma.TenantWhereInput = {
+      OR: candidates.map((value) => ({ phone: value })),
+    };
+    if (landlordId) where.landlordId = landlordId;
+    return await db.tenant.findMany({ where, orderBy: { createdAt: "desc" } });
+  } catch (err) {
+    console.warn("find tenants by phone failed", err);
+    return [];
+  }
+}
+
 export async function findContractorByPhone(phone?: string) {
   if (!isDbEnabled || !phone) return null;
   const trimmed = phone.trim();
@@ -1243,6 +1332,7 @@ export default {
   getUnitById,
   findUnitByGroupJid,
   findTenantByPhone,
+  findTenantsByPhone,
   findTenantByEmail,
   findContractorByPhone,
   findLatestMaintenanceForTenantId,
@@ -1265,6 +1355,10 @@ export default {
   setGlobalAutoReplyDelayMinutes,
   getGlobalAutoReplyCooldownMinutes,
   setGlobalAutoReplyCooldownMinutes,
+  getAutoReplyApprovalPolicy,
+  setAutoReplyApprovalPolicy,
+  getWhatsAppRoutingMode,
+  setWhatsAppRoutingMode,
   getLandlordActiveWindowMinutes,
   setLandlordActiveWindowMinutes,
   getFollowUpNudgeHours,

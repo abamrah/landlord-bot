@@ -1139,6 +1139,18 @@ router.get("/auto-reply-cooldown", async (req, res) => {
   res.json({ minutes: setting.minutes, source: setting.source });
 });
 
+router.get("/auto-reply-approval-policy", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const setting = await repo.getAutoReplyApprovalPolicy(authReq.landlordId);
+  res.json({ policy: setting.policy, source: setting.source });
+});
+
+router.get("/whatsapp-routing-mode", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const setting = await repo.getWhatsAppRoutingMode(authReq.landlordId);
+  res.json({ mode: setting.mode, source: setting.source });
+});
+
 router.patch("/auto-reply", async (req, res) => {
   const authReq = req as unknown as AuthRequest;
   const schema = z.object({ enabled: z.boolean() });
@@ -1167,6 +1179,26 @@ router.patch("/auto-reply-cooldown", async (req, res) => {
   const updated = await repo.setGlobalAutoReplyCooldownMinutes({ minutes: parsed.data.minutes, landlordId: authReq.landlordId });
   if (!updated) return res.status(500).json({ error: "auto_reply_cooldown_update_failed" });
   res.json({ minutes: parsed.data.minutes });
+});
+
+router.patch("/auto-reply-approval-policy", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ policy: z.enum(["high_critical", "all", "off"]) });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.setAutoReplyApprovalPolicy({ policy: parsed.data.policy, landlordId: authReq.landlordId });
+  if (!updated) return res.status(500).json({ error: "auto_reply_approval_policy_update_failed" });
+  res.json({ policy: parsed.data.policy });
+});
+
+router.patch("/whatsapp-routing-mode", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({ mode: z.enum(["per_landlord", "shared_number"]) });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  const updated = await repo.setWhatsAppRoutingMode({ mode: parsed.data.mode, landlordId: authReq.landlordId });
+  if (!updated) return res.status(500).json({ error: "whatsapp_routing_mode_update_failed" });
+  res.json({ mode: parsed.data.mode });
 });
 
 router.get("/auto-reply-active-window", async (req, res) => {

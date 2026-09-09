@@ -2578,6 +2578,19 @@
           </div>
         </div>
 
+        <div id="onboardingQuickstart" class="panel panel-sm" style="display:none;margin-bottom:14px;border:1px dashed var(--accent);background:linear-gradient(180deg, rgba(0,200,150,.08), transparent);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;">Start Here</div>
+              <h3 style="margin-top:2px;">Get live in under 3 minutes</h3>
+              <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Complete these core steps first. You can configure advanced features later.</p>
+              <div id="onboardingChecklist" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="dismissQuickstart" style="align-self:flex-start;">Hide</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" id="onboardingActions"></div>
+        </div>
+
         <!-- KPI CARDS -->
         <div class="kpi-grid">
           <div class="kpi" style="--kpi-accent:#f59e0b;" onclick="showView('maintenance')">
@@ -2794,7 +2807,7 @@
             <button class="btn btn-ghost btn-sm" onclick="loadUpcomingTasks()">↻ Refresh</button>
           </div>
           <div id="upcomingTasksList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:0;">
-            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading tasks…</div>
+            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading upcoming tasks and reminders...</div>
           </div>
         </div>
 
@@ -2842,7 +2855,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="7" style="color:var(--text-muted)">Loading...</td>
+                    <td colspan="7" style="color:var(--text-muted)">Loading maintenance tickets...</td>
                   </tr>
                 </tbody>
               </table>
@@ -2987,7 +3000,7 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="6" style="color:var(--text-muted)">Loading...</td>
+                <td colspan="6" style="color:var(--text-muted)">Loading units and occupants...</td>
               </tr>
             </tbody>
           </table>
@@ -3023,7 +3036,7 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="5" style="color:var(--text-muted)">Loading...</td>
+                <td colspan="5" style="color:var(--text-muted)">Loading contractor directory...</td>
               </tr>
             </tbody>
           </table>
@@ -3079,7 +3092,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="5" style="color:var(--text-muted)">Loading...</td>
+                  <td colspan="5" style="color:var(--text-muted)">Loading utility bills...</td>
                 </tr>
               </tbody>
             </table>
@@ -4400,7 +4413,7 @@
             <span class="chip chip-muted" id="globalAutoReplyStatusSettings">—</span>
           </div>
           <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">
-            When enabled, the AI auto-replies to tenant messages. High/critical severity issues are always held for your approval.
+            When enabled, the AI auto-replies to tenant messages. Approval behavior is configurable below.
           </p>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
             <div>
@@ -4475,6 +4488,39 @@
           </div>
           <div style="margin-top:16px;">
             <button class="btn btn-primary btn-sm" id="saveSettingsTiming">Save Timing Settings</button>
+          </div>
+        </div>
+
+        <!-- Messaging Workflow -->
+        <div class="panel" style="margin-top:20px;">
+          <div class="panel-header">
+            <h3>💬 Messaging Workflow</h3>
+          </div>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+            Tune how AI replies are approved and how inbound WhatsApp messages are routed.
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">Approval Policy</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Choose when AI replies should pause for your approval</p>
+              <select id="settingsApprovalPolicy" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);">
+                <option value="high_critical">Hold high and critical only</option>
+                <option value="all">Hold every AI reply</option>
+                <option value="off">Send automatically (no hold)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">WhatsApp Routing Mode</label>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Control whether inbound traffic is per-landlord or shared-number routed</p>
+              <select id="settingsRoutingMode" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);">
+                <option value="per_landlord">Per-landlord numbers</option>
+                <option value="shared_number">Single shared central number</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px;align-items:center;">
+            <button class="btn btn-primary btn-sm" id="saveSettingsWorkflow">Save Workflow Settings</button>
+            <span id="settingsWorkflowHint" style="font-size:12px;color:var(--text-muted);"></span>
           </div>
         </div>
 
@@ -4634,6 +4680,7 @@
       <div class="mobile-dot active" data-panel="1"></div>
       <div class="mobile-dot" data-panel="2"></div>
     </div>
+    <div style="text-align:center;font-size:11px;color:var(--text-muted);padding-bottom:8px;">Swipe: Menu · AI Agent · Mission Control</div>
   </div>
 
   <!-- MOBILE NOTIFICATION PANEL -->
@@ -4929,7 +4976,8 @@
 
     // ── STATE ──
     const ACTIVE_STATUSES = ['OPEN', 'PENDING', 'IN_TRIAGE', 'SCHEDULED', 'IN_PROGRESS'];
-    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, landlordActiveWindowMinutes: 30, followUpNudgeHours: 48, followUpMaxHours: 72, leaseExpiryDays: 60, webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
+    const state = { units: [], tenants: [], contractors: [], maintenance: [], utilityBills: [], utilityCreds: [], reminders: [], properties: [], dbEnabled: true, autoReplyGlobalEnabled: true, autoReplyDelayMinutes: 5, autoReplyCooldownMinutes: 60, landlordActiveWindowMinutes: 30, followUpNudgeHours: 48, followUpMaxHours: 72, leaseExpiryDays: 60, autoReplyApprovalPolicy: 'high_critical', whatsappRoutingMode: 'per_landlord', webhookStatus: null, health: { llm: 'unknown', whatsapp: 'unknown' } };
+    const QUICKSTART_DISMISS_KEY = 'nestmind-quickstart-dismissed-v1';
 
     function severityOf(r) { return (r?.triageJson?.classification?.severity || r?.triage?.classification?.severity || 'unknown').toString().toLowerCase(); }
     function formatStatus(s) { return (s || '').replace(/_/g, ' '); }
@@ -4998,6 +5046,8 @@
     async function loadFollowUpNudgeHours() { try { const r = await fetchJson('/admin/follow-up-nudge-hours'); state.followUpNudgeHours = Number(r.hours) || 48; } catch { state.followUpNudgeHours = 48; } renderFollowUpNudgeHours(); }
     async function loadFollowUpMaxHours() { try { const r = await fetchJson('/admin/follow-up-max-hours'); state.followUpMaxHours = Number(r.hours) || 72; } catch { state.followUpMaxHours = 72; } renderFollowUpMaxHours(); }
     async function loadLeaseExpiryDays() { try { const r = await fetchJson('/admin/lease-expiry-days'); state.leaseExpiryDays = Number(r.days) || 60; } catch { state.leaseExpiryDays = 60; } renderLeaseExpiryDays(); }
+    async function loadApprovalPolicy() { try { const r = await fetchJson('/admin/auto-reply-approval-policy'); state.autoReplyApprovalPolicy = r.policy || 'high_critical'; } catch { state.autoReplyApprovalPolicy = 'high_critical'; } renderWorkflowSettings(); }
+    async function loadRoutingMode() { try { const r = await fetchJson('/admin/whatsapp-routing-mode'); state.whatsappRoutingMode = r.mode || 'per_landlord'; } catch { state.whatsappRoutingMode = 'per_landlord'; } renderWorkflowSettings(); }
     async function loadContractors() { const { items } = await fetchJson('/admin/contractors'); state.contractors = items || []; renderContractors(); }
     async function loadMaintenance(filter) {
       filter = filter || {};
@@ -5132,6 +5182,18 @@
     function renderFollowUpNudgeHours() { var el = document.getElementById('followUpNudgeHours'); if (el) el.value = state.followUpNudgeHours; var s = document.getElementById('settingsNudgeHours'); if (s) s.value = state.followUpNudgeHours; }
     function renderFollowUpMaxHours() { var el = document.getElementById('followUpMaxHours'); if (el) el.value = state.followUpMaxHours; var s = document.getElementById('settingsMaxHours'); if (s) s.value = state.followUpMaxHours; }
     function renderLeaseExpiryDays() { var el = document.getElementById('leaseExpiryDays'); if (el) el.value = state.leaseExpiryDays; var s = document.getElementById('settingsLeaseExpiryDays'); if (s) s.value = state.leaseExpiryDays; }
+    function renderWorkflowSettings() {
+      var p = document.getElementById('settingsApprovalPolicy');
+      var r = document.getElementById('settingsRoutingMode');
+      var hint = document.getElementById('settingsWorkflowHint');
+      if (p) p.value = state.autoReplyApprovalPolicy || 'high_critical';
+      if (r) r.value = state.whatsappRoutingMode || 'per_landlord';
+      if (hint) {
+        hint.textContent = state.autoReplyApprovalPolicy === 'all'
+          ? 'Every AI message requires review.'
+          : (state.autoReplyApprovalPolicy === 'off' ? 'AI sends automatically.' : 'Only high/critical are held for review.');
+      }
+    }
 
     function renderContractors() {
       var tbody = document.querySelector('#contractorTable tbody');
@@ -5163,6 +5225,15 @@
 
     function renderKanban() {
       var el = document.getElementById('maintKanban');
+      if (!state.maintenance.length) {
+        el.innerHTML = '<div class="panel" style="grid-column:1 / -1;text-align:center;padding:28px;">'
+          + '<div style="font-size:28px;margin-bottom:8px;">🛠️</div>'
+          + '<div style="font-weight:600;margin-bottom:4px;">No maintenance tickets yet</div>'
+          + '<div style="color:var(--text-muted);font-size:13px;">Ask a tenant to send a WhatsApp message to trigger the first ticket.</div>'
+          + '<div style="margin-top:10px;"><button class="btn btn-secondary btn-sm" onclick="showView(\'whatsapp\')">Check WhatsApp Connection</button></div>'
+          + '</div>';
+        return;
+      }
       var cols = ['OPEN', 'PENDING', 'IN_TRIAGE', 'SCHEDULED', 'IN_PROGRESS', 'RESOLVED'];
       var colColors = { OPEN: 'var(--warn)', PENDING: 'var(--info)', IN_TRIAGE: 'var(--accent)', SCHEDULED: 'var(--info)', IN_PROGRESS: 'var(--accent-2)', RESOLVED: 'var(--success)' };
       el.innerHTML = cols.map(function (status) {
@@ -5272,6 +5343,46 @@
       document.getElementById('statContractors').textContent = state.contractors.length;
       var activeReminders = state.reminders.filter(function (r) { return r.active !== false; }).length;
       document.getElementById('statReminders').textContent = activeReminders;
+      renderOnboardingQuickstart();
+    }
+
+    function renderOnboardingQuickstart() {
+      var panel = document.getElementById('onboardingQuickstart');
+      var checklist = document.getElementById('onboardingChecklist');
+      var actions = document.getElementById('onboardingActions');
+      if (!panel || !checklist || !actions) return;
+
+      if (localStorage.getItem(QUICKSTART_DISMISS_KEY) === '1') {
+        panel.style.display = 'none';
+        return;
+      }
+
+      var whatsappReady = state.health && state.health.whatsapp === 'connected';
+      var hasUnit = (state.units || []).length > 0;
+      var hasTenant = (state.tenants || []).length > 0;
+      var hasCoreSetup = whatsappReady && hasUnit && hasTenant;
+
+      if (hasCoreSetup) {
+        panel.style.display = 'none';
+        return;
+      }
+
+      panel.style.display = '';
+      var steps = [
+        { done: whatsappReady, label: 'Connect WhatsApp' },
+        { done: hasUnit, label: 'Add your first unit' },
+        { done: hasTenant, label: 'Add your first tenant' }
+      ];
+      checklist.innerHTML = steps.map(function (s) {
+        return '<span class="chip ' + (s.done ? 'chip-success' : 'chip-muted') + '">' + (s.done ? '✓ ' : '○ ') + s.label + '</span>';
+      }).join('');
+
+      var ctas = [];
+      if (!whatsappReady) ctas.push('<button class="btn btn-primary btn-sm" onclick="showView(\'whatsapp\')">Connect WhatsApp</button>');
+      if (!hasUnit) ctas.push('<button class="btn btn-secondary btn-sm" onclick="showView(\'units\')">Add Unit</button>');
+      if (!hasTenant) ctas.push('<button class="btn btn-secondary btn-sm" onclick="showView(\'tenants\')">Add Tenant</button>');
+      ctas.push('<button class="btn btn-ghost btn-sm" onclick="showView(\'guides\')">View 2-min Guide</button>');
+      actions.innerHTML = ctas.join('');
     }
 
     function renderHealth() {
@@ -5283,6 +5394,7 @@
       }
       apply('connLlm', state.health.llm || 'unknown');
       apply('connWhatsapp', state.health.whatsapp || 'unknown');
+      renderOnboardingQuickstart();
     }
 
     function renderWebhookStatus() {
@@ -6113,6 +6225,10 @@
     // Refresh buttons
     document.getElementById('refreshBtn').addEventListener('click', function () { loadAll(); toast('Refreshed'); });
     document.getElementById('addUnitShortcut').addEventListener('click', function () { showView('units'); });
+    document.getElementById('dismissQuickstart').addEventListener('click', function () {
+      localStorage.setItem(QUICKSTART_DISMISS_KEY, '1');
+      renderOnboardingQuickstart();
+    });
     document.getElementById('refreshUnits').addEventListener('click', loadUnits);
     document.getElementById('refreshTenants').addEventListener('click', loadTenants);
     document.getElementById('refreshContractors').addEventListener('click', loadContractors);
@@ -6170,6 +6286,7 @@
       if (tog) tog.checked = state.autoReplyGlobalEnabled;
       var stat = document.getElementById('globalAutoReplyStatusSettings');
       if (stat) { stat.textContent = state.autoReplyGlobalEnabled ? 'Active' : 'Paused'; stat.className = 'chip ' + (state.autoReplyGlobalEnabled ? 'chip-success' : 'chip-muted'); }
+      renderWorkflowSettings();
       // Theme label
       var theme = document.documentElement.getAttribute('data-theme') || 'light';
       var ti = document.getElementById('settingsThemeIcon'); if (ti) ti.textContent = theme === 'dark' ? '☀️' : '🌙';
@@ -6208,6 +6325,29 @@
         renderFollowUpNudgeHours(); renderFollowUpMaxHours(); renderLeaseExpiryDays(); renderSettingsPage();
         toast('Timing settings saved');
       } catch (err) { toast('Failed: ' + err.message); }
+    });
+
+    document.getElementById('saveSettingsWorkflow').addEventListener('click', async function () {
+      var policy = document.getElementById('settingsApprovalPolicy').value;
+      var mode = document.getElementById('settingsRoutingMode').value;
+      try {
+        await fetchJson('/admin/auto-reply-approval-policy', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ policy: policy })
+        });
+        await fetchJson('/admin/whatsapp-routing-mode', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: mode })
+        });
+        state.autoReplyApprovalPolicy = policy;
+        state.whatsappRoutingMode = mode;
+        renderWorkflowSettings();
+        toast('Workflow settings saved');
+      } catch (err) {
+        toast('Failed: ' + err.message);
+      }
     });
 
     // Maintenance view toggle
@@ -6818,6 +6958,7 @@
       loadUnits().then(function () { fillUnitSelects(); });
       loadTenants(); loadAutoReplySettings(); loadAutoReplyDelay(); loadAutoReplyCooldown(); loadLandlordActiveWindow();
       loadFollowUpNudgeHours(); loadFollowUpMaxHours(); loadLeaseExpiryDays();
+      loadApprovalPolicy(); loadRoutingMode();
       loadContractors(); loadMaintenance(); loadUtilities(); loadUtilCreds(); loadGreenButtonData();
       loadHealth(); loadWebhookStatus(); loadReminders(); loadAccount();
       loadUsageStats(); loadExpiringLeases();

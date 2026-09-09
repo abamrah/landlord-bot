@@ -144,6 +144,45 @@ function isValidTenantDraft(draft: string): boolean {
   return !invalidPatterns.some((p) => p.test(lower));
 }
 
+function shouldHoldForApproval(policy: "high_critical" | "all" | "off", severity: string): boolean {
+  if (policy === "off") return false;
+  if (policy === "all") return true;
+  const normalized = (severity || "").toLowerCase();
+  return normalized === "high" || normalized === "critical";
+}
+
+async function resolveSharedNumberTenant(phone: string): Promise<{
+  tenant: Awaited<ReturnType<typeof repo.findTenantByPhone>> | null;
+  ambiguous: boolean;
+  candidateCount: number;
+}> {
+  const matches = await repo.findTenantsByPhone(phone);
+  if (!matches.length) return { tenant: null, ambiguous: false, candidateCount: 0 };
+  if (matches.length === 1) return { tenant: matches[0], ambiguous: false, candidateCount: 1 };
+
+  const now = new Date();
+  const activeCandidates = (
+    await Promise.all(
+      matches.map(async (candidate) => {
+        const activeLease = await db.unitTenant.findFirst({
+          where: {
+            tenantId: candidate.id,
+            OR: [{ endDate: null }, { endDate: { gte: now } }],
+          },
+          orderBy: { startDate: "desc" },
+        });
+        return activeLease ? candidate : null;
+      }),
+    )
+  ).filter(Boolean);
+
+  if (activeCandidates.length === 1) {
+    return { tenant: activeCandidates[0], ambiguous: false, candidateCount: matches.length };
+  }
+
+  return { tenant: null, ambiguous: true, candidateCount: matches.length };
+}
+
 const router = express.Router();
 
 // Twilio signature verification middleware.
@@ -616,6 +655,8 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
   const landlordId = bucket.landlordId || tenant.landlordId || "";
   const globalAutoReply = await repo.getGlobalAutoReplyEnabled(landlordId);
   const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
+  const approvalPolicySetting = await repo.getAutoReplyApprovalPolicy(landlordId);
+  const approvalPolicy = approvalPolicySetting.policy;
 
   // eslint-disable-next-line no-console
   console.info("flushTenantReply: processing", {
@@ -786,7 +827,7 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
           autopilotEnabled: true,
         });
       }
-      const isHighCriticalBatch = batchSeverity === "high" || batchSeverity === "critical";
+      const holdForApprovalBatch = shouldHoldForApproval(approvalPolicy, batchSeverity);
 
       // ── Auto-reply status: generated (agentic batch) ──
       if (draftText) {
@@ -806,7 +847,7 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
         }
       }
 
-      if (draftText && canAutoReply && !isHighCriticalBatch) {
+      if (draftText && canAutoReply && !holdForApprovalBatch) {
         const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
         if (!sendResult.ok) {
           // eslint-disable-next-line no-console
@@ -846,10 +887,10 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
             }
           }
         }
-      } else if (isHighCriticalBatch && draftText) {
-        // HIGH/CRITICAL: Hold the auto-reply for landlord approval
+      } else if (holdForApprovalBatch && draftText) {
+        // Configured policy: hold the auto-reply for landlord approval
         // eslint-disable-next-line no-console
-        console.info("auto-reply HELD for landlord approval (agentic batch)", { tenantId: tenant.id, severity: batchSeverity });
+        console.info("auto-reply HELD for landlord approval (agentic batch)", { tenantId: tenant.id, severity: batchSeverity, policy: approvalPolicy });
         // Store the draft in the maintenance record so approve/deny can forward it
         if (latestRecord?.id) {
           await repo.updateMaintenanceAnalysis({ id: latestRecord.id, aiDraft: { draft: draftText } as any });
@@ -895,9 +936,9 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
         tenantId: tenant.id,
         tenantPhone: tenant.phone || bucket.replyTo,
         message: combinedMessage,
-        category: isHighCriticalBatch ? "urgent_maintenance" : "maintenance",
+        category: holdForApprovalBatch ? "urgent_maintenance" : "maintenance",
         severity: batchSeverity,
-        autoReplySent: Boolean(draftText && canAutoReply && !isHighCriticalBatch),
+        autoReplySent: Boolean(draftText && canAutoReply && !holdForApprovalBatch),
         aiDraft: draftText,
         maintenanceId: latestRecord?.id,
       });
@@ -981,7 +1022,7 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
   const triageJson: any = record?.triageJson || triage || {};
   const aiDraft: any = record?.aiDraft || draftResponse || {};
   const linearBatchSeverity = (triageJson?.classification?.severity || "normal").toString().toLowerCase();
-  const isHighCriticalLinearBatch = linearBatchSeverity === "high" || linearBatchSeverity === "critical";
+  const holdForApprovalLinearBatch = shouldHoldForApproval(approvalPolicy, linearBatchSeverity);
 
   // ── Auto-reply status: generated (linear batch) ──
   if (draftText) {
@@ -990,7 +1031,7 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
     });
   }
 
-  if (draftText && canAutoReply && !isHighCriticalLinearBatch) {
+  if (draftText && canAutoReply && !holdForApprovalLinearBatch) {
     const sendResult = await whatsappService.sendWhatsAppText({ to: bucket.replyTo, text: draftText, landlordId });
     if (!sendResult.ok) {
       // eslint-disable-next-line no-console
@@ -1010,9 +1051,9 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
       console.info("auto-reply sent (linear batch)", { tenantId: tenant.id, replyTo: bucket.replyTo });
       broadcastAutoReplyStatus(landlordId, record?.id, tenant.id, "sent", { tenantName: tenant.name });
     }
-  } else if (isHighCriticalLinearBatch && draftText) {
-    // HIGH/CRITICAL: Hold the auto-reply for landlord approval
-    console.info("auto-reply HELD for landlord approval (linear batch)", { tenantId: tenant.id, severity: linearBatchSeverity });
+  } else if (holdForApprovalLinearBatch && draftText) {
+    // Configured policy: hold the auto-reply for landlord approval
+    console.info("auto-reply HELD for landlord approval (linear batch)", { tenantId: tenant.id, severity: linearBatchSeverity, policy: approvalPolicy });
     if (record?.id) {
       await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: draftText } as any });
     }
@@ -1052,9 +1093,9 @@ async function flushTenantReply(params: { bucketKey: string; tenantId: string })
       tenantId: tenant.id,
       tenantPhone: tenant.phone || bucket.replyTo,
       message: combinedMessage,
-      category: isHighCriticalLinearBatch ? "urgent_maintenance" : "maintenance",
+      category: holdForApprovalLinearBatch ? "urgent_maintenance" : "maintenance",
       severity: linearBatchSeverity,
-      autoReplySent: Boolean(draftText && canAutoReply && !isHighCriticalLinearBatch),
+      autoReplySent: Boolean(draftText && canAutoReply && !holdForApprovalLinearBatch),
       aiDraft: draftText,
       maintenanceId: record?.id,
     });
@@ -1104,6 +1145,33 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     let instanceLandlord = instanceName ? await resolveLandlordByInstance(instanceName) : null;
 
     let resolvedLandlordId = instanceLandlord?.id || "";
+    const globalRoutingSetting = await repo.getWhatsAppRoutingMode();
+    const landlordRoutingSetting = instanceLandlord?.id
+      ? await repo.getWhatsAppRoutingMode(instanceLandlord.id)
+      : null;
+    const routingMode = landlordRoutingSetting?.mode === "shared_number" || globalRoutingSetting.mode === "shared_number"
+      ? "shared_number"
+      : "per_landlord";
+    let sharedResolvedTenant: Awaited<ReturnType<typeof repo.findTenantByPhone>> | null = null;
+
+    if (!isGroup && routingMode === "shared_number" && !instanceLandlord) {
+      const sharedResolution = await resolveSharedNumberTenant(sender);
+      if (sharedResolution.ambiguous) {
+        console.warn("shared-number routing ambiguous sender", {
+          sender,
+          candidateCount: sharedResolution.candidateCount,
+        });
+        return res.json({
+          ok: true,
+          ignored: "ambiguous_tenant_match",
+          candidateCount: sharedResolution.candidateCount,
+        });
+      }
+      sharedResolvedTenant = sharedResolution.tenant;
+      if (sharedResolvedTenant?.landlordId) {
+        resolvedLandlordId = sharedResolvedTenant.landlordId;
+      }
+    }
 
     // ── Group message handling ──
     // If the message comes from a known unit WhatsApp group, route it to the
@@ -1169,6 +1237,13 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     const effectiveLandlordId = resolvedLandlordId || "";
 
     let ctx = await resolveContext(sender);
+    if (sharedResolvedTenant) {
+      ctx = {
+        role: "tenant",
+        landlordId: sharedResolvedTenant.landlordId || null,
+        entity: sharedResolvedTenant,
+      };
+    }
     // If sender is unknown but we know the instance, resolve via instance owner
     if (ctx.role === "unknown" && instanceLandlord) {
       // Sender is a tenant/unknown person messaging a landlord's WhatsApp — treat as tenant
@@ -1470,7 +1545,9 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     // Scope tenant lookup to THIS landlord's instance to prevent cross-tenant data leaks
     // For group messages, first try to resolve the participant from the unit's tenant list
     // (more reliable than phone matching since we already confirmed the group JID)
-    let tenant: Awaited<ReturnType<typeof repo.findTenantByPhone>> = null;
+    let tenant: Awaited<ReturnType<typeof repo.findTenantByPhone>> = !isGroup && sharedResolvedTenant
+      ? sharedResolvedTenant
+      : null;
     if (isGroup && groupUnit?.tenants?.length) {
       const senderDigits = sender.replace(/\D/g, "");
       for (const ut of groupUnit.tenants) {
@@ -1975,6 +2052,8 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     const conversationLog = Array.isArray(record?.chatLog) ? (record?.chatLog as any[]) : [];
+    const approvalPolicySetting = await repo.getAutoReplyApprovalPolicy(tenantLandlordId);
+    const approvalPolicy = approvalPolicySetting.policy;
 
     // ── AGENTIC IMMEDIATE PATH ──
     // Guard: if we already sent a reply to this tenant in the last 30s (e.g., via
@@ -2076,7 +2155,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         const globalAutoReply = await repo.getGlobalAutoReplyEnabled(tenantLandlordId);
         const canAutoReply = globalAutoReply.enabled && tenant.autoReplyEnabled !== false;
         const agentSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
-        const isHighCriticalImm = agentSeverity === "high" || agentSeverity === "critical";
+        const holdForApprovalImm = shouldHoldForApproval(approvalPolicy, agentSeverity);
 
         // ── Auto-reply status: generated (agentic immediate) ──
         if (agentDraft) {
@@ -2085,7 +2164,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           });
         }
 
-        if (agentDraft && canAutoReply && !isHighCriticalImm) {
+        if (agentDraft && canAutoReply && !holdForApprovalImm) {
           const sendResult = await whatsappService.sendWhatsAppText({ to: replyTo, text: agentDraft, landlordId: tenantLandlordId });
           if (!sendResult.ok) {
             // eslint-disable-next-line no-console
@@ -2124,10 +2203,10 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
               }
             }
           }
-        } else if (isHighCriticalImm && agentDraft) {
-          // HIGH/CRITICAL: Hold the auto-reply for landlord approval
+        } else if (holdForApprovalImm && agentDraft) {
+          // Configured policy: hold the auto-reply for landlord approval
           // eslint-disable-next-line no-console
-          console.info("auto-reply HELD for landlord approval (agentic immediate)", { tenantId: tenant.id, severity: agentSeverity });
+          console.info("auto-reply HELD for landlord approval (agentic immediate)", { tenantId: tenant.id, severity: agentSeverity, policy: approvalPolicy });
           // Store the draft so approve/deny can forward it
           if (record?.id) {
             await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: agentDraft } as any });
@@ -2149,7 +2228,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
           steps: agentResult.steps.length,
           autoReplySent,
           severity: agentSeverity,
-          heldForApproval: isHighCriticalImm,
+          heldForApproval: holdForApprovalImm,
         });
 
         // Notify landlord about tenant message (agentic path)
@@ -2230,7 +2309,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
     }
 
     const linearImmSeverity = (triage?.classification?.severity || "normal").toString().toLowerCase();
-    const isHighCriticalLinearImm = linearImmSeverity === "high" || linearImmSeverity === "critical";
+    const holdForApprovalLinearImm = shouldHoldForApproval(approvalPolicy, linearImmSeverity);
 
     // ── Auto-reply status: generated (linear immediate) ──
     if (draftText) {
@@ -2239,7 +2318,7 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
       });
     }
 
-    if (draftText && canAutoReply && !isHighCriticalLinearImm) {
+    if (draftText && canAutoReply && !holdForApprovalLinearImm) {
       const sendResult = await whatsappService.sendWhatsAppText({
         to: replyTo,
         text: draftText,
@@ -2256,9 +2335,9 @@ const evolutionWebhookHandler: express.RequestHandler = async (req, res) => {
         autoReplyReason = "draft_sent";
         broadcastAutoReplyStatus(tenantLandlordId, record?.id, tenant.id, "sent", { tenantName: tenant.name });
       }
-    } else if (isHighCriticalLinearImm && draftText) {
-      // HIGH/CRITICAL: Hold the auto-reply for landlord approval
-      console.info("auto-reply HELD for landlord approval (linear immediate)", { tenantId: tenant.id, severity: linearImmSeverity });
+    } else if (holdForApprovalLinearImm && draftText) {
+      // Configured policy: hold the auto-reply for landlord approval
+      console.info("auto-reply HELD for landlord approval (linear immediate)", { tenantId: tenant.id, severity: linearImmSeverity, policy: approvalPolicy });
       if (record?.id) {
         await repo.updateMaintenanceAnalysis({ id: record.id, aiDraft: { draft: draftText } as any });
       }
