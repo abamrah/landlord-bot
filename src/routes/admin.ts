@@ -59,6 +59,8 @@ const tenantSchema = z.object({
   role: z.enum(["tenant", "resident"]).optional(),
   utilitySharePercent: z.number().min(0).max(100).optional(),
   rentAmountCents: z.number().int().min(0).optional(),
+  leaseEnd: z.string().optional(),
+  rentDueDay: z.number().int().min(1).max(31).optional(),
 });
 
 const tenantUpdateSchema = z.object({
@@ -3443,6 +3445,36 @@ router.get("/portfolio", async (req, res) => {
   }
 });
 
+// ── Approval Queue ─────────────────────────────────────────
+/** GET /admin/approval-queue — Maintenance requests with AI drafts awaiting landlord action */
+router.get("/approval-queue", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    const requests = await db.maintenanceRequest.findMany({
+      where: {
+        landlordId: authReq.landlordId,
+        aiDraft: { not: null },
+        status: { in: [MaintenanceStatus.OPEN, MaintenanceStatus.IN_TRIAGE, MaintenanceStatus.PENDING] },
+        NOT: { autopilotStatus: "landlord_skipped" },
+      },
+      include: {
+        tenant: { select: { id: true, name: true, phone: true } },
+        unit: { select: { id: true, label: true, address: true } },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+    const queue = requests.filter((r) => {
+      const chatLog = Array.isArray(r.chatLog) ? (r.chatLog as any[]) : [];
+      if (chatLog.length === 0) return true;
+      const last = chatLog[chatLog.length - 1];
+      return last?.role === "ai" || last?.role === "system";
+    });
+    res.json({ queue, count: queue.length });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 // ═══════════════════════════════════════════════════════════
 //  FINANCIAL RECORDS ENDPOINTS
 // ═══════════════════════════════════════════════════════════
@@ -3511,6 +3543,20 @@ router.delete("/financial/records/:id", async (req, res) => {
     });
     if (!record) return res.status(404).json({ error: "not_found" });
     await db.financialRecord.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+/** PATCH /admin/approval-queue/:id/skip — Mark a draft as skipped by landlord */
+router.patch("/approval-queue/:id/skip", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  try {
+    await db.maintenanceRequest.updateMany({
+      where: { id: req.params.id, landlordId: authReq.landlordId },
+      data: { autopilotStatus: "landlord_skipped" },
+    });
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
@@ -3805,6 +3851,31 @@ router.post("/notices/generate", async (req, res) => {
       fileName,
       pdfBase64: pdfBuffer.toString("base64"),
     });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+// ── Profile Update ─────────────────────────────────────────
+/** PATCH /admin/profile — Update landlord profile fields */
+router.patch("/profile", async (req, res) => {
+  const authReq = req as unknown as AuthRequest;
+  const schema = z.object({
+    name: z.string().min(1).optional(),
+    company: z.string().optional(),
+    phone: z.string().optional(),
+    province: z.string().optional(),
+    timezone: z.string().optional(),
+  });
+  const parsed = schema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "validation_failed", details: parsed.error.flatten() });
+  try {
+    const updated = await db.landlord.update({
+      where: { id: authReq.landlordId },
+      data: parsed.data,
+      select: { id: true, name: true, company: true, phone: true, province: true, timezone: true },
+    });
+    res.json({ ok: true, landlord: updated });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }

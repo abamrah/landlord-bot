@@ -2507,6 +2507,7 @@
     <a class="nav-item" data-target="leases">📋 <span>Leases</span></a>
     <div class="nav-title">Operations</div>
     <a class="nav-item" data-target="maintenance">🛠️ <span>Maintenance</span></a>
+    <a class="nav-item" data-target="review-queue" id="reviewQueueNavItem">✅ <span>Review Queue <span id="reviewQueueBadge" style="display:none;background:var(--accent);color:#000;border-radius:10px;font-size:11px;font-weight:700;padding:1px 6px;margin-left:4px;">0</span></span></a>
     <a class="nav-item" data-target="contractors">🧰 <span>Contractors</span></a>
     <a class="nav-item" data-target="rent-collection">🏦 <span>Rent Collection</span></a>
     <a class="nav-item" data-target="screening">🔍 <span>Screening</span></a>
@@ -2850,6 +2851,20 @@
         </div>
       </section>
 
+      <!-- ═══════════════════ REVIEW QUEUE ═══════════════════ -->
+      <section id="review-queue" class="section">
+        <div class="section-header">
+          <h2>Review Queue <span id="reviewQueueCount" style="font-size:14px;color:var(--text-muted);font-weight:400;"></span></h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadApprovalQueue()">↻ Refresh</button>
+        </div>
+        <div id="reviewQueueEmpty" style="display:none;padding:48px;text-align:center;color:var(--text-muted);">
+          <div style="font-size:48px;margin-bottom:12px;">✅</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px;">All caught up</div>
+          <div style="font-size:13px;">No AI drafts are waiting for your review.</div>
+        </div>
+        <div id="reviewQueueList"></div>
+      </section>
+
       <!-- ═══════════════════ TENANTS ═══════════════════ -->
       <section id="tenants" class="section">
         <div class="section-header">
@@ -2882,6 +2897,7 @@
                 id="tenantSharePercent" type="number" min="0" max="100" placeholder="e.g. 50" /></div>
             <div class="form-field"><label>Monthly Rent ($)</label><input id="tenantRentAmount" type="number" min="0"
                 step="0.01" placeholder="e.g. 1500" /></div>
+            <div class="form-field"><label>Lease End Date</label><input id="tenantLeaseEnd" type="date" /></div>
             <button class="btn btn-primary" id="createTenantBtn" style="align-self:end;">+ Add Tenant</button>
           </div>
         </div>
@@ -2918,9 +2934,13 @@
       <!-- ═══════════════════ UNITS ═══════════════════ -->
       <section id="units" class="section">
         <div class="section-header">
-          <h2>Properties &amp; Units<a class="help-tip" onclick="openGuideFor('guideUnits')"
+          <h2>Properties &amp; Units <span id="unitsUsageCounter" style="font-size:13px;color:var(--text-muted);font-weight:400;"></span><a class="help-tip" onclick="openGuideFor('guideUnits')"
               title="Properties & units guide">?</a></h2>
           <button class="btn btn-secondary btn-sm" id="refreshUnits">↻</button>
+        </div>
+        <div id="unitPlanLimitBanner" style="display:none;background:rgba(245,158,11,.1);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;">
+          <strong>Unit limit reached.</strong> You've used all units on your current plan.
+          <button class="btn btn-primary btn-sm" style="margin-left:10px;" onclick="upgradePlan('PRO')">Upgrade to PRO</button>
         </div>
 
         <!-- Property creation -->
@@ -3703,6 +3723,14 @@
           </div>
         </div>
 
+        <!-- Empty state shown when WhatsApp not yet connected -->
+        <div id="waNotConnectedState" style="display:none;text-align:center;padding:32px;background:var(--surface);border-radius:var(--radius);border:1px dashed var(--border-light);margin-bottom:16px;">
+          <div style="font-size:36px;margin-bottom:8px;">💬</div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Connect WhatsApp to get started</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Scan the QR code above to link your WhatsApp account. Tenants can then message you and the AI agent will handle triage and replies.</div>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('waConnectBtn').click()">Connect Now</button>
+        </div>
+
         <!-- AI Quick Chat (available once WhatsApp connected) -->
         <div class="panel panel-sm" id="waNestMindChat" style="margin-bottom:16px;display:none;">
           <div class="panel-header">
@@ -3764,7 +3792,15 @@
                 id="reminderAmount" type="number" min="0" step="0.01" placeholder="Auto from bills" /></div>
             <div class="form-field"><label>Day</label><input id="reminderDay" type="number" min="1" max="28"
                 placeholder="1-28" /></div>
-            <div class="form-field"><label>Time (local)</label><input id="reminderTime" placeholder="14:00" /></div>
+            <div class="form-field"><label>Local Time</label><input id="reminderTime" placeholder="14:00" /></div>
+            <div class="form-field"><label>Timezone</label><select id="reminderTimezone">
+                <option value="America/Toronto">Eastern (Toronto)</option>
+                <option value="America/Vancouver">Pacific (Vancouver)</option>
+                <option value="America/Edmonton">Mountain (Edmonton)</option>
+                <option value="America/Winnipeg">Central (Winnipeg)</option>
+                <option value="America/Halifax">Atlantic (Halifax)</option>
+                <option value="UTC">UTC</option>
+              </select></div>
             <div class="form-field"><label>Style</label><select id="reminderStyle">
                 <option value="short">Short</option>
                 <option value="medium">Medium</option>
@@ -4280,8 +4316,27 @@
           <div class="panel">
             <div class="panel-header">
               <h3>Profile</h3>
+              <button class="btn btn-secondary btn-sm" id="editProfileBtn" onclick="toggleProfileEdit()">Edit</button>
             </div>
             <div id="acctProfile" style="color:var(--text-secondary)">Loading...</div>
+            <form id="profileEditForm" style="display:none;margin-top:12px;" onsubmit="saveProfile(event)">
+              <div class="form-field" style="margin-bottom:8px;"><label>Name</label><input id="profileName" /></div>
+              <div class="form-field" style="margin-bottom:8px;"><label>Company</label><input id="profileCompany" /></div>
+              <div class="form-field" style="margin-bottom:8px;"><label>Phone</label><input id="profilePhone" /></div>
+              <div class="form-field" style="margin-bottom:8px;"><label>Province</label>
+                <select id="profileProvince">
+                  <option value="ON">Ontario (ON)</option><option value="BC">British Columbia (BC)</option>
+                  <option value="AB">Alberta (AB)</option><option value="SK">Saskatchewan (SK)</option>
+                  <option value="MB">Manitoba (MB)</option><option value="QC">Quebec (QC)</option>
+                  <option value="NS">Nova Scotia (NS)</option><option value="NB">New Brunswick (NB)</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleProfileEdit()">Cancel</button>
+              </div>
+              <div id="profileSaveStatus" style="font-size:12px;color:var(--text-muted);margin-top:6px;"></div>
+            </form>
           </div>
           <div class="panel">
             <div class="panel-header">
@@ -4470,6 +4525,7 @@
         <a class="mobile-nav-item" data-section="leases"><span class="nav-emoji">📋</span> Leases</a>
         <div class="mobile-nav-title">Operations</div>
         <a class="mobile-nav-item" data-section="maintenance"><span class="nav-emoji">🛠️</span> Maintenance</a>
+        <a class="mobile-nav-item" data-section="review-queue"><span class="nav-emoji">✅</span> Review Queue</a>
         <a class="mobile-nav-item" data-section="contractors"><span class="nav-emoji">🧰</span> Contractors</a>
         <a class="mobile-nav-item" data-section="rent-collection"><span class="nav-emoji">🏦</span> Rent Collection</a>
         <a class="mobile-nav-item" data-section="screening"><span class="nav-emoji">🔍</span> Screening</a>
@@ -4625,6 +4681,19 @@
         <h3 id="drawerTitle">Ticket Details</h3><button class="btn btn-ghost" id="drawerClose">✕</button>
       </div>
       <div id="drawerContent"></div>
+    </div>
+  </div>
+
+  <!-- TENANT CONVERSATION DRAWER -->
+  <div class="drawer-backdrop" id="convDrawer" onclick="if(event.target===this)closeConvDrawer()">
+    <div class="drawer">
+      <div class="drawer-header">
+        <h3 id="convDrawerTitle">Conversation</h3>
+        <button class="btn btn-ghost" onclick="closeConvDrawer()">✕</button>
+      </div>
+      <div id="convDrawerContent" style="padding:12px;overflow-y:auto;max-height:calc(100vh - 80px);">
+        <div style="color:var(--text-muted);text-align:center;padding:40px;">Loading...</div>
+      </div>
     </div>
   </div>
 
@@ -5032,6 +5101,7 @@
           '</div>' +
           '<div class="actions-cell">' +
           (t.phone ? '<button class="btn btn-primary btn-sm tenant-msg-btn" data-id="' + t.id + '" data-name="' + t.name + '" data-phone="' + (t.phone || '') + '">💬 Message</button>' : '') +
+          (t.phone ? '<button class="btn btn-ghost btn-sm" onclick="openTenantConversation(\'' + encodeURIComponent(t.phone) + '\', \'' + t.name.replace(/'/g, '') + '\')">💬 Chat</button>' : '') +
           leaseUploadBtn +
           '<button class="btn btn-ghost btn-sm tenant-edit" data-id="' + t.id + '">Edit</button>' +
           '<button class="btn btn-danger btn-sm tenant-delete" data-id="' + t.id + '">Delete</button>' +
@@ -6899,6 +6969,8 @@
     async function loadAccount() {
       try {
         var me = await fetchJson('/auth/me');
+        // Populate _profileData so toggleProfileEdit() pre-fills correctly
+        _profileData = { name: me.landlord.name, company: me.landlord.company, phone: me.landlord.phone, province: me.landlord.province };
         document.getElementById('acctProfile').innerHTML =
           '<div style="font-size:16px;font-weight:700;margin-bottom:4px;">' + (me.landlord.name || 'N/A') + '</div>' +
           '<div style="color:var(--text-muted)">' + me.landlord.email + '</div>' +
@@ -8172,6 +8244,7 @@
       var titles = {
         mission: 'Dashboard', maintenance: 'Maintenance', tenants: 'Tenants',
         units: 'Units', contractors: 'Contractors', utilities: 'Utilities', financials: 'Financials',
+        'review-queue': 'Review Queue',
         agent: 'AI Agent', usage: 'AI Usage', whatsapp: 'WhatsApp',
         reminders: 'Reminders', leases: 'Leases', guides: 'Tips & Guides', account: 'Account',
         settings: 'Settings', 'rent-collection': 'Rent Collection', screening: 'Screening'
@@ -8240,6 +8313,357 @@
       backdrop.classList.remove('open');
       if (_approvalResolve) { _approvalResolve(text); _approvalResolve = null; }
     });
+
+    // ═══════════════════════════════════════════════════════════
+    //  REVIEW QUEUE
+    // ═══════════════════════════════════════════════════════════
+    async function loadApprovalQueue() {
+      try {
+        var data = await fetchJson('/admin/approval-queue');
+        var queue = data.queue || [];
+        updateApprovalBadge(queue.length);
+        var el = document.getElementById('reviewQueueList');
+        var empty = document.getElementById('reviewQueueEmpty');
+        var counter = document.getElementById('reviewQueueCount');
+        counter.textContent = queue.length ? '(' + queue.length + ' pending)' : '';
+        if (!queue.length) { el.innerHTML = ''; empty.style.display = ''; return; }
+        empty.style.display = 'none';
+        var confidenceChip = function(c) {
+          var map = { high: ['var(--success)', '#000', '✓ High confidence'], medium: ['var(--warn)', '#000', '~ Medium'], low: ['var(--danger)', '#fff', '⚠ Low confidence'] };
+          var m = map[c] || map.medium;
+          return '<span style="background:' + m[0] + ';color:' + m[1] + ';border-radius:10px;font-size:11px;font-weight:600;padding:2px 8px;">' + m[2] + '</span>';
+        };
+        el.innerHTML = queue.map(function(r) {
+          var draft = (r.aiDraft && r.aiDraft.draft) || '';
+          var conf = (r.aiDraft && r.aiDraft.confidence) || 'medium';
+          var sev = ((r.triageJson && r.triageJson.classification && r.triageJson.classification.severity) || r.priority || 'NORMAL').toLowerCase();
+          var sevColors = { critical: 'var(--danger)', high: '#f97316', normal: 'var(--info)', low: 'var(--text-muted)' };
+          var elapsed = r.createdAt ? Math.round((Date.now() - new Date(r.createdAt)) / 60000) + 'm ago' : '';
+          return '<div class="panel panel-sm" style="margin-bottom:12px;" data-req-id="' + r.id + '">' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">' +
+            '<div>' +
+            '<div style="font-weight:600;font-size:14px;">' + (r.tenant ? r.tenant.name : 'Unknown') + ' &middot; ' + (r.unit ? r.unit.label : '—') + '</div>' +
+            '<div style="font-size:12px;color:var(--text-muted);">' + elapsed + '</div>' +
+            '</div>' +
+            '<div style="display:flex;gap:6px;align-items:center;">' +
+            '<span style="font-size:11px;font-weight:700;color:' + (sevColors[sev] || 'var(--text)') + ';text-transform:uppercase;">' + sev + '</span>' +
+            confidenceChip(conf) +
+            '</div>' +
+            '</div>' +
+            '<div style="font-size:13px;color:var(--text-secondary);background:var(--surface-2);border-radius:6px;padding:8px 10px;margin-bottom:8px;border-left:3px solid var(--border-light);">' +
+            '<div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">Tenant message</div>' +
+            (r.message || '').slice(0, 200) +
+            '</div>' +
+            '<div style="font-size:13px;background:var(--accent-dim);border-radius:6px;padding:8px 10px;margin-bottom:10px;border-left:3px solid var(--accent);">' +
+            '<div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">AI draft reply</div>' +
+            (draft || '<em style="color:var(--text-muted)">No draft</em>') +
+            '</div>' +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary btn-sm" onclick="queueApprove(\'' + r.id + '\', ' + JSON.stringify(draft).replace(/"/g, '&quot;') + ')">✓ Approve & Send</button>' +
+            '<button class="btn btn-secondary btn-sm" onclick="queueEdit(\'' + r.id + '\', ' + JSON.stringify(draft).replace(/"/g, '&quot;') + ')">✏ Edit & Send</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="queueSkip(\'' + r.id + '\')">Skip</button>' +
+            '</div>' +
+            '</div>';
+        }).join('');
+      } catch(e) { console.error('Approval queue error', e); }
+    }
+
+    function updateApprovalBadge(count) {
+      var badge = document.getElementById('reviewQueueBadge');
+      if (!badge) return;
+      if (count > 0) { badge.textContent = count; badge.style.display = ''; }
+      else { badge.style.display = 'none'; }
+    }
+
+    async function queueApprove(id, draft) {
+      try {
+        await fetchJson('/maintenance/' + id + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'landlord', content: draft }) });
+        toast('Reply sent'); loadApprovalQueue();
+      } catch(e) { toast('Failed: ' + e.message); }
+    }
+
+    async function queueEdit(id, draft) {
+      var edited = await openApprovalModal(draft);
+      if (!edited) return;
+      await queueApprove(id, edited);
+    }
+
+    async function queueSkip(id) {
+      try {
+        await fetchJson('/admin/approval-queue/' + id + '/skip', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+        toast('Skipped'); loadApprovalQueue();
+      } catch(e) { toast('Failed: ' + e.message); }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  TENANT CONVERSATION VIEW
+    // ═══════════════════════════════════════════════════════════
+    async function openTenantConversation(encodedPhone, name) {
+      var phone = decodeURIComponent(encodedPhone);
+      var drawer = document.getElementById('convDrawer');
+      var content = document.getElementById('convDrawerContent');
+      var title = document.getElementById('convDrawerTitle');
+      title.textContent = name ? name + ' — Chat' : 'Conversation';
+      content.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:40px;">Loading...</div>';
+      drawer.classList.add('open');
+      try {
+        var data = await fetchJson('/admin/conversations/' + encodeURIComponent(phone));
+        var msgs = data.messages || data || [];
+        if (!msgs.length) { content.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:40px;">No messages yet.</div>'; return; }
+        var roleStyles = {
+          tenant: 'background:var(--surface-2);border-left:3px solid var(--info);',
+          ai: 'background:var(--accent-dim);border-left:3px solid var(--accent);',
+          landlord: 'background:var(--surface-3);border-left:3px solid var(--accent-2);',
+          system: 'background:var(--surface);border-left:3px solid var(--border);'
+        };
+        content.innerHTML = msgs.map(function(m) {
+          var s = roleStyles[m.role] || roleStyles.system;
+          var when = m.createdAt ? new Date(m.createdAt).toLocaleString() : '';
+          return '<div style="' + s + 'border-radius:6px;padding:8px 12px;margin-bottom:8px;">' +
+            '<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:flex;justify-content:space-between;">' +
+            '<strong>' + (m.role || '?').toUpperCase() + '</strong><span>' + when + '</span>' +
+            '</div>' +
+            '<div style="font-size:13px;">' + (m.content || '').replace(/</g, '&lt;') + '</div>' +
+            '</div>';
+        }).join('');
+      } catch(e) { content.innerHTML = '<div style="color:var(--danger);padding:20px;">Failed to load: ' + e.message + '</div>'; }
+    }
+
+    function closeConvDrawer() {
+      document.getElementById('convDrawer').classList.remove('open');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  PROFILE EDIT
+    // ═══════════════════════════════════════════════════════════
+    var _profileData = {};
+    function toggleProfileEdit() {
+      var form = document.getElementById('profileEditForm');
+      var showing = form.style.display !== 'none';
+      if (showing) { form.style.display = 'none'; return; }
+      document.getElementById('profileName').value = _profileData.name || '';
+      document.getElementById('profileCompany').value = _profileData.company || '';
+      document.getElementById('profilePhone').value = _profileData.phone || '';
+      document.getElementById('profileProvince').value = _profileData.province || 'ON';
+      form.style.display = '';
+    }
+
+    async function saveProfile(e) {
+      e.preventDefault();
+      var status = document.getElementById('profileSaveStatus');
+      status.textContent = 'Saving...';
+      try {
+        var r = await fetchJson('/admin/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: document.getElementById('profileName').value.trim(), company: document.getElementById('profileCompany').value.trim(), phone: document.getElementById('profilePhone').value.trim(), province: document.getElementById('profileProvince').value }) });
+        _profileData = Object.assign(_profileData, r.landlord);
+        document.getElementById('profileEditForm').style.display = 'none';
+        status.textContent = '';
+        loadAccount();
+        toast('Profile saved');
+      } catch(e) { status.textContent = 'Failed: ' + e.message; }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  UNIT PLAN LIMIT
+    // ═══════════════════════════════════════════════════════════
+    async function loadUnitPlanLimits() {
+      try {
+        var me = await fetchJson('/auth/me');
+        var used = (me.usage && me.usage.units) || 0;
+        var max = (me.limits && me.limits.maxUnits) || Infinity;
+        var counter = document.getElementById('unitsUsageCounter');
+        if (counter) counter.textContent = max === Infinity ? '' : '(' + used + ' / ' + max + ')';
+        var banner = document.getElementById('unitPlanLimitBanner');
+        if (banner) banner.style.display = (used >= max && max !== Infinity) ? '' : 'none';
+      } catch(e) {}
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  REMINDER TIMEZONE CONVERSION
+    // ═══════════════════════════════════════════════════════════
+    function localTimeToUtc(timeStr, timezone) {
+      // timeStr = "HH:MM", timezone = IANA timezone
+      var today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+      try {
+        var dt = new Date(today + 'T' + timeStr + ':00');
+        var utc = new Intl.DateTimeFormat('en-CA', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timezone }).format(dt);
+        // Use the inverse: find UTC equivalent
+        var localParts = new Intl.DateTimeFormat('en-CA', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timezone }).formatToParts(dt);
+        // Simple approach: offset calculation
+        var localDate = new Date(today + 'T' + timeStr + ':00');
+        var utcStr = localDate.toLocaleString('en-CA', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hour12: false });
+        // Get offset between timezone and UTC
+        var inTz = new Date(localDate.toLocaleString('en-US', { timeZone: timezone }));
+        var inUtc = new Date(localDate.toLocaleString('en-US', { timeZone: 'UTC' }));
+        var offset = inTz - inUtc; // ms, positive if east of UTC
+        var utcTime = new Date(localDate.getTime() - offset);
+        var h = String(utcTime.getUTCHours()).padStart(2, '0');
+        var m = String(utcTime.getUTCMinutes()).padStart(2, '0');
+        return h + ':' + m;
+      } catch(e) { return timeStr; }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  WEBSOCKET — REAL-TIME DASHBOARD UPDATES
+    // ═══════════════════════════════════════════════════════════
+    (function initDashboardWebSocket() {
+      var token = localStorage.getItem('token');
+      if (!token) return;
+      var protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      var ws;
+      var reconnectDelay = 2000;
+
+      function connect() {
+        ws = new WebSocket(protocol + '//' + location.host + '/ws?token=' + encodeURIComponent(token));
+
+        ws.onopen = function() { reconnectDelay = 2000; };
+
+        ws.onmessage = function(event) {
+          try {
+            var msg = JSON.parse(event.data);
+            var type = msg.type;
+
+            if (type === 'notification') {
+              var n = msg.notification || {};
+              if (n.type === 'maintenance' || n.type === 'approval_request') {
+                loadApprovalQueue();
+                if (n.type === 'maintenance') loadMaintenance && loadMaintenance();
+              }
+              // Push to notification panel if it exists
+              var badge = document.getElementById('notifBadge');
+              if (badge) { var cur = parseInt(badge.textContent || '0', 10); badge.textContent = cur + 1; badge.style.display = ''; }
+              var mobileBadge = document.getElementById('mobileNotifBadge');
+              if (mobileBadge) { var mc = parseInt(mobileBadge.textContent || '0', 10); mobileBadge.textContent = mc + 1; mobileBadge.style.display = ''; }
+            }
+
+            if (type === 'new_maintenance' || type === 'approval_needed') {
+              loadApprovalQueue();
+              if (type === 'new_maintenance' && window.loadMaintenance) loadMaintenance();
+            }
+
+            if (type === 'message_sent') {
+              showToastWs('Message sent to ' + (msg.payload && msg.payload.to ? msg.payload.to : 'tenant'));
+            }
+          } catch(e) {}
+        };
+
+        ws.onclose = function() {
+          setTimeout(connect, reconnectDelay);
+          reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+        };
+
+        ws.onerror = function() { ws.close(); };
+      }
+
+      function showToastWs(msg) {
+        var el = document.getElementById('toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('show');
+        setTimeout(function() { el.classList.remove('show'); }, 3000);
+      }
+
+      connect();
+    })();
+
+    // ═══════════════════════════════════════════════════════════
+    //  HOOK INTO EXISTING HANDLERS (lease fields, unit limits, timezone)
+    // ═══════════════════════════════════════════════════════════
+
+    // Patch createTenantBtn to include lease fields
+    (function() {
+      var btn = document.getElementById('createTenantBtn');
+      if (!btn) return;
+      var origClone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(origClone, btn);
+      origClone.addEventListener('click', async function () {
+        var name = document.getElementById('tenantName').value.trim();
+        var phone = document.getElementById('tenantPhone').value.trim();
+        var email = document.getElementById('tenantEmail').value.trim();
+        var unitId = document.getElementById('tenantUnit').value.trim();
+        var leaseEnd = document.getElementById('tenantLeaseEnd') ? document.getElementById('tenantLeaseEnd').value : '';
+        var rentAmountStr = document.getElementById('tenantRentAmount') ? document.getElementById('tenantRentAmount').value.trim() : '';
+        if (!name) return toast('Name required');
+        var body = { name: name, phone: phone || undefined, email: email || undefined, unitId: unitId || undefined };
+        if (leaseEnd) body.leaseEnd = leaseEnd;
+        if (rentAmountStr) body.rentAmount = Math.round(parseFloat(rentAmountStr) * 100);
+        try {
+          await fetchJson('/admin/tenants', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+          toast('Tenant created');
+          ['tenantName','tenantPhone','tenantEmail','tenantLeaseEnd','tenantRentAmount'].forEach(function(id) { var el = document.getElementById(id); if(el) el.value = ''; });
+          loadTenants && loadTenants();
+          loadUnitPlanLimits();
+        } catch (err) { toast('Failed: ' + err.message); }
+      });
+    })();
+
+    // Patch createUnitBtn to show plan limit banner on 403
+    (function() {
+      var btn = document.getElementById('createUnitBtn');
+      if (!btn) return;
+      var origClone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(origClone, btn);
+      origClone.addEventListener('click', async function () {
+        var label = document.getElementById('unitLabel').value.trim();
+        var address = document.getElementById('unitAddress').value.trim();
+        if (!label || !address) return toast('Label and address required');
+        try {
+          await fetchJson('/admin/units', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label: label, address: address }) });
+          toast('Unit created');
+          document.getElementById('unitLabel').value = '';
+          document.getElementById('unitAddress').value = '';
+          loadUnits && loadUnits();
+          loadUnitPlanLimits();
+        } catch (err) {
+          if (err.message && err.message.includes('plan_limit')) {
+            document.getElementById('unitPlanLimitBanner').style.display = '';
+          } else { toast('Failed: ' + err.message); }
+        }
+      });
+    })();
+
+    // Patch reminder save to convert local time to UTC using timezone
+    (function() {
+      var btn = document.getElementById('saveReminder');
+      if (!btn) return;
+      var orig = btn.cloneNode(true);
+      btn.parentNode.replaceChild(orig, btn);
+      orig.addEventListener('click', async function() {
+        var type = document.getElementById('reminderType').value;
+        var day = document.getElementById('reminderDay').value;
+        var timeLocal = document.getElementById('reminderTime').value.trim();
+        var style = document.getElementById('reminderStyle').value;
+        var tzEl = document.getElementById('reminderTimezone');
+        var tz = tzEl ? tzEl.value : 'UTC';
+        if (!day || !timeLocal) return toast('Day and time required');
+        var timeUtc = localTimeToUtc(timeLocal, tz);
+        try {
+          await fetchJson('/admin/reminders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, dayOfMonth: parseInt(day), timeUtc: timeUtc, style: style, timezone: tz }) });
+          toast('Reminder added'); loadReminders && loadReminders();
+        } catch(e) { toast('Failed: ' + e.message); }
+      });
+    })();
+
+    // Patch WhatsApp section to show/hide empty state
+    (function() {
+      var origDashInitQR = window.dashInitQR;
+      var origDashCheckState = window.dashCheckState;
+      function updateWaEmptyState(isConnected) {
+        var emptyState = document.getElementById('waNotConnectedState');
+        var chat = document.getElementById('waNestMindChat');
+        if (!emptyState) return;
+        if (isConnected) { emptyState.style.display = 'none'; }
+        else { if (chat && chat.style.display === 'none') emptyState.style.display = ''; }
+      }
+      // Check on load
+      fetchJson('/admin/whatsapp/instance/mine').then(function(mine) {
+        updateWaEmptyState(mine && mine.state === 'open');
+      }).catch(function() { updateWaEmptyState(false); });
+    })();
+
+    // Load plan limits on startup
+    loadUnitPlanLimits();
+    // Load approval queue on startup
+    loadApprovalQueue();
 
   </script>
 </body>

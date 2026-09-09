@@ -183,7 +183,9 @@ model UnitTenant {
 	unitId              String
 	role                String   @default("tenant") // "tenant" | "resident"
 	utilitySharePercent Float?
-	rentAmountCents    Int?      // monthly rent in cents
+	rentAmountCents     Int?     // monthly rent in cents
+	leaseEnd            DateTime?
+	rentDueDay          Int?     @default(1)
 	startDate           DateTime @default(now())
 	endDate             DateTime?
 	leaseDocuments      LeaseDocument[]

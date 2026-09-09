@@ -494,6 +494,9 @@ export async function createTenant(params: {
   unitId?: string;
   landlordId?: string;
   autoReplyEnabled?: boolean;
+  leaseEnd?: string | Date | null;
+  rentAmount?: number | null;
+  rentDueDay?: number | null;
 }) {
   if (!isDbEnabled) return null;
   // Normalize empty strings to null so unique constraints work
@@ -511,7 +514,15 @@ export async function createTenant(params: {
       },
     });
     if (params.unitId) {
-      await db.unitTenant.create({ data: { unitId: params.unitId, tenantId: record.id } });
+      await db.unitTenant.create({
+        data: {
+          unitId: params.unitId,
+          tenantId: record.id,
+          leaseEnd: params.leaseEnd ? new Date(params.leaseEnd) : undefined,
+          rentAmount: params.rentAmount ?? undefined,
+          rentDueDay: params.rentDueDay ?? undefined,
+        },
+      });
     }
     return record;
   } catch (err) {

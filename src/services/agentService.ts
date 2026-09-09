@@ -43,6 +43,7 @@ type UtilityCheckResult = {
 
 type DraftResult = {
   draft: string;
+  confidence: "low" | "medium" | "high";
   skillLoaded: boolean;
   generatedAt: string;
   source: "initial" | "refine";
@@ -599,6 +600,7 @@ export async function draftRtaResponse(params: {
   if (!modelAvailable()) {
     return {
       draft: "Vertex AI not configured. Set GOOGLE_PROJECT_ID/LOCATION to enable drafting.",
+      confidence: "medium" as const,
       ...basePayload,
       source: "initial",
       notes: "vertex_not_configured",
@@ -641,24 +643,43 @@ export async function draftRtaResponse(params: {
     landlordPosition ? "--- LAST LANDLORD POSITION ---\n" + landlordPosition : "",
     "--- TENANT MESSAGE ---",
     params.tenantMessage || "",
+    "",
+    "--- OUTPUT FORMAT ---",
+    "Respond with valid JSON only (no markdown, no code block):",
+    '{"draft": "<your 2-4 sentence reply>", "confidence": "high|medium|low"}',
+    "confidence rules: high=clear standard request with obvious resolution; medium=some ambiguity or investigation needed; low=legal uncertainty, missing context, or unusual situation.",
   ].join("\n\n");
 
-  const draft = await runGemini(prompt);
+  const raw = await runGemini(prompt);
 
-  if (isLlmFallback(draft)) {
+  if (isLlmFallback(raw)) {
     return {
       draft: "LLM temporarily unavailable. Please try again in a few minutes.",
+      confidence: "medium",
       ...basePayload,
       source: "initial",
-      notes: draft,
+      notes: raw,
     };
   }
 
-  return {
-    draft,
-    ...basePayload,
-    source: "initial",
-  };
+  // Parse JSON response; fall back to treating raw as the draft
+  try {
+    const jsonStr = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+    const parsed = JSON.parse(jsonStr);
+    return {
+      draft: String(parsed.draft || raw),
+      confidence: (["low", "medium", "high"].includes(parsed.confidence) ? parsed.confidence : "medium") as "low" | "medium" | "high",
+      ...basePayload,
+      source: "initial",
+    };
+  } catch {
+    return {
+      draft: raw,
+      confidence: "medium",
+      ...basePayload,
+      source: "initial",
+    };
+  }
 }
 
 type RefineDraftParams = {
@@ -684,6 +705,7 @@ export async function refineDraft(params: RefineDraftParams): Promise<DraftResul
   if (!trimmedInstructions) {
     return {
       draft: baseDraft || "No instructions provided.",
+      confidence: "medium" as const,
       ...basePayload,
       source: "refine",
       notes: "missing_instructions",
@@ -693,6 +715,7 @@ export async function refineDraft(params: RefineDraftParams): Promise<DraftResul
   if (!baseDraft) {
     return {
       draft: "No existing draft to refine. Generate an initial draft first.",
+      confidence: "medium" as const,
       ...basePayload,
       source: "refine",
       instructions: trimmedInstructions,
@@ -703,6 +726,7 @@ export async function refineDraft(params: RefineDraftParams): Promise<DraftResul
   if (!modelAvailable()) {
     return {
       draft: baseDraft,
+      confidence: "medium" as const,
       ...basePayload,
       source: "refine",
       instructions: trimmedInstructions,
@@ -738,6 +762,7 @@ export async function refineDraft(params: RefineDraftParams): Promise<DraftResul
   if (isLlmFallback(refined)) {
     return {
       draft: baseDraft || "LLM temporarily unavailable. Please try again later.",
+      confidence: "medium" as const,
       ...basePayload,
       source: "refine",
       instructions: trimmedInstructions,
@@ -748,6 +773,7 @@ export async function refineDraft(params: RefineDraftParams): Promise<DraftResul
 
   return {
     draft: refined || baseDraft,
+    confidence: "medium" as const,
     ...basePayload,
     source: "refine",
     instructions: trimmedInstructions,

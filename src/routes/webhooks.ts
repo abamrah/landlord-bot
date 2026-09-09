@@ -469,6 +469,17 @@ async function maybeRunAutopilot(record: any, triage: any, aiDraft: any, reason 
     });
     return false;
   }
+  const draftConfidence = (aiDraft?.confidence || record?.aiDraft?.confidence || "medium").toString().toLowerCase();
+  if (draftConfidence === "low") {
+    await repo.logAutopilotEvent({
+      id: record.id,
+      type: "skip",
+      message: "Autopilot blocked: AI flagged low confidence in draft",
+      status: "blocked_confidence",
+      meta: { severity, reason, confidence: draftConfidence },
+    });
+    return false;
+  }
   const chatLog = Array.isArray(record.chatLog) ? record.chatLog : [];
   const lastEntry = chatLog[chatLog.length - 1];
   if (lastEntry?.role !== "tenant") {
